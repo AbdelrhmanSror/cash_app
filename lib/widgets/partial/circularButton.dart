@@ -6,13 +6,12 @@ class CircularButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () => {},
+    return Container(
+      width: 40,
+      height: 40,
       child: Icon(icon, size: 20, color: const Color(0xFF281361)),
-      style: ElevatedButton.styleFrom(
-          elevation: 0,
-          shape: const CircleBorder(),
-          primary: Color(0xFFF0F6FC)),
+      decoration:
+          BoxDecoration(shape: BoxShape.circle, color: Color(0xFFe0f2f1)),
     );
   }
 }

@@ -114,48 +114,55 @@ class OperationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double balance = model.totalCashIn - model.totalCashOut;
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(children: [
-          const CircularButton(icon: Icons.add_outlined),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: CircularButton(
+                  icon: (model.type == CASH_IN ? Icons.add : Icons.remove)),
+            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                padding: const EdgeInsets.only(bottom: 4),
+                constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
+                child: AppTextWithDot(
+                    text: model.date,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: const Color(0xFF281361)),
+              ),
+              CompositeWidget(
+                width: 150,
+                widgets: [
+                  AppTextWithDot(text: 'Balance ', color: Colors.grey),
+                  AppTextWithDot(
+                      text: '${(balance).abs()} EGP',
+                      color: balance < 0 ? Colors.red : Colors.greenAccent)
+                ],
+              )
+            ])
+          ]),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
-              padding: EdgeInsets.only(bottom: 8),
-              constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
+              padding: const EdgeInsets.only(bottom: 4),
+              constraints: const BoxConstraints(minWidth: 1, maxWidth: 100),
               child: AppTextWithDot(
-                  text: model.date,
+                  text: '${model.cash} EGP',
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: const Color(0xFF281361)),
+                  color:
+                      model.type == CASH_OUT ? Colors.red : Colors.greenAccent),
             ),
-            CompositeWidget(
-              width: 150,
-              widgets: [
-                AppTextWithDot(text: 'Balance ', color: Colors.grey),
-                AppTextWithDot(
-                    text: '${(balance).abs()} EGP',
-                    color: balance < 0 ? Colors.red : Colors.greenAccent)
-              ],
-            )
-          ])
-        ]),
-        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Container(
-            padding: EdgeInsets.only(bottom: 8),
-            constraints: const BoxConstraints(minWidth: 1, maxWidth: 100),
-            child: AppTextWithDot(
-                text: '${model.cash} EGP',
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color:
-                    model.type == CASH_OUT ? Colors.red : Colors.greenAccent),
-          ),
-          Text(model.type,
-              style: const TextStyle(fontSize: 10, color: Colors.grey)),
-        ]),
-      ],
+            Text(model.type,
+                style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          ]),
+        ],
+      ),
     );
   }
 }

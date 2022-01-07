@@ -59,6 +59,7 @@ class _CashScreenState extends State<CashScreen> {
   final _detailsFieldController = TextEditingController();
 
   var opacity = 0.0;
+  var showDetailTextField = false;
 
   TextField cashNumberField() {
     return TextField(
@@ -67,10 +68,12 @@ class _CashScreenState extends State<CashScreen> {
         if (text.isEmpty) {
           setState(() {
             opacity = 0.0;
+            showDetailTextField = false;
           });
         } else {
           setState(() {
             opacity = 1.0;
+            showDetailTextField = true;
           });
         }
       },
@@ -91,6 +94,7 @@ class _CashScreenState extends State<CashScreen> {
     return Opacity(
         opacity: opacity,
         child: TextFormField(
+            enabled: showDetailTextField,
             controller: _detailsFieldController,
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
