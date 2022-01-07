@@ -1,5 +1,5 @@
 import 'package:debts_app/database/AppDataModel.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeTextWidget.dart';
+import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,13 +18,11 @@ class InOutCashDetails extends StatelessWidget {
         (models != null && models!.isNotEmpty) ? models![0].totalCashOut : 0;
 
     return Row(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        CompositeTextWidget(
-          width: 200,
-          texts: [
+        CompositeWidget(
+          width: 150,
+          widgets: [
             AppTextWithDot(
               text: 'Cash in',
               color: Colors.grey,
@@ -49,9 +47,9 @@ class InOutCashDetails extends StatelessWidget {
             endIndent: 10,
           ),
         ),
-        CompositeTextWidget(
+        CompositeWidget(
           width: 200,
-          texts: [
+          widgets: [
             AppTextWithDot(
               text: 'Cash out',
               color: Colors.grey,

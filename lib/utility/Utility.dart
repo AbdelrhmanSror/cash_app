@@ -15,12 +15,22 @@ class Utility {
     return balance;
   }
 
-  static int getSize(List<AppModel> data) {
-    //if the type is emptyApp model then this means the database is empty .
-    if (data[0] is! EmptyAppModel) {
+  static int getSize(List<AppModel>? data) {
+    //if the type is emptyApp model then this means the database is empty  and the call is from the database.
+    //if the the data is empty and the call is not from the database
+    if (data != null && data[0] is! EmptyAppModel) {
       return data.length;
     } else {
       return 0;
+    }
+  }
+
+  static bool fromDatabase(List<AppModel>? data) {
+    //if the the data is empty and the call is not from the database
+    if (data == null) {
+      return false;
+    } else {
+      return true;
     }
   }
 }

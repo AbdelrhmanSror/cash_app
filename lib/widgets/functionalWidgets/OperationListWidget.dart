@@ -2,44 +2,47 @@ import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partialWidgets/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeTextWidget.dart';
+import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
 import 'package:debts_app/widgets/partialWidgets/circularButton.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class OperationListWidget extends StatefulWidget {
-  OperationListWidget({required this.models, required this.height, Key? key})
-      : super(key: key);
-  final List<AppModel> models;
-  final double height;
+  OperationListWidget({required this.models, required this.onPressed, Key? key})
+      : super(key: key) {}
+
+  List<AppModel>? models;
+  Function(AppModel) onPressed;
 
   @override
   State<OperationListWidget> createState() => _OperationListWidgetState();
 }
 
 class _OperationListWidgetState extends State<OperationListWidget> {
+  bool _showLoadingBar = false;
+
+  @override
+  void initState() {
+    super.initState();
+    print('INITIALIZE STATE OF LIST');
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    double screenHeight = size.height;
-    double abovePadding = MediaQuery.of(context).padding.top;
-    double appBarHeight = 50;
-    double leftHeight = screenHeight - abovePadding - appBarHeight;
-    double height50 = leftHeight * 0.3;
-
-    return SizedBox(
-      width: double.infinity,
-      height: height50,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: _buildSuggestions(),
-      ),
+    print('BUILDING OF LIST');
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: _buildSuggestions(),
     );
   }
 
   Widget _buildSuggestions() {
     int count = Utility.getSize(widget.models);
     print('SIZE IS $count');
+    if (!Utility.fromDatabase(widget.models)) {
+      _showLoadingBar = true;
+    } else {
+      _showLoadingBar = false;
+    }
     if (count == 0) return _buildEmptyWidget();
     return ListView.separated(
         itemCount: count,
@@ -49,42 +52,68 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildEmptyWidget() {
+    var opacity = 0.0;
+    if (!_showLoadingBar) opacity = 1;
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        AppTextWithDot(
-          text: 'No Operations',
-          color: Color(0xFACDCACA),
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-        ),
-        CircularProgressIndicator(
-          strokeWidth: 3,
-        ),
-        Column(
-          children: [
-            AppTextWithDot(
-              text: 'Add new operation',
-              color: Colors.blue,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-            Image.asset(
-              'assets/images/1f447.png',
-              width: 20,
-              height: 15,
-            )
-          ],
-        )
+        Opacity(
+            opacity: opacity,
+            child: AppTextWithDot(
+              text: 'No Operations',
+              color: Color(0xFACDCACA),
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            )),
+        Visibility(
+            visible: _showLoadingBar,
+            child: const CircularProgressIndicator(
+              strokeWidth: 3,
+            )),
+        Opacity(
+            opacity: opacity,
+            child: Column(
+              children: [
+                AppTextWithDot(
+                  text: 'Add new operation',
+                  color: Colors.blue,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                Image.asset(
+                  'assets/images/1f447.png',
+                  width: 20,
+                  height: 15,
+                )
+              ],
+            ))
       ],
     );
   }
 
   Widget _buildRow(int index) {
-    final double balance =
-        widget.models[index].totalCashIn - widget.models[index].totalCashOut;
+    return InkWell(
+        child: OperationTile(model: widget.models![index]),
+        onTap: () {
+          print('index $index');
+          widget.onPressed(widget.models![index]);
+        });
+  }
+}
+
+class OperationTile extends StatelessWidget {
+  const OperationTile({
+    Key? key,
+    required this.model,
+  }) : super(key: key);
+
+  final AppModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    final double balance = model.totalCashIn - model.totalCashOut;
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,15 +124,15 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             Container(
               constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
               child: AppTextWithDot(
-                  text: widget.models[index].date,
+                  text: model.date,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   color: const Color(0xFF281361)),
             ),
-            CompositeTextWidget(
+            CompositeWidget(
               width: 150,
-              texts: [
-                AppTextWithDot(text: 'Balance', color: Colors.grey),
+              widgets: [
+                AppTextWithDot(text: 'Balance ', color: Colors.grey),
                 AppTextWithDot(
                     text: '${(balance).abs()} EGP',
                     color: balance < 0 ? Colors.red : Colors.greenAccent)
@@ -115,14 +144,13 @@ class _OperationListWidgetState extends State<OperationListWidget> {
           Container(
             constraints: const BoxConstraints(minWidth: 1, maxWidth: 100),
             child: AppTextWithDot(
-                text: '${widget.models[index].cash} EGP',
+                text: '${model.cash} EGP',
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: widget.models[index].type == CASH_OUT
-                    ? Colors.red
-                    : Colors.greenAccent),
+                color:
+                    model.type == CASH_OUT ? Colors.red : Colors.greenAccent),
           ),
-          Text(widget.models[index].type,
+          Text(model.type,
               style: const TextStyle(fontSize: 10, color: Colors.grey)),
         ]),
       ],

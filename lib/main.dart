@@ -1,6 +1,8 @@
 import 'package:debts_app/bottomNavigation.dart';
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/widgets/screens/CashBookScreen.dart';
+import 'package:debts_app/widgets/screens/CashInScreen.dart';
+import 'package:debts_app/widgets/screens/CashOutScreen.dart';
 import 'package:flutter/material.dart';
 
 final database = AppDatabase();
@@ -38,13 +40,10 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
   //screen to navigate in bottom navigation bar.
   List<Widget> _widgetOptions() {
     CashBookScreen screen1 = CashBookScreen();
-    CashBookScreen screen2 = CashBookScreen();
-    CashBookScreen screen3 = CashBookScreen();
-    return [
-      screen1,
-      screen2,
-      screen3,
-    ];
+    CashInScreen screen2 = CashInScreen();
+    CashOutScreen screen3 = CashOutScreen();
+
+    return [screen1, screen2, screen3];
   }
 
   //updating the index when tap on bar on bottom navigation so the widget rebuilds its self,
@@ -58,16 +57,6 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 50,
-        backgroundColor: Theme.of(context).canvasColor,
-        elevation: 0,
-        title: const Text(
-          'DEBTS',
-          style: TextStyle(
-              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-      ),
       body: _widgetOptions()[_selectedIndex],
       bottomNavigationBar: MyBottomNavigation(
         selectedIndex: _selectedIndex,

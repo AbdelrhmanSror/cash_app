@@ -7,9 +7,13 @@ import 'package:sqflite/sqflite.dart';
 
 //callback for database
 abstract class AppDatabaseListener {
-  void onInsertionDatabase(AppModel model);
+  void onInsertDatabase(AppModel model);
 
-  void onDeletionDatabase(AppModel model);
+  void onDeleteAllDatabase(AppModel model);
+
+  void onDeleteDatabase(int id);
+
+  void onUpdateDatabase(AppModel model);
 
   void onLoadingDatabase(bool active);
 
@@ -17,23 +21,8 @@ abstract class AppDatabaseListener {
 }
 
 class EmptyAppModel extends AppModel {
-  @override
-  final String date;
-  @override
-  final double cash;
-  @override
-  final double totalCashIn;
-  @override
-  final double totalCashOut;
-  @override
-  final String type;
-
   EmptyAppModel(
-      {this.date = '',
-      this.cash = 0,
-      this.totalCashIn = 0,
-      this.totalCashOut = 0,
-      this.type = ''})
+      {date = '', cash = 0.0, totalCashIn = 0.0, totalCashOut = 0.0, type = ''})
       : super(
             date: date,
             cash: cash,
@@ -48,6 +37,7 @@ class AppModel {
   final double cash;
   double totalCashIn;
   double totalCashOut;
+  final String description;
   final String type;
 
   AppModel(
@@ -55,6 +45,7 @@ class AppModel {
       required this.date,
       this.totalCashIn = 0,
       this.totalCashOut = 0,
+      this.description = '',
       required this.cash,
       required this.type});
 
@@ -66,6 +57,7 @@ class AppModel {
       'cash': cash,
       'totalCashIn': totalCashIn,
       'totalCashOut': totalCashOut,
+      'description': description,
       'type': type
     };
   }
@@ -84,7 +76,7 @@ class AppDatabase {
 
   void _alertOnInsertion(AppModel models) {
     for (var listener in _listeners) {
-      listener.onInsertionDatabase(models);
+      listener.onInsertDatabase(models);
     }
   }
 
@@ -100,9 +92,21 @@ class AppDatabase {
     }
   }
 
-  void _alertOnDelete(AppModel models) {
+  void _alertOnDeleteAll(AppModel models) {
     for (var listener in _listeners) {
-      listener.onDeletionDatabase(models);
+      listener.onDeleteAllDatabase(models);
+    }
+  }
+
+  void _alertOnDelete(int id) {
+    for (var listener in _listeners) {
+      listener.onDeleteDatabase(id);
+    }
+  }
+
+  void _alertOnUpdate(AppModel models) {
+    for (var listener in _listeners) {
+      listener.onUpdateDatabase(models);
     }
   }
 
@@ -117,7 +121,7 @@ class AppDatabase {
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
         return db.execute(
-          'CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, date TEXT, totalCashIn DOUBLE,totalCashOut DOUBLE,cash DOUBLE,type TEXT)',
+          'CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, date TEXT, totalCashIn DOUBLE,totalCashOut DOUBLE,cash DOUBLE,type TEXT,description TEXT)',
         );
       },
       // Set the version. This executes the onCreate function and provides a
@@ -169,6 +173,7 @@ class AppDatabase {
           totalCashIn: maps[i]['totalCashIn'],
           totalCashOut: maps[i]['totalCashOut'],
           cash: maps[i]['cash'],
+          description: maps[i]['description'],
           type: maps[i]['type']);
     });
     print('MODELS AFTER LATEST');
@@ -195,6 +200,7 @@ class AppDatabase {
           totalCashIn: maps[i]['totalCashIn'],
           totalCashOut: maps[i]['totalCashOut'],
           cash: maps[i]['cash'],
+          description: maps[i]['description'],
           type: maps[i]['type']);
     });
     if (models.isEmpty) {
@@ -202,6 +208,37 @@ class AppDatabase {
     }
     _alertOnLoading(false);
     _alertOnStart(models);
+  }
+
+  Future<void> updateModel(AppModel model) async {
+    // Get a reference to the database.
+    final db = await (_database ?? _init());
+
+    // Update the given model.
+    await db.update(
+      _tableName,
+      model.toMap(),
+      // Ensure that the model has a matching id.
+      where: 'id = ?',
+      // Pass the model's id as a whereArg to prevent SQL injection.
+      whereArgs: [model.id],
+    );
+    _alertOnUpdate(model);
+  }
+
+  Future<void> deleteModel(int id) async {
+    // Get a reference to the database.
+    final db = await (_database ?? _init());
+
+    // Remove the Dog from the database.
+    await db.delete(
+      _tableName,
+      // Use a `where` clause to delete a specific model.
+      where: 'id = ?',
+      // Pass the Model's id as a whereArg to prevent SQL injection.
+      whereArgs: [id],
+    );
+    _alertOnDelete(id);
   }
 
   void deleteAll() async {
@@ -215,6 +252,6 @@ class AppDatabase {
       /*where: 'id = ?',*/
       // Pass the Dog's id as a whereArg to prevent SQL injection.
     );
-    _alertOnDelete(EmptyAppModel());
+    _alertOnDeleteAll(EmptyAppModel());
   }
 }

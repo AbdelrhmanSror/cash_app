@@ -1,22 +1,19 @@
-import 'package:debts_app/database/AppDataModel.dart';
-import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partialWidgets/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeTextWidget.dart';
+import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class NetBalanceWidget extends StatelessWidget {
   NetBalanceWidget({
-    required this.models,
+    required this.netBalance,
     Key? key,
   }) : super(key: key);
-  final List<AppModel>? models;
+  final double netBalance;
 
   @override
   Widget build(BuildContext context) {
-    final balance = Utility.getBalance(models![0]);
-    return CompositeTextWidget(
-      width: 150,
-      texts: [
+    return CompositeWidget(
+      width: 250,
+      widgets: [
         AppTextWithDot(
           text: 'Net balance',
           color: const Color(0xFACDCACA),
@@ -24,8 +21,8 @@ class NetBalanceWidget extends StatelessWidget {
           fontWeight: FontWeight.normal,
         ),
         AppTextWithDot(
-          text: ' ${(balance).abs()} EGP',
-          color: balance < 0 ? Colors.red : Colors.greenAccent,
+          text: ' ${(netBalance).abs()} EGP',
+          color: netBalance < 0 ? Colors.red : Colors.greenAccent,
           fontSize: 13,
           fontWeight: FontWeight.normal,
         )

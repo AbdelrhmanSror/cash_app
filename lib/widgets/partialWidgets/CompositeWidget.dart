@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CompositeTextWidget extends StatelessWidget {
-  CompositeTextWidget(
+class CompositeWidget extends StatelessWidget {
+  CompositeWidget(
       {required this.width,
-      required this.texts,
+      required this.widgets,
       this.vertical = false,
       Key? key})
       : super(key: key);
-  List<Widget> texts = [];
+  List<Widget> widgets = [];
   bool vertical;
   final double width;
 
@@ -15,22 +15,25 @@ class CompositeTextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (vertical) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          for (var i = 0; i < texts.length; i++)
+          for (var i = 0; i < widgets.length; i++)
             Container(
+                //to limit the width the widget can expand
                 constraints: BoxConstraints(minWidth: 1, maxWidth: width),
-                child: texts[i]),
+                child: widgets[i]),
         ],
       );
     }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        for (var i = 0; i < texts.length; i++)
+        for (var i = 0; i < widgets.length; i++)
           Container(
+              //to limit the width the widget can expand
               constraints: BoxConstraints(minWidth: 1, maxWidth: width),
-              child: texts[i]),
+              child: widgets[i]),
       ],
     );
   }
