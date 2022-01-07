@@ -1,17 +1,18 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Utility.dart';
-import 'package:debts_app/widgets/partialWidgets/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
-import 'package:debts_app/widgets/partialWidgets/circularButton.dart';
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/CompositeWidget.dart';
+import 'package:debts_app/widgets/partial/circularButton.dart';
 import 'package:flutter/material.dart';
 
 class OperationListWidget extends StatefulWidget {
-  OperationListWidget({required this.models, required this.onPressed, Key? key})
-      : super(key: key) {}
+  const OperationListWidget(
+      {required this.models, required this.onPressed, Key? key})
+      : super(key: key);
 
-  List<AppModel>? models;
-  Function(AppModel) onPressed;
+  final List<AppModel>? models;
+  final Function(AppModel) onPressed;
 
   @override
   State<OperationListWidget> createState() => _OperationListWidgetState();
@@ -63,7 +64,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             opacity: opacity,
             child: AppTextWithDot(
               text: 'No Operations',
-              color: Color(0xFACDCACA),
+              color: const Color(0xFACDCACA),
               fontSize: 12,
               fontWeight: FontWeight.normal,
             )),
@@ -97,7 +98,6 @@ class _OperationListWidgetState extends State<OperationListWidget> {
     return InkWell(
         child: OperationTile(model: widget.models![index]),
         onTap: () {
-          print('index $index');
           widget.onPressed(widget.models![index]);
         });
   }
@@ -122,6 +122,7 @@ class OperationTile extends StatelessWidget {
           const CircularButton(icon: Icons.add_outlined),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
+              padding: EdgeInsets.only(bottom: 8),
               constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
               child: AppTextWithDot(
                   text: model.date,
@@ -142,6 +143,7 @@ class OperationTile extends StatelessWidget {
         ]),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Container(
+            padding: EdgeInsets.only(bottom: 8),
             constraints: const BoxConstraints(minWidth: 1, maxWidth: 100),
             child: AppTextWithDot(
                 text: '${model.cash} EGP',

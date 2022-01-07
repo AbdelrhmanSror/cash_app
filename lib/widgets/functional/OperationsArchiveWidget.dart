@@ -1,6 +1,5 @@
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:flutter/material.dart';
-
-import '../partialWidgets/AppTextWithDots.dart';
 
 class OperationsArchiveWidget extends StatelessWidget {
   const OperationsArchiveWidget({
@@ -21,7 +20,7 @@ class OperationsArchiveWidget extends StatelessWidget {
           backgroundColor: MaterialStateColor.resolveWith(
               (states) => Theme.of(context).canvasColor),
           padding: MaterialStateProperty.all<EdgeInsets>(
-              EdgeInsets.fromLTRB(60, 5, 60, 5))),
+              const EdgeInsets.fromLTRB(60, 5, 60, 5))),
       onPressed: onPressed,
       child: AppTextWithDot(
         text: 'Operations archive',

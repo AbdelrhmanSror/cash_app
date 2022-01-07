@@ -1,5 +1,5 @@
-import 'package:debts_app/widgets/partialWidgets/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class OperationNumberWidget extends StatelessWidget {
@@ -24,17 +24,17 @@ class OperationNumberWidget extends StatelessWidget {
             text: '(',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: Color(0xFACDCACA)),
+            color: const Color(0xFACDCACA)),
         AppTextWithDot(
             text: '$countNumber',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: Color(0xFACDCACA)),
+            color: const Color(0xFACDCACA)),
         AppTextWithDot(
             text: ')',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: Color(0xFACDCACA)),
+            color: const Color(0xFACDCACA)),
       ],
     );
   }

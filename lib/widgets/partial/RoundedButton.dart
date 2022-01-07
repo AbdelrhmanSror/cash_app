@@ -2,24 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RoundedButton extends StatelessWidget {
-  RoundedButton({
+  const RoundedButton({
     required this.text,
     required this.radius,
     required this.backgroundColor,
-    required this.padding_left,
-    required this.padding_top,
-    required this.padding_right,
-    required this.padding_bottom,
+    required this.paddingLeft,
+    required this.paddingTop,
+    required this.paddingRight,
+    required this.paddingBottom,
     required this.onPressed,
     Key? key,
   }) : super(key: key);
   final Widget text;
   final double radius;
   final Color backgroundColor;
-  final double padding_left;
-  final double padding_top;
-  final double padding_right;
-  final double padding_bottom;
+  final double paddingLeft;
+  final double paddingTop;
+  final double paddingRight;
+  final double paddingBottom;
   final Function() onPressed;
 
   @override
@@ -34,7 +34,7 @@ class RoundedButton extends StatelessWidget {
         backgroundColor:
             MaterialStateColor.resolveWith((states) => backgroundColor),
         padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(
-            padding_left, padding_top, padding_right, padding_bottom)),
+            paddingLeft, paddingTop, paddingRight, paddingBottom)),
       ),
       onPressed: onPressed,
       child: text,

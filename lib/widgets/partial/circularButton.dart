@@ -8,9 +8,11 @@ class CircularButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () => {},
-      child: Icon(icon, size: 20, color: Color(0xFF281361)),
+      child: Icon(icon, size: 20, color: const Color(0xFF281361)),
       style: ElevatedButton.styleFrom(
-          shape: CircleBorder(), primary: Color(0xFFF0F6FC)),
+          elevation: 0,
+          shape: const CircleBorder(),
+          primary: Color(0xFFF0F6FC)),
     );
   }
 }

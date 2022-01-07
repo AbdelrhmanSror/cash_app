@@ -1,19 +1,19 @@
 import 'package:debts_app/database/AppDataModel.dart';
+import 'package:debts_app/database/AppDatabaseCallback.dart';
 import 'package:debts_app/utility/Utility.dart';
-import 'package:debts_app/widgets/functionalWidgets/ArchiveButtonWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/CashInButtonWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/CashOutButtonWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/InOutCashDetails.dart';
-import 'package:debts_app/widgets/functionalWidgets/NetBalanceWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/OperationListWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/OperationNumberWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/OperationsArchiveWidget.dart';
-import 'package:debts_app/widgets/screens/CashInScreen.dart';
-import 'package:debts_app/widgets/screens/CashOutScreen.dart';
+import 'package:debts_app/widgets/functional/ArchiveButtonWidget.dart';
+import 'package:debts_app/widgets/functional/CashInButtonWidget.dart';
+import 'package:debts_app/widgets/functional/CashOutButtonWidget.dart';
+import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
+import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
+import 'package:debts_app/widgets/functional/OperationListWidget.dart';
+import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
+import 'package:debts_app/widgets/functional/OperationsArchiveWidget.dart';
 import 'package:debts_app/widgets/screens/ListDetailScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
+import 'CashScreen.dart';
 
 class CashBookScreen extends StatefulWidget {
   const CashBookScreen({Key? key}) : super(key: key);
@@ -58,19 +58,17 @@ class _CashBookScreenState extends State<CashBookScreen>
       body: Column(
         children: [
           Column(children: [
-            InOutCashDetails(models: _models),
+            buildInOutCashDetails(),
             const Divider(
               thickness: 0.5,
               color: Colors.blueGrey,
               indent: 20,
               endIndent: 20,
             ),
-            NetBalanceWidget(
-              netBalance: _models == null ? 0 : Utility.getBalance(_models![0]),
-            ),
+            buildNetBalanceWidget(),
             Container(
                 padding: const EdgeInsets.all(16.0),
-                child: OperationsArchiveWidget(onPressed: () {}))
+                child: buildOperationsArchiveWidget())
           ]),
           Expanded(
             child: Column(
@@ -81,42 +79,19 @@ class _CashBookScreenState extends State<CashBookScreen>
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        OperationNumberWidget(
-                            countNumber: Utility.getSize(_models)),
-                        ArchiveButtonWidget(onPressed: () => deleteAll())
+                        buildOperationNumberWidget(),
+                        buildArchiveButtonWidget()
                       ]),
                 ),
-                Expanded(
-                    child: OperationListWidget(
-                        models: _models,
-                        onPressed: (model) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ListDetailScreen(model: model)),
-                          );
-                        })),
+                Expanded(child: buildOperationListWidget(context)),
                 Container(
                   padding: const EdgeInsets.only(
                       left: 8, right: 8, top: 8, bottom: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      CashInButton(onCashInPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CashInScreen()),
-                        );
-                      }),
-                      CashOutButton(onCashOutPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CashOutScreen()),
-                        );
-                      })
+                      buildCashInButton(context),
+                      buildCashOutButton(context)
                     ],
                   ),
                 ),
@@ -127,6 +102,54 @@ class _CashBookScreenState extends State<CashBookScreen>
       ),
     );
   }
+
+  CashOutButton buildCashOutButton(BuildContext context) {
+    return CashOutButton(onCashOutPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CashOutScreen()),
+      );
+    });
+  }
+
+  CashInButton buildCashInButton(BuildContext context) {
+    return CashInButton(onCashInPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CashInScreen()),
+      );
+    });
+  }
+
+  OperationListWidget buildOperationListWidget(BuildContext context) {
+    return OperationListWidget(
+        models: _models,
+        onPressed: (model) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ListDetailScreen(model: model)),
+          );
+        });
+  }
+
+  ArchiveButtonWidget buildArchiveButtonWidget() =>
+      ArchiveButtonWidget(onPressed: () => deleteAll());
+
+  OperationNumberWidget buildOperationNumberWidget() {
+    return OperationNumberWidget(countNumber: Utility.getSize(_models));
+  }
+
+  OperationsArchiveWidget buildOperationsArchiveWidget() =>
+      OperationsArchiveWidget(onPressed: () {});
+
+  NetBalanceWidget buildNetBalanceWidget() {
+    return NetBalanceWidget(
+      netBalance: _models == null ? 0 : _models![0].getBalance(),
+    );
+  }
+
+  InOutCashDetails buildInOutCashDetails() => InOutCashDetails(models: _models);
 
   @override
   void onInsertDatabase(AppModel model) {

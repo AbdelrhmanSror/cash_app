@@ -1,10 +1,6 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
-
-import '../partialWidgets/AppTextWithDots.dart';
-import '../partialWidgets/RoundedButton.dart';
 
 class CashOutButton extends StatelessWidget {
   const CashOutButton({required this.onCashOutPressed, Key? key})
@@ -22,10 +18,10 @@ class CashOutButton extends StatelessWidget {
           color: Colors.red),
       backgroundColor: const Color(0xCCFDF1F3),
       radius: 5.0,
-      padding_top: 20,
-      padding_bottom: 20,
-      padding_left: 40,
-      padding_right: 40,
+      paddingTop: 20,
+      paddingBottom: 20,
+      paddingLeft: 40,
+      paddingRight: 40,
       onPressed: () => onCashOutPressed(),
     );
   }

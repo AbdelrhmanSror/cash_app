@@ -1,9 +1,9 @@
 import 'package:debts_app/bottomNavigation.dart';
-import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/widgets/screens/CashBookScreen.dart';
-import 'package:debts_app/widgets/screens/CashInScreen.dart';
-import 'package:debts_app/widgets/screens/CashOutScreen.dart';
+import 'package:debts_app/widgets/screens/CashScreen.dart';
 import 'package:flutter/material.dart';
+
+import 'database/AppDatabase.dart';
 
 final database = AppDatabase();
 

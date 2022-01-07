@@ -1,5 +1,5 @@
-import 'package:debts_app/widgets/partialWidgets/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class NetBalanceWidget extends StatelessWidget {

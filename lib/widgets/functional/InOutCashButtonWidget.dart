@@ -1,7 +1,8 @@
-import 'package:debts_app/widgets/functionalWidgets/CashInButtonWidget.dart';
-import 'package:debts_app/widgets/functionalWidgets/CashOutButtonWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'CashInButtonWidget.dart';
+import 'CashOutButtonWidget.dart';
 
 class InOutCashButton extends StatelessWidget {
   const InOutCashButton(

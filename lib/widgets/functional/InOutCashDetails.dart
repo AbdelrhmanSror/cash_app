@@ -1,9 +1,7 @@
 import 'package:debts_app/database/AppDataModel.dart';
-import 'package:debts_app/widgets/partialWidgets/CompositeWidget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
-
-import '../partialWidgets/AppTextWithDots.dart';
 
 class InOutCashDetails extends StatelessWidget {
   const InOutCashDetails({required this.models, Key? key}) : super(key: key);
@@ -30,7 +28,7 @@ class InOutCashDetails extends StatelessWidget {
               fontWeight: FontWeight.normal,
             ),
             AppTextWithDot(
-              text: '${totalCashIn} EGP',
+              text: '$totalCashIn EGP',
               color: Colors.greenAccent,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -57,7 +55,7 @@ class InOutCashDetails extends StatelessWidget {
               fontWeight: FontWeight.normal,
             ),
             AppTextWithDot(
-              text: '${totalCashOut} EGP',
+              text: '$totalCashOut EGP',
               color: Colors.red,
               fontSize: 18,
               fontWeight: FontWeight.bold,
