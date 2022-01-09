@@ -1,14 +1,19 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/main.dart';
 import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/DateFormatter.dart';
+import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
+import 'package:debts_app/widgets/screens/CashBookScreen.dart';
 import 'package:flutter/material.dart';
 
+import 'CashScreen.dart';
+
 class ListDetailScreen extends StatefulWidget {
-  const ListDetailScreen({required this.model, Key? key}) : super(key: key);
-  final AppModel model;
+  ListDetailScreen({required this.model, Key? key}) : super(key: key);
+  AppModel model;
 
   @override
   State<ListDetailScreen> createState() {
@@ -55,7 +60,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 child: Container(
                   padding:
                       const EdgeInsets.only(left: 8, right: 16, bottom: 32),
-                  child: buildUpdateButton(),
+                  child: buildEditButton(),
                 ),
               )
             ],
@@ -65,7 +70,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  RoundedButton buildUpdateButton() {
+  RoundedButton buildEditButton() {
     return RoundedButton(
         text: AppTextWithDot(
           text: 'EDIT',
@@ -78,7 +83,31 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingBottom: 16,
         paddingLeft: 16,
         paddingRight: 16,
-        onPressed: () {});
+        onPressed: () async {
+          AppModel result = EmptyAppModel();
+          if (widget.model.type == CASH_IN) {
+            result = await Navigator.of(context).push(
+                Utility.createAnimationRoute(
+                    CashInScreen(
+                        operationType: UPDATE, modelToEdit: widget.model),
+                    const Offset(0.0, 1.0),
+                    Offset.zero,
+                    Curves.ease));
+          } else {
+            result =
+                await Navigator.of(context).push(Utility.createAnimationRoute(
+                    CashOutScreen(
+                      operationType: UPDATE,
+                      modelToEdit: widget.model,
+                    ),
+                    const Offset(0.0, 1.0),
+                    Offset.zero,
+                    Curves.ease));
+          }
+          setState(() {
+            widget.model = result;
+          });
+        });
   }
 
   RoundedButton buildDeleteButton(BuildContext context) {
@@ -95,8 +124,38 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingLeft: 16,
         paddingRight: 16,
         onPressed: () {
-          database.deleteModel(widget.model.id);
-          Navigator.pop(context);
+          showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              elevation: 20,
+              content: const Text(
+                'Do you want to delete this operation?',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, 'Cancel');
+                  },
+                  child: const Text('CANCEL',
+                      style: TextStyle(color: Colors.blue)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    database.deleteModel(widget.model);
+                    Navigator.pop(context);
+                    Navigator.of(context).pop(Utility.createAnimationRoute(
+                        const CashBookScreen(),
+                        const Offset(0.1, 0.0),
+                        Offset.zero,
+                        Curves.ease));
+                  },
+                  child:
+                      const Text('DELETE', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          );
         });
   }
 
@@ -104,8 +163,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     return CompositeWidget(
       widgets: [
         AppTextWithDot(
-            text: widget.model.date,
-            color: Color(0xFF281361),
+            text: DateFormatter.getDateTimeRepresentation(
+                DateTime.parse(widget.model.date)),
+            color: const Color(0xFF281361),
             fontSize: 20,
             fontWeight: FontWeight.bold),
         const Divider(height: 20, color: Colors.white),

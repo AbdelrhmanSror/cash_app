@@ -24,7 +24,7 @@ class OperationNumberWidget extends StatelessWidget {
             text: '(',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: const Color(0xFACDCACA)),
+            color: Color(0xFACDCACA)),
         AppTextWithDot(
             text: '$countNumber',
             fontWeight: FontWeight.normal,
@@ -34,7 +34,7 @@ class OperationNumberWidget extends StatelessWidget {
             text: ')',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: const Color(0xFACDCACA)),
+            color: Color(0xFACDCACA)),
       ],
     );
   }

@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RoundedButton extends StatelessWidget {
-  const RoundedButton({
+  RoundedButton({
     required this.text,
     required this.radius,
     required this.backgroundColor,
@@ -11,6 +10,7 @@ class RoundedButton extends StatelessWidget {
     required this.paddingRight,
     required this.paddingBottom,
     required this.onPressed,
+    this.hide = false,
     Key? key,
   }) : super(key: key);
   final Widget text;
@@ -21,23 +21,27 @@ class RoundedButton extends StatelessWidget {
   final double paddingRight;
   final double paddingBottom;
   final Function() onPressed;
+  bool hide;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius),
+    return Opacity(
+      opacity: hide ? 0.0 : 1.0,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius),
+            ),
           ),
+          backgroundColor:
+              MaterialStateColor.resolveWith((states) => backgroundColor),
+          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(
+              paddingLeft, paddingTop, paddingRight, paddingBottom)),
         ),
-        backgroundColor:
-            MaterialStateColor.resolveWith((states) => backgroundColor),
-        padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(
-            paddingLeft, paddingTop, paddingRight, paddingBottom)),
+        onPressed: hide ? null : onPressed,
+        child: text,
       ),
-      onPressed: onPressed,
-      child: text,
     );
   }
 }

@@ -11,7 +11,7 @@ class CircularButton extends StatelessWidget {
       height: 40,
       child: Icon(icon, size: 20, color: const Color(0xFF281361)),
       decoration:
-          BoxDecoration(shape: BoxShape.circle, color: Color(0xFFe0f2f1)),
+          const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFe0f2f1)),
     );
   }
 }

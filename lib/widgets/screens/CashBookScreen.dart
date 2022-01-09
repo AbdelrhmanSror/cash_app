@@ -1,5 +1,6 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/database/AppDatabaseCallback.dart';
+import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/functional/ArchiveButtonWidget.dart';
 import 'package:debts_app/widgets/functional/CashInButtonWidget.dart';
@@ -9,6 +10,7 @@ import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/widgets/functional/OperationsArchiveWidget.dart';
+import 'package:debts_app/widgets/screens/ArchiveModalSheetScreen.dart';
 import 'package:debts_app/widgets/screens/ListDetailScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +33,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   @override
   void initState() {
     super.initState();
+    print('init state');
     //register this widget as listener to the any updates happen in the database
     database.registerListener(this);
     //retrieve all the data in the database to initialize our app
@@ -45,79 +48,88 @@ class _CashBookScreenState extends State<CashBookScreen>
   Widget build(BuildContext context) {
     print('BUIDLing cash book screen');
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 50,
-        backgroundColor: Theme.of(context).canvasColor,
-        elevation: 0,
-        title: const Text(
-          'DEBTS',
-          style: TextStyle(
-              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
+        appBar: AppBar(
+          toolbarHeight: 50,
+          backgroundColor: Theme.of(context).canvasColor,
+          elevation: 0,
+          title: const Text(
+            'DEBTS',
+            style: TextStyle(
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
+          ),
         ),
-      ),
-      body: Column(
-        children: [
-          Column(children: [
-            buildInOutCashDetails(),
-            const Divider(
-              thickness: 0.5,
-              color: Colors.blueGrey,
-              indent: 20,
-              endIndent: 20,
-            ),
-            buildNetBalanceWidget(),
-            Container(
-                padding: const EdgeInsets.all(16.0),
-                child: buildOperationsArchiveWidget())
-          ]),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildOperationNumberWidget(),
-                        buildArchiveButtonWidget()
-                      ]),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              database.retrieveAll();
+            });
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(children: [
+                buildInOutCashDetails(),
+                const Divider(
+                  thickness: 0.5,
+                  color: Colors.blueGrey,
+                  indent: 20,
+                  endIndent: 20,
                 ),
-                Expanded(child: buildOperationListWidget(context)),
+                buildNetBalanceWidget(),
                 Container(
-                  padding: const EdgeInsets.only(
-                      left: 8, right: 8, top: 8, bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      buildCashInButton(context),
-                      buildCashOutButton(context)
-                    ],
-                  ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: buildOperationsArchiveWidget())
+              ]),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            buildOperationNumberWidget(),
+                            buildArchiveButtonWidget()
+                          ]),
+                    ),
+                    Expanded(child: buildOperationListWidget(context)),
+                    Container(
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, top: 8, bottom: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          buildCashInButton(context),
+                          buildCashOutButton(context)
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
+              )
+            ],
+          ),
+        ));
   }
 
   CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CashOutScreen()),
-      );
+      Navigator.of(context).push(Utility.createAnimationRoute(
+          CashOutScreen(operationType: INSERT),
+          const Offset(1.0, 0.0),
+          Offset.zero,
+          Curves.ease));
     });
   }
 
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CashInScreen()),
-      );
+      Navigator.of(context).push(Utility.createAnimationRoute(
+          CashInScreen(operationType: INSERT),
+          const Offset(1.0, 0.0),
+          Offset.zero,
+          Curves.ease));
     });
   }
 
@@ -125,16 +137,20 @@ class _CashBookScreenState extends State<CashBookScreen>
     return OperationListWidget(
         models: _models,
         onPressed: (model) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ListDetailScreen(model: model)),
-          );
+          Navigator.of(context).push(Utility.createAnimationRoute(
+              ListDetailScreen(model: model),
+              const Offset(0.0, 1.0),
+              Offset.zero,
+              Curves.ease));
         });
   }
 
-  ArchiveButtonWidget buildArchiveButtonWidget() =>
-      ArchiveButtonWidget(onPressed: () => deleteAll());
+  ArchiveButtonWidget buildArchiveButtonWidget() => ArchiveButtonWidget(
+      onPressed: () {
+        Utility.createModalSheet(
+            context, ArchiveModalSheetScreen(models: _models!));
+      },
+      hide: (_models == null || _models![0] is EmptyAppModel));
 
   OperationNumberWidget buildOperationNumberWidget() {
     return OperationNumberWidget(countNumber: Utility.getSize(_models));
@@ -153,7 +169,9 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   @override
   void onInsertDatabase(AppModel model) {
+/*
     print('insertion cash book screen');
+*/
     if (!mounted) return;
     setState(() {
       if (_models == null || _models![0] is EmptyAppModel) {
@@ -165,7 +183,9 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   @override
   void onStartDatabase(List<AppModel> models) {
+/*
     print('start cash book screen');
+*/
     if (!mounted) return;
     setState(() {
       //initial setup for models
@@ -184,23 +204,33 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onLoadingDatabase(bool active) {}
-
-  @override
-  void onDeleteDatabase(int id) {
+  void onLastRowDeleted() {
     if (!mounted) return;
     setState(() {
-      for (int index = 0; index < _models!.length; index++) {
-        if (_models![index].id == id) {
-          _models!.removeAt(index);
-          return;
-        }
-      }
+      //remove last value in the list
+      //we remove last value by first index because we retrieve all value from database in descending order
+      _models!.removeAt(0);
+    });
+  }
+
+  @override
+  void onUpdateAllDatabase(List<AppModel> models) {
+    if (!mounted) return;
+    setState(() {
+      _models = models;
     });
   }
 
   @override
   void onUpdateDatabase(AppModel model) {
-    // TODO: implement onUpdateDatabase
+    if (!mounted) return;
+    setState(() {
+      for (int i = 0; i < _models!.length; i++) {
+        if (_models![i].id == model.id) {
+          _models![i] = model;
+          break;
+        }
+      }
+    });
   }
 }

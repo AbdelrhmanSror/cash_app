@@ -21,7 +21,7 @@ class InOutCashDetails extends StatelessWidget {
         CompositeWidget(
           width: 150,
           widgets: [
-            AppTextWithDot(
+             AppTextWithDot(
               text: 'Cash in',
               color: Colors.grey,
               fontSize: 12,

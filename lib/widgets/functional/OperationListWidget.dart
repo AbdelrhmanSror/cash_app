@@ -1,5 +1,6 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/DateFormatter.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
@@ -22,14 +23,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   bool _showLoadingBar = false;
 
   @override
-  void initState() {
-    super.initState();
-    print('INITIALIZE STATE OF LIST');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print('BUILDING OF LIST');
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: _buildSuggestions(),
@@ -38,7 +32,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
   Widget _buildSuggestions() {
     int count = Utility.getSize(widget.models);
-    print('SIZE IS $count');
+    // print('SIZE IS $count');
     if (!Utility.fromDatabase(widget.models)) {
       _showLoadingBar = true;
     } else {
@@ -64,7 +58,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             opacity: opacity,
             child: AppTextWithDot(
               text: 'No Operations',
-              color: const Color(0xFACDCACA),
+              color: Color(0xFACDCACA),
               fontSize: 12,
               fontWeight: FontWeight.normal,
             )),
@@ -131,7 +125,8 @@ class OperationTile extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 4),
                 constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
                 child: AppTextWithDot(
-                    text: model.date,
+                    text: DateFormatter.getDateTimeRepresentation(
+                        DateTime.parse(model.date)),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                     color: const Color(0xFF281361)),

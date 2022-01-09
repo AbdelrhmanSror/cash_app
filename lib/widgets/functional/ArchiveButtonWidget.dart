@@ -3,9 +3,10 @@ import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
 
 class ArchiveButtonWidget extends StatelessWidget {
-  const ArchiveButtonWidget({required this.onPressed, Key? key})
+  ArchiveButtonWidget({required this.onPressed, this.hide = false, Key? key})
       : super(key: key);
   final Function() onPressed;
+  bool hide;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +23,7 @@ class ArchiveButtonWidget extends StatelessWidget {
       paddingLeft: 16,
       paddingRight: 16,
       onPressed: onPressed,
+      hide: hide,
     );
   }
 }

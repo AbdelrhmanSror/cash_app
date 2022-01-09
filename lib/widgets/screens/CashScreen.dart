@@ -1,16 +1,18 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/main.dart';
 import 'package:debts_app/utility/Constants.dart';
-import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 class CashInScreen extends CashScreen {
-  const CashInScreen({Key? key})
+  CashInScreen({AppModel? modelToEdit, required operationType, Key? key})
       : super(
+            operationType: operationType,
             key: key,
+            modelToEdit: modelToEdit,
             cashFieldTextColor: Colors.greenAccent,
             cashFieldHintTextColor: Colors.greenAccent,
             validationButtonTextColor: Colors.green,
@@ -19,9 +21,11 @@ class CashInScreen extends CashScreen {
 }
 
 class CashOutScreen extends CashScreen {
-  const CashOutScreen({Key? key})
+  CashOutScreen({AppModel? modelToEdit, required operationType, Key? key})
       : super(
             key: key,
+            operationType: operationType,
+            modelToEdit: modelToEdit,
             cashFieldTextColor: Colors.red,
             cashFieldHintTextColor: Colors.red,
             validationButtonTextColor: Colors.red,
@@ -30,12 +34,14 @@ class CashOutScreen extends CashScreen {
 }
 
 abstract class CashScreen extends StatefulWidget {
-  const CashScreen(
+  CashScreen(
       {required this.cashFieldTextColor,
       required this.cashFieldHintTextColor,
       required this.validationButtonTextColor,
       required this.validationButtonBackgroundColor,
       required this.type,
+      required this.operationType,
+      this.modelToEdit,
       Key? key})
       : super(key: key);
   final Color cashFieldTextColor;
@@ -48,6 +54,9 @@ abstract class CashScreen extends StatefulWidget {
 
   final String type;
 
+  String operationType;
+  final AppModel? modelToEdit;
+
   @override
   State<CashScreen> createState() {
     return _CashScreenState();
@@ -55,25 +64,28 @@ abstract class CashScreen extends StatefulWidget {
 }
 
 class _CashScreenState extends State<CashScreen> {
-  final _numberFieldController = TextEditingController();
-  final _detailsFieldController = TextEditingController();
+  final _numberFieldFocusNode = FocusNode();
 
-  var opacity = 0.0;
-  var showDetailTextField = false;
+  double opacity = 0.0;
+  String numberText = '';
+  String descriptionText = '';
 
-  TextField cashNumberField() {
-    return TextField(
-      controller: _numberFieldController,
+  TextFormField cashNumberField() {
+    var numberTextField = TextFormField(
+      initialValue: widget.operationType == UPDATE
+          ? widget.modelToEdit?.cash.toString()
+          : null,
+      focusNode: _numberFieldFocusNode,
       onChanged: (text) {
         if (text.isEmpty) {
           setState(() {
+            numberText = '';
             opacity = 0.0;
-            showDetailTextField = false;
           });
         } else {
           setState(() {
+            numberText = text;
             opacity = 1.0;
-            showDetailTextField = true;
           });
         }
       },
@@ -82,30 +94,56 @@ class _CashScreenState extends State<CashScreen> {
           fontSize: 30,
           fontWeight: FontWeight.bold),
       keyboardType: TextInputType.number,
-      onSubmitted: (text) {},
       decoration: InputDecoration.collapsed(
           hintStyle:
               TextStyle(fontSize: 30.0, color: widget.cashFieldHintTextColor),
           hintText: '0.00 EGP'),
     );
+    return numberTextField;
   }
 
   Widget buildCashDetailsFieldWidget() {
-    return Opacity(
+    var detailsTextField = Opacity(
         opacity: opacity,
         child: TextFormField(
-            enabled: showDetailTextField,
-            controller: _detailsFieldController,
+            initialValue: widget.operationType == UPDATE
+                ? widget.modelToEdit?.description
+                : null,
+            enabled: opacity >= 1.0,
+            onChanged: (text) {
+              if (text.isEmpty) {
+                setState(() {
+                  descriptionText = '';
+                });
+              } else {
+                setState(() {
+                  descriptionText = text;
+                });
+              }
+            },
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
                 labelText: 'Details (article ,invoice number, quantity...)')));
+
+    return detailsTextField;
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _numberFieldController.clear();
-    _detailsFieldController.clear();
+  void initState() {
+    super.initState();
+    //to immediately show keyboard of cashNumber field after build finish
+    SchedulerBinding.instance?.addPostFrameCallback((Duration _) {
+      _numberFieldFocusNode.requestFocus();
+    });
+    //if the operation type is update so we show the description textFormField
+    //initially setup the value with the value in model in case user did no changes.
+    if (widget.operationType == UPDATE) {
+      setState(() {
+        numberText = widget.modelToEdit!.cash.toString();
+        descriptionText = widget.modelToEdit!.description.toString();
+        opacity = 1.0;
+      });
+    }
   }
 
   @override
@@ -165,14 +203,36 @@ class _CashScreenState extends State<CashScreen> {
       paddingLeft: 16,
       paddingRight: 16,
       onPressed: () {
-        if (_numberFieldController.text.isNotEmpty) {
-          database.insert(AppModel(
-              date: Utility.getTimeNow(),
-              description: _detailsFieldController.text,
-              cash: (double.parse(_numberFieldController.text)),
-              type: widget.type));
-          FocusScope.of(context).unfocus();
-          Navigator.pop(context);
+        if (numberText.isNotEmpty) {
+          if (widget.operationType == INSERT) {
+            database.insert(AppModel(
+                date: '${DateTime.now()}',
+                description: descriptionText,
+                cash: (double.parse(numberText)),
+                type: widget.type));
+            FocusScope.of(context).unfocus();
+            Future.delayed(const Duration(milliseconds: 500), () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            });
+          } else {
+            var updatedModel = database.updateModel(AppModel(
+                totalCashIn: widget.modelToEdit!.totalCashIn,
+                totalCashOut: widget.modelToEdit!.totalCashOut,
+                date: widget.modelToEdit!.date,
+                description: descriptionText,
+                cash: (double.parse(numberText)),
+                type: widget.type,
+                id: widget.modelToEdit!.id));
+            FocusScope.of(context).unfocus();
+            //we delay the back to previous screen until keyboard is totally dismissed to prevent overflow render flex from happening
+            Future.delayed(const Duration(milliseconds: 500), () {
+              setState(() {
+                Navigator.pop(context, updatedModel);
+              });
+            });
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Enter the ${widget.type} amount!')));

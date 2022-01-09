@@ -3,7 +3,7 @@ import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class NetBalanceWidget extends StatelessWidget {
-  NetBalanceWidget({
+  const NetBalanceWidget({
     required this.netBalance,
     Key? key,
   }) : super(key: key);
@@ -16,7 +16,7 @@ class NetBalanceWidget extends StatelessWidget {
       widgets: [
         AppTextWithDot(
           text: 'Net balance',
-          color: const Color(0xFACDCACA),
+          color: Color(0xFACDCACA),
           fontSize: 13,
           fontWeight: FontWeight.normal,
         ),

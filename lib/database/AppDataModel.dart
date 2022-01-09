@@ -1,16 +1,10 @@
 class EmptyAppModel extends AppModel {
-  EmptyAppModel(
-      {date = '', cash = 0.0, totalCashIn = 0.0, totalCashOut = 0.0, type = ''})
-      : super(
-            date: date,
-            cash: cash,
-            totalCashOut: totalCashOut,
-            totalCashIn: totalCashIn,
-            type: type);
+  EmptyAppModel({date = '', cash = 0.0, type = ''})
+      : super(date: date, cash: cash, type: type);
 }
 
 class AppModel {
-  final int id;
+  int id;
   final String date;
   final double cash;
   double totalCashIn;
@@ -31,6 +25,7 @@ class AppModel {
   // columns in the database.
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'date': date,
       'cash': cash,
       'totalCashIn': totalCashIn,
@@ -43,4 +38,24 @@ class AppModel {
   double getBalance() {
     return totalCashIn - totalCashOut;
   }
+
+  // Implement toString to make it easier to see information about
+  // each dog when using the print statement.
+  @override
+  String toString() {
+    return 'AppModel{id: $id, date: $date, cash: $cash  cashout:$totalCashOut  cashin $totalCashIn  type $type}';
+  }
+}
+
+extension ToAppModel on List<Map<String, dynamic>> {
+  List<AppModel> toAppModels() => List.generate(length, (i) {
+        return AppModel(
+            id: this[i]['id'],
+            date: this[i]['date'],
+            totalCashIn: this[i]['totalCashIn'],
+            totalCashOut: this[i]['totalCashOut'],
+            cash: this[i]['cash'],
+            description: this[i]['description'],
+            type: this[i]['type']);
+      });
 }
