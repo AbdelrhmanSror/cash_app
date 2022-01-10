@@ -1,6 +1,7 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/main.dart';
 import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
@@ -205,19 +206,15 @@ class _CashScreenState extends State<CashScreen> {
       onPressed: () {
         if (numberText.isNotEmpty) {
           if (widget.operationType == INSERT) {
-            database.insert(AppModel(
+            appDatabase.insert(AppModel(
                 date: '${DateTime.now()}',
                 description: descriptionText,
                 cash: (double.parse(numberText)),
                 type: widget.type));
             FocusScope.of(context).unfocus();
-            Future.delayed(const Duration(milliseconds: 500), () {
-              setState(() {
-                Navigator.pop(context);
-              });
-            });
+            context.navigateBackWithDelay(200, '');
           } else {
-            var updatedModel = database.updateModel(AppModel(
+            var updatedModel = appDatabase.updateModel(AppModel(
                 totalCashIn: widget.modelToEdit!.totalCashIn,
                 totalCashOut: widget.modelToEdit!.totalCashOut,
                 date: widget.modelToEdit!.date,
@@ -227,11 +224,7 @@ class _CashScreenState extends State<CashScreen> {
                 id: widget.modelToEdit!.id));
             FocusScope.of(context).unfocus();
             //we delay the back to previous screen until keyboard is totally dismissed to prevent overflow render flex from happening
-            Future.delayed(const Duration(milliseconds: 500), () {
-              setState(() {
-                Navigator.pop(context, updatedModel);
-              });
-            });
+            context.navigateBackWithDelay(200, updatedModel);
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

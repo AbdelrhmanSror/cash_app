@@ -1,6 +1,6 @@
+import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ClosedBookAlertScreen extends StatelessWidget {
@@ -8,6 +8,8 @@ class ClosedBookAlertScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //wait 2 second and dismiss the the screen
+    context.navigateBackWithDelay(2000, '');
     return Scaffold(
       body: Column(mainAxisSize: MainAxisSize.max, children: [
         Expanded(
@@ -29,7 +31,7 @@ class ClosedBookAlertScreen extends StatelessWidget {
                 Center(
                   child: AppTextWithDot(
                     text:
-                        'You can see all your operations in Operations archive',
+                    'You can see all your operations in Operations archive',
                     color: Colors.grey,
                     fontSize: 14,
                     maxLines: 2,

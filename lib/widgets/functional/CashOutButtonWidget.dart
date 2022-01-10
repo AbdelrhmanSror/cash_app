@@ -18,10 +18,10 @@ class CashOutButton extends StatelessWidget {
           color: Colors.red),
       backgroundColor: const Color(0xCCFDF1F3),
       radius: 5.0,
-      paddingTop: 20,
-      paddingBottom: 20,
-      paddingLeft: 40,
-      paddingRight: 40,
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 45,
+      paddingRight: 45,
       onPressed: () => onCashOutPressed(),
     );
   }

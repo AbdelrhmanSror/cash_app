@@ -20,9 +20,9 @@ class AppDatabase {
     _listeners.add(listener);
   }
 
-  void _alertOnInsertion(AppModel models) {
+  void _alertOnInsertion(AppModel model) {
     for (var listener in _listeners) {
-      listener.onInsertDatabase(models);
+      listener.onInsertDatabase(model);
     }
   }
 
@@ -32,9 +32,9 @@ class AppDatabase {
     }
   }
 
-  void _alertOnDeleteAll(EmptyAppModel model) {
+  void _alertOnDeleteAll(List<AppModel> models) {
     for (var listener in _listeners) {
-      listener.onDeleteAllDatabase(model);
+      listener.onDeleteAllDatabase(models);
     }
   }
 
@@ -169,12 +169,8 @@ class AppDatabase {
     final db = await _database!;
     final List<Map<String, dynamic>> maps =
         await db.rawQuery('SELECT * FROM "$_tableName" ORDER BY "id" DESC');
-
     // Convert the List<Map<String, dynamic> into a List<AppModel>.
     List<AppModel> models = maps.toAppModels();
-    if (models.isEmpty) {
-      models.add(EmptyAppModel());
-    }
     return models;
   }
 
@@ -281,6 +277,6 @@ class AppDatabase {
     await db.delete(
       _tableName,
     );
-    _alertOnDeleteAll(EmptyAppModel());
+    _alertOnDeleteAll([]);
   }
 }

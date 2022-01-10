@@ -24,17 +24,17 @@ class OperationNumberWidget extends StatelessWidget {
             text: '(',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: Color(0xFACDCACA)),
+            color: Colors.blueGrey.shade200),
         AppTextWithDot(
             text: '$countNumber',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: const Color(0xFACDCACA)),
+            color: Colors.blueGrey.shade200),
         AppTextWithDot(
             text: ')',
             fontWeight: FontWeight.normal,
             fontSize: 16,
-            color: Color(0xFACDCACA)),
+            color: Colors.blueGrey.shade200),
       ],
     );
   }

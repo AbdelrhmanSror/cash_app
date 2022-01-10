@@ -1,4 +1,3 @@
-import 'package:debts_app/database/AppDataModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -11,25 +10,6 @@ class Utility {
     return formattedDate;
   }*/
 
-  static int getSize(List<AppModel>? data) {
-    //if the type is emptyApp model then this means the database is empty  and the call is from the database.
-    //if the the data is empty  the call is not from the database
-    //if the database is empty it will return emptyAppModel type class
-    if (data != null && data[0] is! EmptyAppModel) {
-      return data.length;
-    } else {
-      return 0;
-    }
-  }
-
-  static bool fromDatabase(List<AppModel>? data) {
-    //if the the data is empty and the call is not from the database
-    if (data == null) {
-      return false;
-    } else {
-      return true;
-    }
-  }
 
   static Route createAnimationRoute(
       Widget destinationWidget, Offset begin, Offset end, Curve curve) {

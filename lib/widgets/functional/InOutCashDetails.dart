@@ -5,15 +5,13 @@ import 'package:flutter/material.dart';
 
 class InOutCashDetails extends StatelessWidget {
   const InOutCashDetails({required this.models, Key? key}) : super(key: key);
-  final List<AppModel>? models;
+  final List<AppModel> models;
 
   @override
   Widget build(BuildContext context) {
     //getting the latest row in the table to get the recent info.
-    final double totalCashIn =
-        (models != null && models!.isNotEmpty) ? models![0].totalCashIn : 0;
-    final double totalCashOut =
-        (models != null && models!.isNotEmpty) ? models![0].totalCashOut : 0;
+    final double totalCashIn = models.isNotEmpty ? models[0].totalCashIn : 0;
+    final double totalCashOut = models.isNotEmpty ? models[0].totalCashOut : 0;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -21,9 +19,9 @@ class InOutCashDetails extends StatelessWidget {
         CompositeWidget(
           width: 150,
           widgets: [
-             AppTextWithDot(
+            AppTextWithDot(
               text: 'Cash in',
-              color: Colors.grey,
+              color: Colors.blueGrey.shade200,
               fontSize: 12,
               fontWeight: FontWeight.normal,
             ),
@@ -36,10 +34,10 @@ class InOutCashDetails extends StatelessWidget {
           ],
           vertical: true,
         ),
-        const SizedBox(
+        SizedBox(
           height: 80,
           child: VerticalDivider(
-            color: Colors.grey,
+            color: Colors.blueGrey.shade200,
             thickness: 1,
             indent: 10,
             endIndent: 10,
@@ -50,7 +48,7 @@ class InOutCashDetails extends StatelessWidget {
           widgets: [
             AppTextWithDot(
               text: 'Cash out',
-              color: Colors.grey,
+              color: Colors.blueGrey.shade200,
               fontSize: 12,
               fontWeight: FontWeight.normal,
             ),

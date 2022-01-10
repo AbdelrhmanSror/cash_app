@@ -142,10 +142,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    database.deleteModel(widget.model);
+                    appDatabase.deleteModel(widget.model);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
-                        const CashBookScreen(),
+                        const CashBookScreen(models: []),
                         const Offset(0.1, 0.0),
                         Offset.zero,
                         Curves.ease));
@@ -169,7 +169,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             fontSize: 20,
             fontWeight: FontWeight.bold),
         const Divider(height: 20, color: Colors.white),
-        AppTextWithDot(text: widget.model.type, color: Colors.grey),
+        AppTextWithDot(
+            text: widget.model.type, color: Colors.blueGrey.shade200),
         const Divider(height: 3, color: Colors.white),
         AppTextWithDot(
             text: '${widget.model.cash} EGP',
@@ -181,7 +182,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         CompositeWidget(width: 250, widgets: [
           AppTextWithDot(
             text: 'Balance  ',
-            color: Colors.grey,
+            color: Colors.blueGrey.shade200,
             fontSize: 12,
           ),
           AppTextWithDot(

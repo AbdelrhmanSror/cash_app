@@ -16,7 +16,7 @@ class NetBalanceWidget extends StatelessWidget {
       widgets: [
         AppTextWithDot(
           text: 'Net balance',
-          color: Color(0xFACDCACA),
+          color: Colors.blueGrey.shade200,
           fontSize: 13,
           fontWeight: FontWeight.normal,
         ),

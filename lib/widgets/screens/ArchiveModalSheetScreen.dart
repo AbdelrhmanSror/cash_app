@@ -1,6 +1,5 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/main.dart';
-import 'package:debts_app/utility/DateFormatter.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
@@ -68,8 +67,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: DateFormatter.getDateTimeRepresentation(
-                                DateTime.parse(models.last.date)),
+                            text: models.last.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -90,8 +88,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: DateFormatter.getDateTimeRepresentation(
-                                DateTime.parse(models.first.date)),
+                            text: models.first.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -156,7 +153,8 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                       paddingLeft: 16,
                       paddingRight: 16,
                       onPressed: () {
-                        database.deleteAll();
+                        appDatabase.deleteAll();
+                        archiveDatabase.insert(models.toArchiveModels());
                         Utility.createModalSheet(
                                 context, const ClosedBookAlertScreen())
                             .then((value) {

@@ -1,7 +1,5 @@
 import 'package:debts_app/database/AppDataModel.dart';
 import 'package:debts_app/utility/Constants.dart';
-import 'package:debts_app/utility/DateFormatter.dart';
-import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/circularButton.dart';
@@ -12,7 +10,7 @@ class OperationListWidget extends StatefulWidget {
       {required this.models, required this.onPressed, Key? key})
       : super(key: key);
 
-  final List<AppModel>? models;
+  final List<AppModel> models;
   final Function(AppModel) onPressed;
 
   @override
@@ -20,8 +18,6 @@ class OperationListWidget extends StatefulWidget {
 }
 
 class _OperationListWidgetState extends State<OperationListWidget> {
-  bool _showLoadingBar = false;
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -31,16 +27,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildSuggestions() {
-    int count = Utility.getSize(widget.models);
-    // print('SIZE IS $count');
-    if (!Utility.fromDatabase(widget.models)) {
-      _showLoadingBar = true;
-    } else {
-      _showLoadingBar = false;
-    }
-    if (count == 0) return _buildEmptyWidget();
+    if (widget.models.isEmpty) return _buildEmptyWidget();
     return ListView.separated(
-        itemCount: count,
+        itemCount: widget.models.length,
         separatorBuilder: (BuildContext context, int index) =>
             const Divider(height: 0, color: Colors.grey),
         itemBuilder: (BuildContext context, int index) => _buildRow(index));
@@ -48,7 +37,6 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
   Widget _buildEmptyWidget() {
     var opacity = 0.0;
-    if (!_showLoadingBar) opacity = 1;
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,11 +50,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
               fontSize: 12,
               fontWeight: FontWeight.normal,
             )),
-        Visibility(
-            visible: _showLoadingBar,
-            child: const CircularProgressIndicator(
-              strokeWidth: 3,
-            )),
+        /*  const CircularProgressIndicator(
+          strokeWidth: 3,
+        ),*/
         Opacity(
             opacity: opacity,
             child: Column(
@@ -90,9 +76,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
   Widget _buildRow(int index) {
     return InkWell(
-        child: OperationTile(model: widget.models![index]),
+        child: OperationTile(model: widget.models[index]),
         onTap: () {
-          widget.onPressed(widget.models![index]);
+          widget.onPressed(widget.models[index]);
         });
   }
 }
@@ -125,8 +111,7 @@ class OperationTile extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 4),
                 constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
                 child: AppTextWithDot(
-                    text: DateFormatter.getDateTimeRepresentation(
-                        DateTime.parse(model.date)),
+                    text: model.getFormattedDate(),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                     color: const Color(0xFF281361)),
@@ -154,7 +139,8 @@ class OperationTile extends StatelessWidget {
                       model.type == CASH_OUT ? Colors.red : Colors.greenAccent),
             ),
             Text(model.type,
-                style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                style:
+                    TextStyle(fontSize: 10, color: Colors.blueGrey.shade200)),
           ]),
         ],
       ),
