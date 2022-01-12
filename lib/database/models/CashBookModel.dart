@@ -1,5 +1,6 @@
-import 'package:debts_app/database/ArchiveModel.dart';
 import 'package:debts_app/utility/DateFormatter.dart';
+
+import 'ArchiveModel.dart';
 
 /*class EmptyListOfAppModel extends DelegatingList<AppModel> {
   final List<EmptyAppModel> models = [];
@@ -8,12 +9,12 @@ import 'package:debts_app/utility/DateFormatter.dart';
   List<AppModel> get delegate => models;
 }*/
 
-class EmptyAppModel extends AppModel {
-  EmptyAppModel({date = '', cash = 0.0, type = ''})
+class EmptyCashBookModel extends CashBookModel {
+  EmptyCashBookModel({date = '', cash = 0.0, type = ''})
       : super(date: date, cash: cash, type: type);
 }
 
-class AppModel {
+class CashBookModel {
   int id;
   final String date;
   final double cash;
@@ -22,13 +23,14 @@ class AppModel {
   final String description;
   final String type;
 
-  AppModel({this.id = 0,
-    required this.date,
-    this.totalCashIn = 0,
-    this.totalCashOut = 0,
-    this.description = '',
-    required this.cash,
-    required this.type});
+  CashBookModel(
+      {this.id = 0,
+      required this.date,
+      this.totalCashIn = 0,
+      this.totalCashOut = 0,
+      this.description = '',
+      required this.cash,
+      required this.type});
 
   // Convert a model into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -60,9 +62,9 @@ class AppModel {
   }
 }
 
-extension ToAppModel on List<Map<String, dynamic>> {
-  List<AppModel> toAppModels() => List.generate(length, (i) {
-        return AppModel(
+extension ToCashBookModel on List<Map<String, dynamic>> {
+  List<CashBookModel> toCashBookModels() => List.generate(length, (i) {
+        return CashBookModel(
             id: this[i]['id'],
             date: this[i]['date'],
             totalCashIn: this[i]['totalCashIn'],
@@ -73,15 +75,17 @@ extension ToAppModel on List<Map<String, dynamic>> {
       });
 }
 
-extension ToArchiveModels on List<AppModel> {
-  List<ArchivedModel> toArchiveModels() => List.generate(length, (i) {
+extension ToArchiveModelList2 on List<CashBookModel> {
+  List<ArchivedModel> toArchivedModels() => List.generate(length, (i) {
         return ArchivedModel(
-            id: this[i].id,
-            date: this[i].date,
-            totalCashIn: this[i].totalCashIn,
-            totalCashOut: this[i].totalCashOut,
-            cash: this[i].cash,
-            description: this[i].description,
-            type: this[i].type);
+            parentModelId: 0,
+            model: CashBookModel(
+                id: this[i].id,
+                date: this[i].date,
+                totalCashIn: this[i].totalCashIn,
+                totalCashOut: this[i].totalCashOut,
+                cash: this[i].cash,
+                description: this[i].description,
+                type: this[i].type));
       });
 }

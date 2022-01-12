@@ -1,11 +1,11 @@
-import 'package:debts_app/database/AppDataModel.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class InOutCashDetails extends StatelessWidget {
   const InOutCashDetails({required this.models, Key? key}) : super(key: key);
-  final List<AppModel> models;
+  final List<CashBookModel> models;
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-import 'package:debts_app/database/AppDataModel.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
@@ -10,8 +10,8 @@ class OperationListWidget extends StatefulWidget {
       {required this.models, required this.onPressed, Key? key})
       : super(key: key);
 
-  final List<AppModel> models;
-  final Function(AppModel) onPressed;
+  final List<CashBookModel> models;
+  final Function(CashBookModel) onPressed;
 
   @override
   State<OperationListWidget> createState() => _OperationListWidgetState();
@@ -89,7 +89,7 @@ class OperationTile extends StatelessWidget {
     required this.model,
   }) : super(key: key);
 
-  final AppModel model;
+  final CashBookModel model;
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
-import 'package:debts_app/database/AppDataModel.dart';
-import 'package:debts_app/main.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
@@ -9,11 +8,14 @@ import 'package:debts_app/widgets/screens/ClosedBookAlertScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'CashBookScreen.dart';
+import 'OperationArchiveScreen.dart';
+
 class ArchiveModalSheetScreen extends StatelessWidget {
   const ArchiveModalSheetScreen({required this.models, Key? key})
       : super(key: key);
 
-  final List<AppModel> models;
+  final List<CashBookModel> models;
 
   @override
   Widget build(BuildContext context) {
@@ -153,8 +155,9 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                       paddingLeft: 16,
                       paddingRight: 16,
                       onPressed: () {
-                        appDatabase.deleteAll();
-                        archiveDatabase.insert(models.toArchiveModels());
+                        cashBookDatabase.deleteAll();
+                        //inserted reversed to make the order ascending in database
+                        archiveDatabase.insert(models.reversed.toList());
                         Utility.createModalSheet(
                                 context, const ClosedBookAlertScreen())
                             .then((value) {

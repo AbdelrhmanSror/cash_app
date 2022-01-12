@@ -1,5 +1,5 @@
-import 'package:debts_app/database/AppDataModel.dart';
-import 'package:debts_app/main.dart';
+import 'package:debts_app/database/AppDatabase.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/DateFormatter.dart';
 import 'package:debts_app/utility/Utility.dart';
@@ -12,8 +12,15 @@ import 'package:flutter/material.dart';
 import 'CashScreen.dart';
 
 class ListDetailScreen extends StatefulWidget {
-  ListDetailScreen({required this.model, Key? key}) : super(key: key);
-  AppModel model;
+  ListDetailScreen(
+      {required this.model,
+      required this.database,
+      this.parentId = -1,
+      Key? key})
+      : super(key: key);
+  CashBookModel model;
+  final AppDatabase database;
+  int parentId;
 
   @override
   State<ListDetailScreen> createState() {
@@ -84,28 +91,33 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingLeft: 16,
         paddingRight: 16,
         onPressed: () async {
-          AppModel result = EmptyAppModel();
+          CashBookModel? result = EmptyCashBookModel();
           if (widget.model.type == CASH_IN) {
-            result = await Navigator.of(context).push(
-                Utility.createAnimationRoute(
+            result =
+                await Navigator.of(context).push(Utility.createAnimationRoute(
                     CashInScreen(
-                        operationType: UPDATE, modelToEdit: widget.model),
+                      operationType: UPDATE,
+                      modelToEdit: widget.model,
+                      database: widget.database,
+                      parentId: widget.parentId,
+                    ),
                     const Offset(0.0, 1.0),
                     Offset.zero,
                     Curves.ease));
           } else {
-            result =
-                await Navigator.of(context).push(Utility.createAnimationRoute(
+            result = await Navigator.of(context).push(
+                Utility.createAnimationRoute(
                     CashOutScreen(
-                      operationType: UPDATE,
-                      modelToEdit: widget.model,
-                    ),
+                        operationType: UPDATE,
+                        modelToEdit: widget.model,
+                        database: widget.database,
+                        parentId: widget.parentId),
                     const Offset(0.0, 1.0),
                     Offset.zero,
                     Curves.ease));
           }
           setState(() {
-            widget.model = result;
+            widget.model = result ?? widget.model;
           });
         });
   }
@@ -142,10 +154,11 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    appDatabase.deleteModel(widget.model);
+                    widget.database
+                        .deleteModel(widget.model, parentId: widget.parentId);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
-                        const CashBookScreen(models: []),
+                        CashBookScreen(),
                         const Offset(0.1, 0.0),
                         Offset.zero,
                         Curves.ease));

@@ -1,3 +1,5 @@
+import 'package:debts_app/database/models/CashBookModel.dart';
+
 class ParentArchivedModel {
   int id;
 
@@ -17,26 +19,21 @@ class ParentArchivedModel {
   }
 }
 
-class ArchivedModel {
+class ArchivedModel extends CashBookModel {
   int parentModelId;
-  int id;
-  final String date;
-  final double cash;
-  double totalCashIn;
-  double totalCashOut;
-  final String description;
-  final String type;
+  CashBookModel model;
 
   ArchivedModel({
-    this.id = 0,
     this.parentModelId = 0,
-    required this.date,
-    this.totalCashIn = 0,
-    this.totalCashOut = 0,
-    this.description = '',
-    required this.cash,
-    required this.type,
-  });
+    required this.model,
+  }) : super(
+            id: model.id,
+            date: model.date,
+            description: model.description,
+            totalCashIn: model.totalCashIn,
+            totalCashOut: model.totalCashOut,
+            cash: model.cash,
+            type: model.type);
 
   // Convert a model into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -68,16 +65,30 @@ extension ToParentArchiveModel on List<Map<String, dynamic>> {
       });
 }
 
-extension ToArchiveModel on List<Map<String, dynamic>> {
+extension ToCashBookModel on List<ArchivedModel> {
+  List<CashBookModel> toCashBookModels() => List.generate(length, (i) {
+        return CashBookModel(
+            id: this[i].id,
+            date: this[i].date,
+            totalCashIn: this[i].totalCashIn,
+            totalCashOut: this[i].totalCashOut,
+            cash: this[i].cash,
+            description: this[i].description,
+            type: this[i].type);
+      });
+}
+
+extension ToArchiveModelList1 on List<Map<String, dynamic>> {
   List<ArchivedModel> toArchivedModels() => List.generate(length, (i) {
         return ArchivedModel(
             parentModelId: this[i]['parentModelId'],
-            id: this[i]['id'],
-            date: this[i]['date'],
-            totalCashIn: this[i]['totalCashIn'],
-            totalCashOut: this[i]['totalCashOut'],
-            cash: this[i]['cash'],
-            description: this[i]['description'],
-            type: this[i]['type']);
+            model: CashBookModel(
+                id: this[i]['id'],
+                date: this[i]['date'],
+                totalCashIn: this[i]['totalCashIn'],
+                totalCashOut: this[i]['totalCashOut'],
+                cash: this[i]['cash'],
+                description: this[i]['description'],
+                type: this[i]['type']));
       });
 }

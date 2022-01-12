@@ -1,15 +1,29 @@
-import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
 
-class ClosedBookAlertScreen extends StatelessWidget {
+class ClosedBookAlertScreen extends StatefulWidget {
   const ClosedBookAlertScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ClosedBookAlertScreen> createState() => _ClosedBookAlertScreenState();
+}
+
+class _ClosedBookAlertScreenState extends State<ClosedBookAlertScreen> {
+  bool _disposed = false;
+
+  void navigateAfter(int milliSeconds) {
+    Future.delayed(Duration(milliseconds: milliSeconds), () {
+      //to prevent navigator from navigate back twice ,
+      // because of the conflict between this navigator and the navigator exist in on pressed close button
+      if (_disposed != true) Navigator.pop(context, '');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     //wait 2 second and dismiss the the screen
-    context.navigateBackWithDelay(2000, '');
+    navigateAfter(3000);
     return Scaffold(
       body: Column(mainAxisSize: MainAxisSize.max, children: [
         Expanded(
@@ -31,7 +45,7 @@ class ClosedBookAlertScreen extends StatelessWidget {
                 Center(
                   child: AppTextWithDot(
                     text:
-                    'You can see all your operations in Operations archive',
+                        'You can see all your operations in Operations archive',
                     color: Colors.grey,
                     fontSize: 14,
                     maxLines: 2,
@@ -67,5 +81,11 @@ class ClosedBookAlertScreen extends StatelessWidget {
         ),
       ]),
     );
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 }
