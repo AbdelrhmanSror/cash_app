@@ -27,6 +27,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildSuggestions() {
+    print('LIST IS ${widget.models}');
     if (widget.models.isEmpty) return _buildEmptyWidget();
     return ListView.separated(
         itemCount: widget.models.length,
@@ -36,40 +37,36 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildEmptyWidget() {
-    var opacity = 0.0;
+    var opacity = 1.0;
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Opacity(
-            opacity: opacity,
-            child: AppTextWithDot(
-              text: 'No Operations',
-              color: Color(0xFACDCACA),
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
-            )),
+        AppTextWithDot(
+          text: 'No Operations',
+          color: Color(0xFACDCACA),
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+        ),
         /*  const CircularProgressIndicator(
           strokeWidth: 3,
         ),*/
-        Opacity(
-            opacity: opacity,
-            child: Column(
-              children: [
-                AppTextWithDot(
-                  text: 'Add new operation',
-                  color: Colors.blue,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                Image.asset(
-                  'assets/images/1f447.png',
-                  width: 20,
-                  height: 15,
-                )
-              ],
-            ))
+        Column(
+          children: [
+            AppTextWithDot(
+              text: 'Add new operation',
+              color: Colors.blue,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            Image.asset(
+              'assets/images/1f447.png',
+              width: 20,
+              height: 15,
+            )
+          ],
+        )
       ],
     );
   }

@@ -1,5 +1,5 @@
+import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/AppDatabaseCallback.dart';
-import 'package:debts_app/database/CashBookDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Utility.dart';
@@ -13,12 +13,11 @@ import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/widgets/functional/OperationsArchiveWidget.dart';
 import 'package:debts_app/widgets/screens/ArchiveModalSheetScreen.dart';
 import 'package:debts_app/widgets/screens/ListDetailScreen.dart';
+import 'package:debts_app/widgets/screens/OperationArchiveParentListScreen.dart';
 import 'package:debts_app/widgets/screens/OperationArchiveScreen.dart';
 import 'package:flutter/material.dart';
 
 import 'CashScreen.dart';
-
-final cashBookDatabase = CashBookDatabase();
 
 class CashBookScreen extends StatefulWidget {
   CashBookScreen({Key? key}) : super(key: key);
@@ -31,7 +30,7 @@ class CashBookScreen extends StatefulWidget {
 }
 
 class _CashBookScreenState extends State<CashBookScreen>
-    with AppDatabaseListener<CashBookModel> {
+    implements CashBookDatabaseListener<CashBookModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,59 +42,59 @@ class _CashBookScreenState extends State<CashBookScreen>
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(children: [
-            buildInOutCashDetails(),
-            const Divider(
-              thickness: 0.2,
-              color: Colors.blueGrey,
-              indent: 20,
-              endIndent: 20,
-            ),
-            buildNetBalanceWidget(),
-            Container(
-                padding: const EdgeInsets.all(16.0),
-                child: buildOperationsArchiveWidget())
-          ]),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildOperationNumberWidget(),
-                        buildArchiveButtonWidget()
-                      ]),
+            children: [
+              Column(children: [
+                buildInOutCashDetails(),
+                const Divider(
+                  thickness: 0.2,
+                  color: Colors.blueGrey,
+                  indent: 20,
+                  endIndent: 20,
                 ),
-                Expanded(child: buildOperationListWidget(context)),
+                buildNetBalanceWidget(),
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                      left: 8, right: 8, top: 8, bottom: 32),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      buildCashInButton(context),
-                      buildCashOutButton(context)
-                    ],
-                  ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: buildOperationsArchiveWidget())
+              ]),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            buildOperationNumberWidget(),
+                            buildArchiveButtonWidget()
+                          ]),
+                    ),
+                    Expanded(child: buildOperationListWidget(context)),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, top: 8, bottom: 32),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          buildCashInButton(context),
+                          buildCashOutButton(context)
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )
-        ],
-      ),
-    ));
+              )
+            ],
+          ),
+        ));
   }
 
   CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          CashOutScreen(operationType: INSERT, database: cashBookDatabase),
+          CashOutScreen(operationType: INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -105,7 +104,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          CashInScreen(operationType: INSERT, database: cashBookDatabase),
+          CashInScreen(operationType: INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -117,7 +116,7 @@ class _CashBookScreenState extends State<CashBookScreen>
         models: widget._models,
         onPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(
-              ListDetailScreen(model: model, database: cashBookDatabase),
+              ListDetailScreen(model: model),
               const Offset(0.0, 1.0),
               Offset.zero,
               Curves.ease));
@@ -138,10 +137,13 @@ class _CashBookScreenState extends State<CashBookScreen>
   OperationsArchiveWidget buildOperationsArchiveWidget() =>
       OperationsArchiveWidget(onPressed: () {
         Navigator.of(context).push(Utility.createAnimationRoute(
-            OperationArchiveScreen(parentId: 1),
-            const Offset(0.0, 1.0),
-            Offset.zero,
-            Curves.ease));
+            OperationArchiveParentListScreen(onPressed: (parentId) {
+          Navigator.of(context).push(Utility.createAnimationRoute(
+              OperationArchiveScreen(parentId: parentId),
+              const Offset(0.0, 1.0),
+              Offset.zero,
+              Curves.ease));
+        }), const Offset(0.0, 1.0), Offset.zero, Curves.ease));
       });
 
   NetBalanceWidget buildNetBalanceWidget() {
@@ -173,7 +175,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onStartDatabase(List<CashBookModel> models) {
+  void onRetrieveDatabase(List<CashBookModel> models) {
 /*
     print('start cash book screen');
 */

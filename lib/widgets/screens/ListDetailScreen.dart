@@ -14,13 +14,9 @@ import 'CashScreen.dart';
 class ListDetailScreen extends StatefulWidget {
   ListDetailScreen(
       {required this.model,
-      required this.database,
-      this.parentId = -1,
       Key? key})
       : super(key: key);
   CashBookModel model;
-  final AppDatabase database;
-  int parentId;
 
   @override
   State<ListDetailScreen> createState() {
@@ -98,8 +94,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     CashInScreen(
                       operationType: UPDATE,
                       modelToEdit: widget.model,
-                      database: widget.database,
-                      parentId: widget.parentId,
                     ),
                     const Offset(0.0, 1.0),
                     Offset.zero,
@@ -108,10 +102,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             result = await Navigator.of(context).push(
                 Utility.createAnimationRoute(
                     CashOutScreen(
-                        operationType: UPDATE,
-                        modelToEdit: widget.model,
-                        database: widget.database,
-                        parentId: widget.parentId),
+                        operationType: UPDATE, modelToEdit: widget.model),
                     const Offset(0.0, 1.0),
                     Offset.zero,
                     Curves.ease));
@@ -154,8 +145,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    widget.database
-                        .deleteModel(widget.model, parentId: widget.parentId);
+                    cashBookDatabase.deleteModel(widget.model);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
                         CashBookScreen(),

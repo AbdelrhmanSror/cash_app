@@ -1,3 +1,4 @@
+import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
@@ -7,9 +8,6 @@ import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:debts_app/widgets/screens/ClosedBookAlertScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'CashBookScreen.dart';
-import 'OperationArchiveScreen.dart';
 
 class ArchiveModalSheetScreen extends StatelessWidget {
   const ArchiveModalSheetScreen({required this.models, Key? key})
@@ -127,14 +125,14 @@ class ArchiveModalSheetScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child:
-                    Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     constraints: const BoxConstraints(
                         minWidth: double.infinity, maxWidth: double.infinity),
                     child: AppTextWithDot(
                       text:
-                          'You can still access your Cashbook in Operations archive',
+                      'You can still access your Cashbook in Operations archive',
                       color: Colors.grey,
                       fontSize: 14,
                     ),
@@ -159,7 +157,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                         //inserted reversed to make the order ascending in database
                         archiveDatabase.insert(models.reversed.toList());
                         Utility.createModalSheet(
-                                context, const ClosedBookAlertScreen())
+                            context, const ClosedBookAlertScreen())
                             .then((value) {
                           Navigator.of(context).pop();
                         });

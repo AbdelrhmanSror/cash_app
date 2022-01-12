@@ -1,10 +1,8 @@
+import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/AppDatabaseCallback.dart';
-import 'package:debts_app/database/ArchiveDatabase.dart';
 import 'package:debts_app/database/models/ArchiveModel.dart';
-import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Utility.dart';
-import 'package:debts_app/widgets/functional/CashInButtonWidget.dart';
-import 'package:debts_app/widgets/functional/CashOutButtonWidget.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/functional/OperationListWidget.dart';
@@ -12,14 +10,11 @@ import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:flutter/material.dart';
 
-import 'CashScreen.dart';
 import 'ListDetailScreen.dart';
-
-final archiveDatabase = ArchiveDatabase();
 
 class OperationArchiveScreen extends StatefulWidget {
   OperationArchiveScreen({Key? key, required this.parentId}) : super(key: key);
-  List<ArchivedModel> _models = [];
+  List<CashBookModel> _models = [];
   final int parentId;
 
   @override
@@ -27,12 +22,12 @@ class OperationArchiveScreen extends StatefulWidget {
 }
 
 class _OperationArchiveScreenState extends State<OperationArchiveScreen>
-    with AppDatabaseListener<ArchivedModel> {
+    implements ArchiveDatabaseListener<CashBookModel> {
   @override
   void initState() {
     super.initState();
     archiveDatabase.registerListener(this);
-    archiveDatabase.retrieveAll(parentId: widget.parentId);
+    archiveDatabase.retrieveAll(parentId: 2);
   }
 
   @override
@@ -78,7 +73,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                           AppTextWithDot(
                               text: widget._models.isNotEmpty
                                   ? widget._models[widget._models.length - 1]
-                                      .getFormattedDate()
+                                  .getFormattedDate()
                                   : '',
                               color: Colors.blueGrey.shade200)
                         ]),
@@ -92,7 +87,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                         AppTextWithDot(
                             text: widget._models.isNotEmpty
                                 ? widget._models[widget._models.length - 1]
-                                    .getFormattedDate()
+                                .getFormattedDate()
                                 : '',
                             color: Colors.blueGrey.shade200)
                       ],
@@ -126,7 +121,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                                 left: 16.0, right: 16.0, top: 20, bottom: 2),
                             child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   buildOperationNumberWidget(),
                                 ]),
@@ -136,14 +131,6 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                             width: double.infinity,
                             padding: const EdgeInsets.only(
                                 left: 8, right: 8, top: 8, bottom: 32),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                buildCashInButton(context),
-                                buildCashOutButton(context)
-                              ],
-                            ),
                           ),
                         ],
                       ),
@@ -154,7 +141,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
             ])));
   }
 
-  CashOutButton buildCashOutButton(BuildContext context) {
+  /* CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
           CashOutScreen(
@@ -165,8 +152,9 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           Offset.zero,
           Curves.ease));
     });
-  }
+  }*/
 
+/*
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
@@ -179,16 +167,14 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           Curves.ease));
     });
   }
+*/
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
         models: widget._models,
         onPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(
-              ListDetailScreen(
-                  model: model,
-                  database: archiveDatabase,
-                  parentId: widget.parentId),
+              ListDetailScreen(model: model),
               const Offset(0.0, 1.0),
               Offset.zero,
               Curves.ease));
@@ -208,52 +194,6 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
   InOutCashDetails buildInOutCashDetails() =>
       InOutCashDetails(models: widget._models);
 
-  @override
-  void onInsertDatabase(List<ArchivedModel> insertedModels) {
-    if (!mounted) return;
-    setState(() {
-      for (var model in insertedModels) {
-        widget._models.insert(0, model);
-      }
-    });
-  }
-
-  @override
-  void onDeleteAllDatabase(List<ArchivedModel> emptyModel) {
-    if (!mounted) return;
-    setState(() {
-      widget._models = emptyModel;
-    });
-  }
-
-  @override
-  void onLastRowDeleted() {
-    if (!mounted) return;
-    setState(() {
-      //remove last value in the list
-      //we remove last value by first index because we retrieve all value from database in descending order
-      widget._models.removeAt(0);
-    });
-  }
-
-  @override
-  void onUpdateAllDatabase(List<ArchivedModel> updatedModels) {
-    if (!mounted) return;
-    setState(() {
-      widget._models = updatedModels;
-    });
-  }
-
-  @override
-  void onUpdateDatabase(ArchivedModel model) {
-    print('update ARchive Screen ${model}');
-
-    if (!mounted) return;
-    setState(() {
-      widget._models[getIndex(model)] = model;
-    });
-  }
-
   int getIndex(ArchivedModel model) {
     var index = 0;
     for (int i = 0; i < widget._models.length; i++) {
@@ -266,11 +206,10 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
   }
 
   @override
-  void onStartDatabase(List<ArchivedModel> models) {
+  void onRetrieveDatabase(List<CashBookModel> models) {
     if (!mounted) return;
     setState(() {
       widget._models = models;
     });
-    print('$models');
   }
 }

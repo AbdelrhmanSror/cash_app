@@ -12,12 +12,8 @@ class CashInScreen extends CashScreen {
   CashInScreen(
       {CashBookModel? modelToEdit,
       required operationType,
-      required database,
-      parentId = -1,
       Key? key})
       : super(
-            database: database,
-            parentId: parentId,
             operationType: operationType,
             key: key,
             modelToEdit: modelToEdit,
@@ -32,12 +28,8 @@ class CashOutScreen extends CashScreen {
   CashOutScreen(
       {CashBookModel? modelToEdit,
       required operationType,
-      required database,
-      parentId = -1,
       Key? key})
       : super(
-            parentId: parentId,
-            database: database,
             key: key,
             operationType: operationType,
             modelToEdit: modelToEdit,
@@ -50,9 +42,7 @@ class CashOutScreen extends CashScreen {
 
 abstract class CashScreen extends StatefulWidget {
   CashScreen(
-      {required this.database,
-      this.parentId = -1,
-      required this.cashFieldTextColor,
+      {required this.cashFieldTextColor,
       required this.cashFieldHintTextColor,
       required this.validationButtonTextColor,
       required this.validationButtonBackgroundColor,
@@ -61,7 +51,6 @@ abstract class CashScreen extends StatefulWidget {
       this.modelToEdit,
       Key? key})
       : super(key: key);
-  final AppDatabase database;
   final Color cashFieldTextColor;
 
   final Color cashFieldHintTextColor;
@@ -74,7 +63,6 @@ abstract class CashScreen extends StatefulWidget {
 
   String operationType;
   final CashBookModel? modelToEdit;
-  int parentId;
 
   @override
   State<CashScreen> createState() {
@@ -226,26 +214,24 @@ class _CashScreenState extends State<CashScreen> {
       onPressed: () {
         if (numberText.isNotEmpty) {
           if (widget.operationType == INSERT) {
-            widget.database.insert(<CashBookModel>[
+            cashBookDatabase.insert(<CashBookModel>[
               CashBookModel(
                   date: '${DateTime.now()}',
                   description: descriptionText,
                   cash: (double.parse(numberText)),
                   type: widget.type)
-            ], parentId: widget.parentId);
+            ]);
             FocusScope.of(context).unfocus();
             context.navigateBackWithDelay(200, '');
           } else {
-            var updatedModel = widget.database.updateModel(
-                CashBookModel(
-                    totalCashIn: widget.modelToEdit!.totalCashIn,
-                    totalCashOut: widget.modelToEdit!.totalCashOut,
-                    date: widget.modelToEdit!.date,
-                    description: descriptionText,
-                    cash: (double.parse(numberText)),
-                    type: widget.type,
-                    id: widget.modelToEdit!.id),
-                parentId: widget.parentId);
+            var updatedModel = cashBookDatabase.updateModel(CashBookModel(
+                totalCashIn: widget.modelToEdit!.totalCashIn,
+                totalCashOut: widget.modelToEdit!.totalCashOut,
+                date: widget.modelToEdit!.date,
+                description: descriptionText,
+                cash: (double.parse(numberText)),
+                type: widget.type,
+                id: widget.modelToEdit!.id));
             FocusScope.of(context).unfocus();
             //we delay the back to previous screen until keyboard is totally dismissed to prevent overflow render flex from happening
             context.navigateBackWithDelay(200, updatedModel);

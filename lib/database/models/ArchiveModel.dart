@@ -1,9 +1,13 @@
 import 'package:debts_app/database/models/CashBookModel.dart';
 
 class ParentArchivedModel {
-  int id;
+  final int id;
+  String startDate;
+  String endDate;
+  double balance;
 
-  ParentArchivedModel({this.id = 0});
+  ParentArchivedModel(
+      {this.id = -1, this.startDate = '', this.endDate = '', this.balance = 0});
 
   // Convert a model into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -61,7 +65,11 @@ class ArchivedModel extends CashBookModel {
 extension ToParentArchiveModel on List<Map<String, dynamic>> {
   List<ParentArchivedModel> toParentArchiveModels() =>
       List.generate(length, (i) {
-        return ParentArchivedModel(id: this[i]['id']);
+        return ParentArchivedModel(
+            id: this[i]['id'],
+            startDate: this[i]['startDate'],
+            endDate: this[i]['endDate'],
+            balance: this[i]['balance']);
       });
 }
 
