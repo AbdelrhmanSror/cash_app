@@ -22,7 +22,7 @@ class OperationsArchiveWidget extends StatelessWidget {
           padding: MaterialStateProperty.all<EdgeInsets>(
               const EdgeInsets.fromLTRB(60, 5, 60, 5))),
       onPressed: onPressed,
-      child: AppTextWithDot(
+      child: const AppTextWithDot(
         text: 'Operations archive',
         fontSize: 12,
         fontWeight: FontWeight.bold,

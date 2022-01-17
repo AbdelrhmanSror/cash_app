@@ -3,15 +3,16 @@ import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
 
 class ArchiveButtonWidget extends StatelessWidget {
-  ArchiveButtonWidget({required this.onPressed, this.hide = false, Key? key})
+ const ArchiveButtonWidget(
+      {required this.onPressed, this.hide = false, Key? key})
       : super(key: key);
   final Function() onPressed;
-  bool hide;
+  final bool hide;
 
   @override
   Widget build(BuildContext context) {
-    return RoundedButton(
-      text: AppTextWithDot(
+    return RoundedTextButton(
+      text: const AppTextWithDot(
           text: 'Archive',
           fontWeight: FontWeight.normal,
           fontSize: 12,

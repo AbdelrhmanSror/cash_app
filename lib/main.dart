@@ -1,7 +1,9 @@
 import 'package:debts_app/bottomNavigation.dart';
+import 'package:debts_app/repositry/DatabaseRepository.dart';
 import 'package:debts_app/widgets/screens/CashBookScreen.dart';
 import 'package:flutter/material.dart';
 
+final databaseRepository = DataBaseRepository();
 
 void main() {
   runApp(const MainStatelessWidget());
@@ -36,7 +38,7 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
 
   //screen to navigate in bottom navigation bar.
   List<Widget> _widgetOptions() {
-    CashBookScreen screen1 = CashBookScreen();
+    CashBookScreen screen1 = const CashBookScreen();
 
     return [screen1];
   }
@@ -53,17 +55,8 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
+    //retrieve all the data in the database to initialize our app
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 70,
-        backgroundColor: Theme.of(context).canvasColor,
-        elevation: 0,
-        title: const Text(
-          'DEBTS',
-          style: TextStyle(
-              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-      ),
       body: PageView(
         children: _widgetOptions(),
         controller: controller,
@@ -82,6 +75,4 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
       ),
     );
   }
-
-
 }

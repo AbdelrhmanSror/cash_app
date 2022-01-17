@@ -1,4 +1,3 @@
-import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Extensions.dart';
@@ -8,11 +7,11 @@ import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../main.dart';
+
 class CashInScreen extends CashScreen {
-  CashInScreen(
-      {CashBookModel? modelToEdit,
-      required operationType,
-      Key? key})
+  const CashInScreen(
+      {CashBookModel? modelToEdit, required operationType, Key? key})
       : super(
             operationType: operationType,
             key: key,
@@ -25,10 +24,8 @@ class CashInScreen extends CashScreen {
 }
 
 class CashOutScreen extends CashScreen {
-  CashOutScreen(
-      {CashBookModel? modelToEdit,
-      required operationType,
-      Key? key})
+  const CashOutScreen(
+      {CashBookModel? modelToEdit, required operationType, Key? key})
       : super(
             key: key,
             operationType: operationType,
@@ -41,7 +38,7 @@ class CashOutScreen extends CashScreen {
 }
 
 abstract class CashScreen extends StatefulWidget {
-  CashScreen(
+  const CashScreen(
       {required this.cashFieldTextColor,
       required this.cashFieldHintTextColor,
       required this.validationButtonTextColor,
@@ -61,7 +58,7 @@ abstract class CashScreen extends StatefulWidget {
 
   final String type;
 
-  String operationType;
+  final String operationType;
   final CashBookModel? modelToEdit;
 
   @override
@@ -159,7 +156,7 @@ class _CashScreenState extends State<CashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 70,
+        toolbarHeight: 60,
         backgroundColor: Theme.of(context).canvasColor,
         elevation: 0,
         centerTitle: true,
@@ -198,8 +195,8 @@ class _CashScreenState extends State<CashScreen> {
     );
   }
 
-  RoundedButton buildValidateButton(BuildContext context) {
-    return RoundedButton(
+  RoundedTextButton buildValidateButton(BuildContext context) {
+    return RoundedTextButton(
       text: AppTextWithDot(
           text: 'VALIDATE',
           fontWeight: FontWeight.normal,
@@ -214,17 +211,15 @@ class _CashScreenState extends State<CashScreen> {
       onPressed: () {
         if (numberText.isNotEmpty) {
           if (widget.operationType == INSERT) {
-            cashBookDatabase.insert(<CashBookModel>[
-              CashBookModel(
-                  date: '${DateTime.now()}',
-                  description: descriptionText,
-                  cash: (double.parse(numberText)),
-                  type: widget.type)
-            ]);
+            databaseRepository.insertCashBook(CashBookModel(
+                date: '${DateTime.now()}',
+                description: descriptionText,
+                cash: (double.parse(numberText)),
+                type: widget.type));
             FocusScope.of(context).unfocus();
             context.navigateBackWithDelay(200, '');
           } else {
-            var updatedModel = cashBookDatabase.updateModel(CashBookModel(
+            databaseRepository.updateCashBook(CashBookModel(
                 totalCashIn: widget.modelToEdit!.totalCashIn,
                 totalCashOut: widget.modelToEdit!.totalCashOut,
                 date: widget.modelToEdit!.date,
@@ -234,7 +229,7 @@ class _CashScreenState extends State<CashScreen> {
                 id: widget.modelToEdit!.id));
             FocusScope.of(context).unfocus();
             //we delay the back to previous screen until keyboard is totally dismissed to prevent overflow render flex from happening
-            context.navigateBackWithDelay(200, updatedModel);
+            context.navigateBackWithDelay(200, '');
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

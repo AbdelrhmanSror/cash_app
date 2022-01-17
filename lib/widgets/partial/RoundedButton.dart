@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class RoundedButton extends StatelessWidget {
-  RoundedButton({
+class RoundedTextButton extends StatelessWidget {
+  RoundedTextButton({
     required this.text,
     required this.radius,
     required this.backgroundColor,
@@ -11,6 +11,7 @@ class RoundedButton extends StatelessWidget {
     required this.paddingBottom,
     required this.onPressed,
     this.hide = false,
+    this.elevation = 5.0,
     Key? key,
   }) : super(key: key);
   final Widget text;
@@ -21,24 +22,25 @@ class RoundedButton extends StatelessWidget {
   final double paddingRight;
   final double paddingBottom;
   final Function() onPressed;
-  bool hide;
+  final bool hide;
+  double elevation;
 
   @override
   Widget build(BuildContext context) {
     return Opacity(
       opacity: hide ? 0.0 : 1.0,
       child: ElevatedButton(
-        style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(radius),
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(radius),
+                bottom: Radius.circular(radius),
+              ),
             ),
-          ),
-          backgroundColor:
-              MaterialStateColor.resolveWith((states) => backgroundColor),
-          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(
-              paddingLeft, paddingTop, paddingRight, paddingBottom)),
-        ),
+            primary: backgroundColor,
+            elevation: elevation,
+            padding: EdgeInsets.fromLTRB(
+                paddingLeft, paddingTop, paddingRight, paddingBottom)),
         onPressed: hide ? null : onPressed,
         child: text,
       ),

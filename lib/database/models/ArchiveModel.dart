@@ -14,6 +14,9 @@ class ParentArchivedModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'startDate': startDate,
+      'endDate': endDate,
+      'balance': balance,
     };
   }
 
@@ -42,6 +45,7 @@ class ArchivedModel extends CashBookModel {
   // Convert a model into a Map. The keys must correspond to the names of the
   // columns in the database.
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'parentModelId': parentModelId,

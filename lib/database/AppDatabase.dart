@@ -1,33 +1,24 @@
 import 'dart:async';
 
-import 'package:debts_app/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'ArchiveDatabase.dart';
-import 'CashBookDatabase.dart';
 import 'models/CashBookModel.dart';
 
 const String cashBookTable = 'CashBookModel';
 const String parentArchiveTable = 'ParentArchiveModels';
 const String childArchiveTable = 'archiveModels';
 
-final cashBookDatabase = CashBookDatabase();
-final archiveDatabase = ArchiveDatabase();
-final parentArchiveDatabase = ParentArchiveDatabase();
-
-abstract class AppDatabase {
+abstract class AppDatabase<T> {
   Future<Database>? _database;
 
   AppDatabase();
 
-  Future<void> insert(List<CashBookModel> modelToInsert);
-
   //default value is negative 1 so it means there is no parent .
-  Future<void> retrieveAll({int parentId = -1});
+  Future<List<T>> retrieveAll(int parentId);
 
   void _createDb(Database db, int newVersion) async {
     // Run the CREATE TABLE statement on the database.

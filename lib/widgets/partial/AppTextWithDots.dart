@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTextWithDot extends StatelessWidget {
-  AppTextWithDot(
+  const AppTextWithDot(
       {required this.text,
       this.fontWeight = FontWeight.normal,
       this.fontSize = 10,
@@ -13,7 +13,7 @@ class AppTextWithDot extends StatelessWidget {
   final Color color;
   final FontWeight fontWeight;
   final double fontSize;
-  int maxLines;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {

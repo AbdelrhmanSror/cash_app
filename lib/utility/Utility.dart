@@ -1,16 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Utility {
-  /*static String getTimeNow() {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('E MMMM y ').format(now) +
-        'at ' +
-        DateFormat('Hm').format(now);
-    return formattedDate;
-  }*/
-
-
   static Route createAnimationRoute(
       Widget destinationWidget, Offset begin, Offset end, Curve curve) {
     return PageRouteBuilder(
@@ -33,10 +25,18 @@ class Utility {
     );
   }
 
-  static Future<void> createModalSheet(BuildContext context, Widget widget) {
+  static Future<void> createModalSheet(BuildContext context, Widget widget,
+      {bool enableDrag = true}) {
     return showBarModalBottomSheet<void>(
       context: context,
-      duration: const Duration(milliseconds: 500),
+      enableDrag: enableDrag,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30),
+        ),
+      ),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      barrierColor: Colors.transparent.withOpacity(0.7),
       builder: (BuildContext context) {
         return widget;
       },

@@ -10,8 +10,8 @@ class CashInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RoundedButton(
-      text: AppTextWithDot(
+    return RoundedTextButton(
+      text: const AppTextWithDot(
           text: '+ CASH IN',
           fontWeight: FontWeight.bold,
           fontSize: 16,

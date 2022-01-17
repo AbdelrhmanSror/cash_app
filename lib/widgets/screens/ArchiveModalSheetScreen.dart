@@ -1,13 +1,14 @@
-import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:debts_app/widgets/screens/ClosedBookAlertScreen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
 
 class ArchiveModalSheetScreen extends StatelessWidget {
   const ArchiveModalSheetScreen({required this.models, Key? key})
@@ -60,14 +61,14 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          AppTextWithDot(
+                          const AppTextWithDot(
                             text: 'Starting date',
                             color: Colors.black87,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: models.last.getFormattedDate(),
+                            text: models.last.date.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -81,14 +82,14 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          AppTextWithDot(
+                          const AppTextWithDot(
                             text: 'Closing date',
                             color: Colors.black87,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: models.first.getFormattedDate(),
+                            text: models.first.date.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -102,7 +103,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          AppTextWithDot(
+                          const AppTextWithDot(
                             text: 'Number of operations',
                             color: Colors.black87,
                             fontSize: 14,
@@ -130,9 +131,9 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     constraints: const BoxConstraints(
                         minWidth: double.infinity, maxWidth: double.infinity),
-                    child: AppTextWithDot(
+                    child: const AppTextWithDot(
                       text:
-                      'You can still access your Cashbook in Operations archive',
+                          'You can still access your Cashbook in Operations archive',
                       color: Colors.grey,
                       fontSize: 14,
                     ),
@@ -140,8 +141,8 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                   Container(
                     constraints: const BoxConstraints(
                         minWidth: double.infinity, maxWidth: double.infinity),
-                    child: RoundedButton(
-                      text: AppTextWithDot(
+                    child: RoundedTextButton(
+                      text: const AppTextWithDot(
                           text: 'CLOSE BOOK',
                           fontWeight: FontWeight.normal,
                           fontSize: 16,
@@ -153,11 +154,9 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                       paddingLeft: 16,
                       paddingRight: 16,
                       onPressed: () {
-                        cashBookDatabase.deleteAll();
-                        //inserted reversed to make the order ascending in database
-                        archiveDatabase.insert(models.reversed.toList());
+                        databaseRepository.archiveCashBooks();
                         Utility.createModalSheet(
-                            context, const ClosedBookAlertScreen())
+                                context, const ClosedBookAlertScreen())
                             .then((value) {
                           Navigator.of(context).pop();
                         });

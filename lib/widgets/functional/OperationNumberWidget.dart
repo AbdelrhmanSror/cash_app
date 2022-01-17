@@ -14,7 +14,7 @@ class OperationNumberWidget extends StatelessWidget {
     return CompositeWidget(
       width: 150,
       widgets: [
-        AppTextWithDot(
+        const AppTextWithDot(
             text: 'Operations',
             fontWeight: FontWeight.bold,
             fontSize: 20,

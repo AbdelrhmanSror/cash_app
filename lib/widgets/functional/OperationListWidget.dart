@@ -1,5 +1,6 @@
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/circularButton.dart';
@@ -32,18 +33,17 @@ class _OperationListWidgetState extends State<OperationListWidget> {
     return ListView.separated(
         itemCount: widget.models.length,
         separatorBuilder: (BuildContext context, int index) =>
-            const Divider(height: 0, color: Colors.grey),
+            const Divider(color: Colors.grey),
         itemBuilder: (BuildContext context, int index) => _buildRow(index));
   }
 
   Widget _buildEmptyWidget() {
-    var opacity = 1.0;
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        AppTextWithDot(
+        const AppTextWithDot(
           text: 'No Operations',
           color: Color(0xFACDCACA),
           fontSize: 12,
@@ -54,7 +54,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
         ),*/
         Column(
           children: [
-            AppTextWithDot(
+            const AppTextWithDot(
               text: 'Add new operation',
               color: Colors.blue,
               fontSize: 20,
@@ -72,6 +72,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildRow(int index) {
+    // A rectangular area of a [Material] that responds to touch.
     return InkWell(
         child: OperationTile(model: widget.models[index]),
         onTap: () {
@@ -92,7 +93,7 @@ class OperationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final double balance = model.totalCashIn - model.totalCashOut;
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 8),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,10 +106,10 @@ class OperationTile extends StatelessWidget {
             ),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 8),
                 constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
                 child: AppTextWithDot(
-                    text: model.getFormattedDate(),
+                    text: model.date.getFormattedDate(),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                     color: const Color(0xFF281361)),

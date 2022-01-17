@@ -1,4 +1,3 @@
-import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/AppDatabaseCallback.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
@@ -11,17 +10,19 @@ import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/widgets/functional/OperationsArchiveWidget.dart';
+import 'package:debts_app/widgets/functional/SyncButton.dart';
 import 'package:debts_app/widgets/screens/ArchiveModalSheetScreen.dart';
 import 'package:debts_app/widgets/screens/ListDetailScreen.dart';
 import 'package:debts_app/widgets/screens/OperationArchiveParentListScreen.dart';
 import 'package:debts_app/widgets/screens/OperationArchiveScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+import 'CashInFilterScreen.dart';
 import 'CashScreen.dart';
 
 class CashBookScreen extends StatefulWidget {
-  CashBookScreen({Key? key}) : super(key: key);
-  List<CashBookModel> _models = [];
+  const CashBookScreen({Key? key}) : super(key: key);
 
   @override
   State<CashBookScreen> createState() {
@@ -31,17 +32,28 @@ class CashBookScreen extends StatefulWidget {
 
 class _CashBookScreenState extends State<CashBookScreen>
     implements CashBookDatabaseListener<CashBookModel> {
+  List<CashBookModel> models = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 60,
+          backgroundColor: Theme.of(context).canvasColor,
+          elevation: 0,
+          title: const Text(
+            'DEBTS',
+            style: TextStyle(
+                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
+          ),
+        ),
         body: RefreshIndicator(
-      onRefresh: () async {
-        setState(() {
-          cashBookDatabase.retrieveAll();
-        });
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          onRefresh: () async {
+            setState(() {
+              databaseRepository.retrieveCashBooks();
+            });
+          },
+          child: Column(
             children: [
               Column(children: [
                 buildInOutCashDetails(),
@@ -65,21 +77,32 @@ class _CashBookScreenState extends State<CashBookScreen>
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            buildOperationNumberWidget(),
-                            buildArchiveButtonWidget()
+                            Row(
+                              children: [
+                                buildOperationNumberWidget(),
+                                SyncButton(
+                                  onPressed: () async {
+                                    databaseRepository.retrieveCashBooks();
+                                  },
+                                )
+                              ],
+                            ),
+                            buildArchiveButtonWidget(),
                           ]),
                     ),
                     Expanded(child: buildOperationListWidget(context)),
                     Container(
-                      width: double.infinity,
+                      constraints: const BoxConstraints(
+                          minWidth: double.infinity, maxWidth: double.infinity),
                       padding: const EdgeInsets.only(
-                          left: 8, right: 8, top: 8, bottom: 32),
+                          left: 16, right: 16, top: 8, bottom: 16),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
-                          buildCashInButton(context),
-                          buildCashOutButton(context)
+                          Expanded(child: buildCashInButton(context)),
+                          const VerticalDivider(),
+                          Expanded(child: buildCashOutButton(context))
                         ],
                       ),
                     ),
@@ -94,7 +117,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          CashOutScreen(operationType: INSERT),
+          const CashOutScreen(operationType: INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -104,7 +127,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          CashInScreen(operationType: INSERT),
+          const CashInScreen(operationType: INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -113,7 +136,7 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
-        models: widget._models,
+        models: models,
         onPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(
               ListDetailScreen(model: model),
@@ -126,21 +149,21 @@ class _CashBookScreenState extends State<CashBookScreen>
   ArchiveButtonWidget buildArchiveButtonWidget() => ArchiveButtonWidget(
       onPressed: () {
         Utility.createModalSheet(
-            context, ArchiveModalSheetScreen(models: widget._models));
+            context, ArchiveModalSheetScreen(models: models));
       },
-      hide: (widget._models.isEmpty));
+      hide: (models.isEmpty));
 
   OperationNumberWidget buildOperationNumberWidget() {
-    return OperationNumberWidget(countNumber: widget._models.length);
+    return OperationNumberWidget(countNumber: models.length);
   }
 
   OperationsArchiveWidget buildOperationsArchiveWidget() =>
       OperationsArchiveWidget(onPressed: () {
         Navigator.of(context).push(Utility.createAnimationRoute(
             OperationArchiveParentListScreen(onPressed: (parentId) {
-          Navigator.of(context).push(Utility.createAnimationRoute(
-              OperationArchiveScreen(parentId: parentId),
-              const Offset(0.0, 1.0),
+              Navigator.of(context).push(Utility.createAnimationRoute(
+                  OperationArchiveScreen(parentId: parentId),
+              const Offset(1.0, 0.0),
               Offset.zero,
               Curves.ease));
         }), const Offset(0.0, 1.0), Offset.zero, Curves.ease));
@@ -148,29 +171,40 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   NetBalanceWidget buildNetBalanceWidget() {
     return NetBalanceWidget(
-      netBalance: widget._models.isEmpty ? 0 : widget._models[0].getBalance(),
+      netBalance: models.isEmpty ? 0 : models[0].getBalance(),
     );
   }
 
-  InOutCashDetails buildInOutCashDetails() =>
-      InOutCashDetails(models: widget._models);
+  Widget buildInOutCashDetails() => InkWell(
+        onTap: () {
+          Utility.createModalSheet(
+              context,
+              CashInFilterScreen(
+                onDateSelected: (startDate, endDate) {},
+              ),
+              enableDrag: false);
+        },
+        child: InOutCashDetails(
+          models: models,
+        ),
+      );
+
+  // Utility.createModalSheet(context, CashInFilterScreen());
 
   @override
   void initState() {
     super.initState();
     //register this widget as listener to the any updates happen in the database
-    cashBookDatabase.registerListener(this);
+    databaseRepository.registerCashBookDatabaseListener(this);
     //retrieve all the data in the database to initialize our app
-    cashBookDatabase.retrieveAll();
+    databaseRepository.retrieveCashBooks();
   }
 
   @override
   void onInsertDatabase(List<CashBookModel> insertedModels) {
     if (!mounted) return;
     setState(() {
-      for (var model in insertedModels) {
-        widget._models.insert(0, model);
-      }
+      models = insertedModels;
     });
   }
 
@@ -182,7 +216,7 @@ class _CashBookScreenState extends State<CashBookScreen>
     if (!mounted) return;
     setState(() {
       //initial setup for models
-      widget._models = models;
+      this.models = models;
     });
   }
 
@@ -190,40 +224,22 @@ class _CashBookScreenState extends State<CashBookScreen>
   void onDeleteAllDatabase(List<CashBookModel> deletedModels) {
     if (!mounted) return;
     setState(() {
-      widget._models = deletedModels;
+      models.clear();
     });
   }
 
   @override
-  void onLastRowDeleted() {
+  void onUpdateDatabase(List<CashBookModel> updatedModels) {
     if (!mounted) return;
     setState(() {
-      //remove last value in the list
-      //we remove last value by first index because we retrieve all value from database in descending order
-      widget._models.removeAt(0);
-    });
-  }
-
-  @override
-  void onUpdateAllDatabase(List<CashBookModel> updatedModels) {
-    if (!mounted) return;
-    setState(() {
-      widget._models = updatedModels;
-    });
-  }
-
-  @override
-  void onUpdateDatabase(CashBookModel model) {
-    if (!mounted) return;
-    setState(() {
-      widget._models[getIndex(model)] = model;
+      models = updatedModels;
     });
   }
 
   int getIndex(CashBookModel model) {
     var index = 0;
-    for (int i = 0; i < widget._models.length; i++) {
-      if (model.id == widget._models[i].id) {
+    for (int i = 0; i < models.length; i++) {
+      if (model.id == models[i].id) {
         index = i;
         break;
       }

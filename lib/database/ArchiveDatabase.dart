@@ -1,46 +1,23 @@
 import 'dart:async';
 
 import 'package:debts_app/database/AppDatabase.dart';
-import 'package:debts_app/database/AppDatabaseCallback.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'models/ArchiveModel.dart';
 
-class ArchiveDatabase extends AppDatabase {
+class ArchiveDatabase extends AppDatabase<ArchivedModel> {
   ArchiveDatabase();
 
-  final List<ArchiveDatabaseListener> _listeners = [];
-
-  void registerListener(ArchiveDatabaseListener listener) {
-    _listeners.add(listener);
-  }
-
-  void _alertOnStart(List<CashBookModel> model) {
-    for (var listener in _listeners) {
-      listener.onRetrieveDatabase(model);
-    }
-  }
-
   // Define a function that inserts models into the database
-  @override
-  Future<void> insert(List<CashBookModel> modelToInsert) async {
+  Future<void> insert(List<CashBookModel> modelsToInsert, int parentId) async {
     final db = await init();
-    _insertWhenNoParentExist(db, modelToInsert);
-  }
-
-  void _insertWhenNoParentExist(
-      Database db, List<CashBookModel> modelsToInsert) async {
     //getting last parent archive models inserted in table.
-    ParentArchivedModel parentArchivedModel =
-        (await parentArchiveDatabase.getLastParentModel());
 
     //we increment the id of newly inserted value by 1  based on last model in table.
-    int newParentId = parentArchivedModel.id + 1;
     Batch batch = db.batch();
-    parentArchiveDatabase.insert(modelsToInsert);
     for (var model in modelsToInsert.toArchivedModels()) {
-      model.parentModelId = newParentId;
+      model.parentModelId = parentId;
       batch.insert(
         childArchiveTable,
         model.toMap(),
@@ -60,8 +37,8 @@ class ArchiveDatabase extends AppDatabase {
 
   // A method that retrieves all the models from the  table.
   @override
-  Future<void> retrieveAll({int parentId = -1}) async {
-    print('retrieve all $parentId');
-    _alertOnStart(await _getArchivedModels(parentId));
+  Future<List<ArchivedModel>> retrieveAll(int parentId) async {
+    final archivedModels = await _getArchivedModels(parentId);
+    return archivedModels;
   }
 }

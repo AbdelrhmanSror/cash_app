@@ -4,7 +4,7 @@ import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class InOutCashDetails extends StatelessWidget {
-  const InOutCashDetails({required this.models, Key? key}) : super(key: key);
+  InOutCashDetails({required this.models, Key? key}) : super(key: key);
   final List<CashBookModel> models;
 
   @override

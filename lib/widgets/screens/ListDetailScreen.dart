@@ -1,7 +1,6 @@
-import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
-import 'package:debts_app/utility/DateFormatter.dart';
+import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
@@ -9,14 +8,19 @@ import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:debts_app/widgets/screens/CashBookScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import 'CashScreen.dart';
 
 class ListDetailScreen extends StatefulWidget {
   ListDetailScreen(
       {required this.model,
+      this.hideEditButton = false,
+      this.hideDeleteButton = false,
       Key? key})
       : super(key: key);
   CashBookModel model;
+  bool hideEditButton;
+  bool hideDeleteButton;
 
   @override
   State<ListDetailScreen> createState() {
@@ -29,7 +33,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 70,
+        toolbarHeight: 60,
         backgroundColor: Theme.of(context).canvasColor,
         elevation: 0,
         centerTitle: true,
@@ -47,7 +51,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 20, top: 4.0),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 4.0, bottom: 8),
             child: buildDetailsWidget(),
           ),
           Row(
@@ -73,9 +78,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  RoundedButton buildEditButton() {
-    return RoundedButton(
-        text: AppTextWithDot(
+  Widget buildEditButton() {
+    return RoundedTextButton(
+        hide: widget.hideEditButton,
+        text: const AppTextWithDot(
           text: 'EDIT',
           fontSize: 16,
           color: Colors.white,
@@ -89,33 +95,33 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         onPressed: () async {
           CashBookModel? result = EmptyCashBookModel();
           if (widget.model.type == CASH_IN) {
-            result =
-                await Navigator.of(context).push(Utility.createAnimationRoute(
-                    CashInScreen(
-                      operationType: UPDATE,
-                      modelToEdit: widget.model,
-                    ),
-                    const Offset(0.0, 1.0),
-                    Offset.zero,
-                    Curves.ease));
+            await Navigator.of(context).push(Utility.createAnimationRoute(
+                CashInScreen(
+                  operationType: UPDATE,
+                  modelToEdit: widget.model,
+                ),
+                const Offset(0.0, 1.0),
+                Offset.zero,
+                Curves.ease));
           } else {
-            result = await Navigator.of(context).push(
-                Utility.createAnimationRoute(
-                    CashOutScreen(
-                        operationType: UPDATE, modelToEdit: widget.model),
-                    const Offset(0.0, 1.0),
-                    Offset.zero,
-                    Curves.ease));
+            await Navigator.of(context).push(Utility.createAnimationRoute(
+                CashOutScreen(operationType: UPDATE, modelToEdit: widget.model),
+                const Offset(0.0, 1.0),
+                Offset.zero,
+                Curves.ease));
           }
+          //get updated model
+          result = await databaseRepository.getById(widget.model.id);
           setState(() {
             widget.model = result ?? widget.model;
           });
         });
   }
 
-  RoundedButton buildDeleteButton(BuildContext context) {
-    return RoundedButton(
-        text: AppTextWithDot(
+  Widget buildDeleteButton(BuildContext context) {
+    return RoundedTextButton(
+        hide: widget.hideDeleteButton,
+        text: const AppTextWithDot(
           text: 'DELETE',
           fontSize: 16,
           color: Colors.white,
@@ -145,10 +151,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    cashBookDatabase.deleteModel(widget.model);
+                    databaseRepository.deleteCashBook(widget.model);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
-                        CashBookScreen(),
+                        const CashBookScreen(),
                         const Offset(0.1, 0.0),
                         Offset.zero,
                         Curves.ease));
@@ -166,8 +172,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     return CompositeWidget(
       widgets: [
         AppTextWithDot(
-            text: DateFormatter.getDateTimeRepresentation(
-                DateTime.parse(widget.model.date)),
+            text: widget.model.date.getFormattedDate(),
             color: const Color(0xFF281361),
             fontSize: 20,
             fontWeight: FontWeight.bold),
@@ -199,21 +204,22 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           height: 20,
           color: Colors.white,
         ),
-        AppTextWithDot(
+        const AppTextWithDot(
             text: 'Note',
             color: Colors.blue,
             fontSize: 16, //show alert on textfield
             fontWeight: FontWeight.bold),
         const Divider(height: 5, color: Colors.white),
         AppTextWithDot(
+          maxLines: 8,
           text: widget.model.description,
           color: Colors.grey,
           fontWeight: FontWeight.bold,
-          fontSize: 12,
+          fontSize: 13,
         )
       ],
       vertical: true,
-      width: 250,
+      width: double.infinity,
     );
   }
 }

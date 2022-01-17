@@ -33,7 +33,7 @@ class _ClosedBookAlertScreenState extends State<ClosedBookAlertScreen> {
                 minWidth: double.infinity, maxWidth: double.infinity),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Center(
                   child: AppTextWithDot(
                     text: 'Cashbook closed!',
@@ -61,8 +61,8 @@ class _ClosedBookAlertScreenState extends State<ClosedBookAlertScreen> {
           child: Container(
             constraints: const BoxConstraints(
                 minWidth: double.infinity, maxWidth: double.infinity),
-            child: RoundedButton(
-              text: AppTextWithDot(
+            child: RoundedTextButton(
+              text: const AppTextWithDot(
                   text: 'CLOSE',
                   fontWeight: FontWeight.normal,
                   fontSize: 16,

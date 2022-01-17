@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CircularButton extends StatelessWidget {
-  CircularButton(
+  const CircularButton(
       {required this.icon,
       this.iconColor = const Color(0xFF281361),
       this.backgroundColor = const Color(0xFFe0f2f1),
       Key? key})
       : super(key: key);
   final IconData icon;
-  Color iconColor;
-  Color backgroundColor;
+  final Color iconColor;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {

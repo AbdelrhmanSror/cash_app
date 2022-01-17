@@ -1,4 +1,3 @@
-import 'package:debts_app/utility/DateFormatter.dart';
 
 import 'ArchiveModel.dart';
 
@@ -44,10 +43,6 @@ class CashBookModel {
       'description': description,
       'type': type
     };
-  }
-
-  String getFormattedDate() {
-    return DateFormatter.getDateTimeRepresentation(DateTime.parse(date));
   }
 
   double getBalance() {
