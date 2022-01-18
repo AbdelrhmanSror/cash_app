@@ -11,7 +11,7 @@ class RoundedTextButton extends StatelessWidget {
     required this.paddingBottom,
     required this.onPressed,
     this.hide = false,
-    this.elevation = 5.0,
+    this.elevation = 2.0,
     Key? key,
   }) : super(key: key);
   final Widget text;

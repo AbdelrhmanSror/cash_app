@@ -11,6 +11,18 @@ extension DelayedBackNavigation on BuildContext {
 
 extension FormattedDate on String {
   String getFormattedDate() {
+    return DateUtility.getDateRepresentation(DateTime.parse(this));
+  }
+}
+
+extension FormattedDate2 on String {
+  String getFormattedDateTime() {
     return DateUtility.getDateTimeRepresentation(DateTime.parse(this));
+  }
+}
+
+extension FormattedDate3 on String {
+  String getFormattedDateTime2() {
+    return DateUtility.getDateTimeRepresentation2(DateTime.parse(this));
   }
 }

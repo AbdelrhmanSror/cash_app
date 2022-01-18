@@ -30,8 +30,8 @@ class _DateTimeState extends State<CashInFilterScreen> {
 
   //variable represents the state of date filter options list arrow
   bool expanded = false;
-
-  RangeValues price = RangeValues(0, 500000);
+  double startPrice = 0;
+  double endPrice = 500000;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Material(
-          elevation: 1,
+          elevation: 0.5,
           child: Padding(
             padding:
                 const EdgeInsets.only(left: 16.0, right: 8, top: 8, bottom: 0),
@@ -186,7 +186,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
 
   Divider buildDivider() {
     return const Divider(
-      thickness: 1,
+      thickness: 0.2,
       color: Colors.grey,
     );
   }
@@ -270,34 +270,85 @@ class _DateTimeState extends State<CashInFilterScreen> {
           constraints: const BoxConstraints(
               minWidth: double.infinity, maxWidth: double.infinity),
           child: SliderTheme(
-            data: const SliderThemeData(trackHeight: 1),
+            data: const SliderThemeData(
+                trackHeight: 0.5, inactiveTrackColor: Colors.black),
             child: RangeSlider(
-                values: price,
+                values: RangeValues(startPrice, endPrice),
                 min: 0,
                 max: 500000,
                 divisions: 500000,
                 onChanged: (value) {
                   setState(() {
-                    price = value;
+                    startPrice = value.start;
+                    endPrice = value.end;
                   });
                 }),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8),
+          padding: const EdgeInsets.only(left: 8.0, right: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${price.start.toInt()} EGP',
-                style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${price.end.toInt()} EGP',
-                style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold),
-              ),
+              TextButton(
+                  onPressed: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: TextField(
+                            onSubmitted: (number) {
+                              setState(() {
+                                if (double.parse(number) <= endPrice) {
+                                  startPrice = double.parse(number);
+                                }
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration.collapsed(
+                                hintText: 'Start Price',
+                                fillColor: Colors.grey.shade50),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text('${startPrice.toInt()} EGP',
+                      style: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold))),
+              TextButton(
+                  onPressed: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: TextField(
+                            onSubmitted: (number) {
+                              setState(() {
+                                //only if the number is bigger than the least number
+                                if (double.parse(number) >= startPrice) {
+                                  endPrice = double.parse(number);
+                                }
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration.collapsed(
+                                hintText: 'End Price',
+                                fillColor: Colors.grey.shade50),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    '${endPrice.toInt()} EGP',
+                    style: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  )),
             ],
           ),
         )

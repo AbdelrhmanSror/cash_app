@@ -53,11 +53,11 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
         body: Column(children: [
           Container(
             margin:
-                const EdgeInsets.only(left: 4, right: 4, top: 16, bottom: 16),
+                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
             padding:
                 const EdgeInsets.only(top: 8.0, bottom: 8, left: 16, right: 16),
             decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
                 border: Border.all(color: Colors.grey.shade300)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -73,13 +73,15 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                       ),
                       AppTextWithDot(
                         text: models.isNotEmpty
-                            ? models[models.length - 1].date.getFormattedDate()
+                            ? models[models.length - 1]
+                                .date
+                                .getFormattedDateTime2()
                             : '',
                         color: Colors.blueGrey.shade300,
-                        fontSize: 13,
+                        fontSize: 12,
                       )
                     ]),
-                Icon(Icons.double_arrow_sharp, color: Colors.blueGrey.shade200),
+                Icon(Icons.arrow_forward, size: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -91,10 +93,12 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                     ),
                     AppTextWithDot(
                       text: models.isNotEmpty
-                          ? models[models.length - 1].date.getFormattedDate()
+                          ? models[models.length - 1]
+                              .date
+                              .getFormattedDateTime2()
                           : '',
                       color: Colors.blueGrey.shade300,
-                      fontSize: 13,
+                      fontSize: 12,
                     )
                   ],
                 )

@@ -68,7 +68,6 @@ class _OperationArchiveParentListScreenWidgetState
 
   @override
   void onRetrieveDatabase(List<ParentArchivedModel> models) {
-    print('modeslsss  $models');
     if (mounted) {
       setState(() {
         this.models = models;
@@ -95,37 +94,41 @@ class OperationTile extends StatelessWidget {
         children: [
           Row(children: [
             Padding(
-              padding: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.only(right: 8),
               child: CircularButton(
                 icon: Icons.book,
                 iconColor: Colors.blue,
                 backgroundColor: Colors.blue.shade50,
               ),
             ),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                padding: const EdgeInsets.only(bottom: 8),
-                constraints: const BoxConstraints(minWidth: 180, maxWidth: 180),
-                child: AppTextWithDot(
-                    text: 'From ${model.startDate.getFormattedDate()}',
-                    fontWeight: FontWeight.normal,
-                    fontSize: 16,
-                    color: Colors.blueGrey.shade300),
-              ),
-              AppTextWithDot(
-                  text: 'To ${model.endDate.getFormattedDate()}',
-                  fontWeight: FontWeight.normal,
-                  fontSize: 16,
-                  color: Colors.blueGrey.shade300),
-            ])
+            Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: AppTextWithDot(
+                        text: 'From ${model.startDate.getFormattedDate()}',
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        color: Colors.blueGrey.shade300),
+                  ),
+                  AppTextWithDot(
+                      text: 'To ${model.endDate.getFormattedDate()}',
+                      fontWeight: FontWeight.normal,
+                      fontSize: 14,
+                      color: Colors.blueGrey.shade300),
+                ])
           ]),
-          Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            AppTextWithDot(
+          Container(
+            width: 100,
+            alignment: Alignment.centerRight,
+            child: AppTextWithDot(
                 text: '${model.balance} EGP',
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
                 color: model.balance < 0 ? Colors.red : Colors.greenAccent),
-          ]),
+          ),
         ],
       ),
     );

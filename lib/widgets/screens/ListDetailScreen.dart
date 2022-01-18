@@ -172,7 +172,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     return CompositeWidget(
       widgets: [
         AppTextWithDot(
-            text: widget.model.date.getFormattedDate(),
+            text: widget.model.date.getFormattedDateTime(),
             color: const Color(0xFF281361),
             fontSize: 20,
             fontWeight: FontWeight.bold),

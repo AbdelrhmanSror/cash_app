@@ -1,4 +1,5 @@
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
+import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
 
 class OperationsArchiveWidget extends StatelessWidget {
@@ -10,24 +11,20 @@ class OperationsArchiveWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-          ),
-          backgroundColor: MaterialStateColor.resolveWith(
-              (states) => Theme.of(context).canvasColor),
-          padding: MaterialStateProperty.all<EdgeInsets>(
-              const EdgeInsets.fromLTRB(60, 5, 60, 5))),
-      onPressed: onPressed,
-      child: const AppTextWithDot(
-        text: 'Operations archive',
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-        color: Colors.blue,
-      ),
-    );
+    return RoundedTextButton(
+        text: const AppTextWithDot(
+          text: 'Operations archive',
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.blue,
+        ),
+        paddingBottom: 5,
+        paddingLeft: 60,
+        paddingRight: 60,
+        paddingTop: 5,
+        onPressed: onPressed,
+        radius: 50,
+        elevation: 1,
+        backgroundColor: Theme.of(context).canvasColor);
   }
 }
