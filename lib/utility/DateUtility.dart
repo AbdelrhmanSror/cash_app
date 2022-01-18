@@ -1,11 +1,6 @@
 import 'package:intl/intl.dart';
 
-class Date {
-  final String firstDate;
-  final String lastDate;
-
-  Date(this.firstDate, this.lastDate);
-}
+import 'dataClasses/Date.dart';
 
 class DateUtility {
   static String removeTimeFromDate(DateTime dateTime) {

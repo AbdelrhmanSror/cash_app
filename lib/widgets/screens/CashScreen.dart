@@ -1,11 +1,11 @@
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Extensions.dart';
+import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import '../../main.dart';
 
@@ -136,11 +136,7 @@ class _CashScreenState extends State<CashScreen> {
   void initState() {
     super.initState();
     //to immediately show keyboard of cashNumber field after build finish
-    SchedulerBinding.instance?.addPostFrameCallback((Duration _) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _numberFieldFocusNode.requestFocus();
-      });
-    });
+    Utility.showKeyboard(_numberFieldFocusNode);
     //if the operation type is update so we show the description textFormField
     //initially setup the value with the value in model in case user did no changes.
     if (widget.operationType == UPDATE) {

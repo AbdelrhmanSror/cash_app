@@ -1,4 +1,3 @@
-
 import 'ArchiveModel.dart';
 
 /*class EmptyListOfAppModel extends DelegatingList<AppModel> {
@@ -9,8 +8,7 @@ import 'ArchiveModel.dart';
 }*/
 
 class EmptyCashBookModel extends CashBookModel {
-  EmptyCashBookModel({date = '', cash = 0.0, type = ''})
-      : super(date: date, cash: cash, type: type);
+  EmptyCashBookModel() : super(date: '', cash: 0.0, type: '');
 }
 
 class CashBookModel {

@@ -4,6 +4,7 @@ import 'package:debts_app/database/CashBookDatabase.dart';
 import 'package:debts_app/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/database/models/ArchiveModel.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/dataClasses/Date.dart';
 
 class DataBaseRepository {
   final _cashBookDatabase = CashBookDatabase();
@@ -110,9 +111,11 @@ class DataBaseRepository {
     _alertOnArchiveCashBookStart(models);
   }
 
-  void fetchByDateRange(String from, String to) async {
-    print(await _cashBookDatabase.fetchByDateRange(from, to));
-    _alertOnCashBookInsertion(
-        await _cashBookDatabase.fetchByDateRange(from, to));
+  void fetchByDateRange(Date date) async {
+    _alertOnCashBookInsertion(await _cashBookDatabase.fetchByDateRange(date));
+  }
+
+  void fetchByType(String type) async {
+    _alertOnCashBookInsertion(await _cashBookDatabase.fetchByType(type));
   }
 }

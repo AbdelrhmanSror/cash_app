@@ -93,7 +93,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingLeft: 16,
         paddingRight: 16,
         onPressed: () async {
-          CashBookModel? result = EmptyCashBookModel();
+          CashBookModel? result /*EmptyCashBookModel()*/;
           if (widget.model.type == CASH_IN) {
             await Navigator.of(context).push(Utility.createAnimationRoute(
                 CashInScreen(

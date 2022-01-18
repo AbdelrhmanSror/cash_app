@@ -15,10 +15,6 @@ abstract class CashBookDatabaseListener<CashBookModel>
 
   //called when updating or deleting some models except last model ,returning All models in the database after the update
   void onUpdateDatabase(List<CashBookModel> updatedModels);
-
-  //called when database is first initialized,returning all models in the database
-  @override
-  void onRetrieveDatabase(List<CashBookModel> models);
 }
 
 abstract class ArchiveDatabaseListener<CashBookModel>

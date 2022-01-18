@@ -1,5 +1,9 @@
+import 'package:debts_app/database/AppDatabaseCallback.dart';
+import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/DateUtility.dart';
 import 'package:debts_app/utility/Utility.dart';
+import 'package:debts_app/utility/dataClasses/Date.dart';
 import 'package:debts_app/widgets/functional/ExpandableWidget.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
@@ -10,28 +14,44 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../main.dart';
 
-class CashInFilterScreen extends StatefulWidget {
-  CashInFilterScreen({required this.onDateSelected, Key? key})
-      : super(key: key);
+class FilterScreen extends StatefulWidget {
+  FilterScreen({required this.onDateSelected, Key? key}) : super(key: key);
 
   Function(DateTime, DateTime) onDateSelected;
 
   @override
-  _DateTimeState createState() => _DateTimeState();
+  _FilterState createState() => _FilterState();
 }
 
-class _DateTimeState extends State<CashInFilterScreen> {
-  String fromDate = ' ';
-  String toDate = ' ';
+class _FilterState extends State<FilterScreen>
+    implements CashBookDatabaseListener<CashBookModel> {
+  String _fromDate = '';
+  String _toDate = '';
 
   //the variable that controls the height of the current widget on the screen.
-  final double screenPercentage = 0.5;
-  bool dateSelected = false;
+  final double _screenPercentage = 0.5;
 
   //variable represents the state of date filter options list arrow
-  bool expanded = false;
-  double startPrice = 0;
-  double endPrice = 500000;
+  bool _expanded = false;
+
+  double _maxCash = 1;
+  double _minCash = 0;
+  double _startPrice = 0;
+  double _endPrice = 0;
+
+  //number of retrieved models;
+  int _count = 0;
+
+  final _dateOptionSelections = [false, false, false, false, false, false];
+  int previousDateSelectedOptionIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    databaseRepository.registerCashBookDatabaseListener(this);
+    databaseRepository.retrieveCashBooks();
+    //   print('models are ${ databaseRepository.getAllCashBooks()}\n');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +63,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
           elevation: 0.5,
           child: Padding(
             padding:
-                const EdgeInsets.only(left: 16.0, right: 8, top: 8, bottom: 0),
+            const EdgeInsets.only(left: 16.0, right: 8, top: 8, bottom: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -73,7 +93,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
               alignment: Alignment.bottomCenter,
               constraints: BoxConstraints.loose(Size(
                   MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height * screenPercentage)),
+                  MediaQuery.of(context).size.height * _screenPercentage)),
               child: buildFilterWidget()),
         ),
         Material(
@@ -98,8 +118,8 @@ class _DateTimeState extends State<CashInFilterScreen> {
                     elevation: 1,
                     onPressed: () {}),
                 RoundedTextButton(
-                    text: const Text(
-                      'Show 29 Results',
+                    text: Text(
+                      'Show $_count Results',
                       style: TextStyle(color: Colors.white),
                     ),
                     radius: 5,
@@ -136,19 +156,19 @@ class _DateTimeState extends State<CashInFilterScreen> {
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        expanded = !expanded;
+                        _expanded = !_expanded;
                       });
                     },
-                    icon: Icon(expanded
+                    icon: Icon(_expanded
                         ? Icons.keyboard_arrow_up_rounded
                         : Icons.keyboard_arrow_down_rounded))
               ],
             ),
-            buildDateSelection(expanded),
+            buildDateSelection(_expanded),
             buildDivider(),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: const Text(
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Text(
                 'Type',
                 style: TextStyle(
                     fontSize: 16,
@@ -199,7 +219,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
             Padding(
               padding: EdgeInsets.only(left: 8.0),
               child: FilterChip(
-                label: Text('Cash: Low to High'),
+                label: const Text('Cash: Low to High'),
                 selected: true,
                 onSelected: (value) {},
               ),
@@ -207,7 +227,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
             Padding(
               padding: EdgeInsets.only(left: 8.0),
               child: FilterChip(
-                label: Text('Cash: High to low'),
+                label: const Text('Cash: High to low'),
                 selected: false,
                 onSelected: (value) {},
               ),
@@ -247,7 +267,9 @@ class _DateTimeState extends State<CashInFilterScreen> {
           child: FilterChip(
             label: Text('Cash In'),
             selected: true,
-            onSelected: (value) {},
+            onSelected: (value) {
+              databaseRepository.fetchByType(CASH_IN);
+            },
           ),
         ),
         Padding(
@@ -255,7 +277,9 @@ class _DateTimeState extends State<CashInFilterScreen> {
           child: FilterChip(
             label: Text('Cash Out'),
             selected: false,
-            onSelected: (value) {},
+            onSelected: (value) {
+              databaseRepository.fetchByType(CASH_OUT);
+            },
           ),
         )
       ],
@@ -273,14 +297,14 @@ class _DateTimeState extends State<CashInFilterScreen> {
             data: const SliderThemeData(
                 trackHeight: 0.5, inactiveTrackColor: Colors.black),
             child: RangeSlider(
-                values: RangeValues(startPrice, endPrice),
-                min: 0,
-                max: 500000,
-                divisions: 500000,
+                values: RangeValues(_startPrice, _endPrice),
+                min: _minCash,
+                max: _maxCash,
+                divisions: _maxCash.toInt(),
                 onChanged: (value) {
                   setState(() {
-                    startPrice = value.start;
-                    endPrice = value.end;
+                    _startPrice = value.start;
+                    _endPrice = value.end;
                   });
                 }),
           ),
@@ -295,12 +319,14 @@ class _DateTimeState extends State<CashInFilterScreen> {
                     showDialog<bool>(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
+                        final focusNode = FocusNode();
+                        final dialog = AlertDialog(
                           content: TextField(
+                            focusNode: focusNode,
                             onSubmitted: (number) {
                               setState(() {
-                                if (double.parse(number) <= endPrice) {
-                                  startPrice = double.parse(number);
+                                if (cashInRange(number)) {
+                                  _startPrice = double.parse(number);
                                 }
                               });
                               Navigator.of(context).pop();
@@ -312,24 +338,28 @@ class _DateTimeState extends State<CashInFilterScreen> {
                                 fillColor: Colors.grey.shade50),
                           ),
                         );
+                        Utility.showKeyboard(focusNode, duration: 100);
+                        return dialog;
                       },
                     );
                   },
-                  child: Text('${startPrice.toInt()} EGP',
+                  child: Text('${_startPrice.toInt()} EGP',
                       style: const TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold))),
               TextButton(
                   onPressed: () {
+                    final focusNode = FocusNode();
                     showDialog<bool>(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
+                        final dialog = AlertDialog(
                           content: TextField(
+                            focusNode: focusNode,
                             onSubmitted: (number) {
                               setState(() {
                                 //only if the number is bigger than the least number
-                                if (double.parse(number) >= startPrice) {
-                                  endPrice = double.parse(number);
+                                if (cashInRange(number)) {
+                                  _endPrice = double.parse(number);
                                 }
                               });
                               Navigator.of(context).pop();
@@ -341,11 +371,13 @@ class _DateTimeState extends State<CashInFilterScreen> {
                                 fillColor: Colors.grey.shade50),
                           ),
                         );
+                        Utility.showKeyboard(focusNode, duration: 100);
+                        return dialog;
                       },
                     );
                   },
                   child: Text(
-                    '${endPrice.toInt()} EGP',
+                    '${_endPrice.toInt()} EGP',
                     style: const TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
                   )),
@@ -354,6 +386,10 @@ class _DateTimeState extends State<CashInFilterScreen> {
         )
       ],
     );
+  }
+
+  bool cashInRange(String number) {
+    return double.parse(number) <= _maxCash && double.parse(number) >= _minCash;
   }
 
   Widget buildDateSelection(bool expand) {
@@ -379,7 +415,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
                     ),
                   ),
                   AppTextWithDot(
-                    text: fromDate,
+                    text: _fromDate,
                     color: Colors.blue,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -412,7 +448,7 @@ class _DateTimeState extends State<CashInFilterScreen> {
                     ),
                   ),
                   AppTextWithDot(
-                    text: toDate,
+                    text: _toDate,
                     color: Colors.blue,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -434,53 +470,73 @@ class _DateTimeState extends State<CashInFilterScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            buildDateChoiceChip(true, 'This Week', () {
+            buildDateChoiceChip(_dateOptionSelections[0], 'This Week', () {
+              final date = DateUtility.getFirstAndLastDateInCurrentWeek();
               setState(() {
-                final date = DateUtility.getFirstAndLastDateInCurrentWeek();
-                fromDate = date.firstDate;
-                toDate = date.lastDate;
+                //unselect the previously selected chip
+                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+                previousDateSelectedOptionIndex = 0;
+                _dateOptionSelections[0] = true;
+                _fromDate = date.firstDate;
+                _toDate = date.lastDate;
               });
               //fetch date by data in this week
-              databaseRepository.fetchByDateRange(fromDate, toDate);
+              databaseRepository.fetchByDateRange(date);
             }),
-            buildDateChoiceChip(false, 'Last 7 Days', () {
+            buildDateChoiceChip(_dateOptionSelections[1], 'Last 7 Days', () {
+              final date = DateUtility.getFirstAndLastDateInLast7Days();
               setState(() {
-                final date = DateUtility.getFirstAndLastDateInLast7Days();
-                fromDate = date.firstDate;
-                toDate = date.lastDate;
+                //unselect the previously selected chip
+                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+                previousDateSelectedOptionIndex = 1;
+                _dateOptionSelections[1] = true;
+                _fromDate = date.firstDate;
+                _toDate = date.lastDate;
               });
-              databaseRepository.fetchByDateRange(fromDate, toDate);
+              databaseRepository.fetchByDateRange(date);
             }),
-            buildDateChoiceChip(false, 'This Year', () {
+            buildDateChoiceChip(_dateOptionSelections[2], 'This Year', () {
+              final date = DateUtility.getFirstAndLastDateInCurrentYear();
               setState(() {
-                final date = DateUtility.getFirstAndLastDateInCurrentYear();
-                fromDate = date.firstDate;
-                toDate = date.lastDate;
+                //unselect the previously selected chip
+                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+                previousDateSelectedOptionIndex = 2;
+                _dateOptionSelections[2] = true;
+                _fromDate = date.firstDate;
+                _toDate = date.lastDate;
               });
-              databaseRepository.fetchByDateRange(fromDate, toDate);
+              databaseRepository.fetchByDateRange(date);
             })
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            buildDateChoiceChip(false, 'Last 30 Days', () {
+            buildDateChoiceChip(_dateOptionSelections[3], 'Last 30 Days', () {
+              final date = DateUtility.getFirstAndLastDateInLast30Days();
               setState(() {
-                final date = DateUtility.getFirstAndLastDateInLast30Days();
-                fromDate = date.firstDate;
-                toDate = date.lastDate;
+                //unselect the previously selected chip
+                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+                previousDateSelectedOptionIndex = 3;
+                _dateOptionSelections[3] = true;
+                _fromDate = date.firstDate;
+                _toDate = date.lastDate;
               });
-              databaseRepository.fetchByDateRange(fromDate, toDate);
+              databaseRepository.fetchByDateRange(date);
             }),
-            buildDateChoiceChip(false, 'Last Month', () {
+            buildDateChoiceChip(_dateOptionSelections[4], 'Last Month', () {
+              final date = DateUtility.getFirstAndLastDateInLastMonth();
               setState(() {
-                final date = DateUtility.getFirstAndLastDateInLastMonth();
-                fromDate = date.firstDate;
-                toDate = date.lastDate;
+                //unselect the previously selected chip
+                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+                previousDateSelectedOptionIndex = 4;
+                _dateOptionSelections[4] = true;
+                _fromDate = date.firstDate;
+                _toDate = date.lastDate;
               });
-              databaseRepository.fetchByDateRange(fromDate, toDate);
+              databaseRepository.fetchByDateRange(date);
             }),
-            buildDateChoiceChip(false, 'Custom', () {
+            buildDateChoiceChip(_dateOptionSelections[5], 'Custom', () {
               Utility.createModalSheet(
                   context,
                   Container(
@@ -488,7 +544,23 @@ class _DateTimeState extends State<CashInFilterScreen> {
                     alignment: Alignment.bottomCenter,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: buildDatePicker((startdate, endDate) {}),
+                      child: buildDatePicker((startDate, endDate) {
+                        final date = Date(
+                            DateUtility.removeTimeFromDate(startDate),
+                            DateUtility.removeTimeFromDate(endDate));
+                        setState(() {
+                          setState(() {
+                            //unselect the previously selected chip
+                            _dateOptionSelections[
+                                previousDateSelectedOptionIndex] = false;
+                            previousDateSelectedOptionIndex = 5;
+                            _dateOptionSelections[5] = true;
+                            _fromDate = date.firstDate;
+                            _toDate = date.lastDate;
+                          });
+                          databaseRepository.fetchByDateRange(date);
+                        });
+                      }),
                     ),
                   ),
                   enableDrag: true);
@@ -505,20 +577,23 @@ class _DateTimeState extends State<CashInFilterScreen> {
       showActionButtons: true,
       selectionMode: DateRangePickerSelectionMode.range,
       view: DateRangePickerView.month,
+      onCancel: () {
+        Navigator.of(context).pop();
+      },
       onSubmit: (selection) {
         //in case user did not enter the date complete.
         if (selection == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('No Entered Date To Confirm!')));
+          Navigator.of(context).pop();
+          return;
         }
         final value = selection as PickerDateRange;
         if (value.startDate == null || value.endDate == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('No entered date To confirm!')));
-        } else {
-          //submit
-          onDateSelected(value.startDate!, value.endDate!);
+          Navigator.of(context).pop();
+          return;
         }
+        //submit
+        onDateSelected(value.startDate!, value.endDate!);
+        Navigator.of(context).pop();
       },
     );
     return datePicker;
@@ -546,4 +621,30 @@ class _DateTimeState extends State<CashInFilterScreen> {
       },
     );
   }
+
+  @override
+  void onRetrieveDatabase(List<CashBookModel> models) {
+    if (!mounted) return;
+    setState(() {
+      _count = models.length;
+      _toDate = DateUtility.removeTimeFromDate(DateTime.parse(models[0].date));
+      _fromDate = DateUtility.removeTimeFromDate(
+          DateTime.parse(models[models.length - 1].date));
+      final cashRange = Utility.getMinAndMaxCash(models);
+      _minCash = cashRange.first;
+      _maxCash = cashRange.last;
+      _startPrice = cashRange.first;
+      _endPrice = cashRange.last;
+      print('models are $_maxCash  $_minCash  $_startPrice  $_endPrice');
+    });
+  }
+
+  @override
+  void onDeleteAllDatabase(List<CashBookModel> emptyModel) {}
+
+  @override
+  void onInsertDatabase(List<CashBookModel> insertedModels) {}
+
+  @override
+  void onUpdateDatabase(List<CashBookModel> updatedModels) {}
 }

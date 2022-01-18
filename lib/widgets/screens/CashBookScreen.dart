@@ -18,8 +18,8 @@ import 'package:debts_app/widgets/screens/OperationArchiveScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import 'CashInFilterScreen.dart';
 import 'CashScreen.dart';
+import 'FilterScreen.dart';
 
 class CashBookScreen extends StatefulWidget {
   const CashBookScreen({Key? key}) : super(key: key);
@@ -179,7 +179,7 @@ class _CashBookScreenState extends State<CashBookScreen>
         onTap: () {
           Utility.createModalSheet(
               context,
-              CashInFilterScreen(
+              FilterScreen(
                 onDateSelected: (startDate, endDate) {},
               ),
               enableDrag: false);
