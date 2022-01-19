@@ -1,6 +1,6 @@
-import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Extensions.dart';
 import 'package:debts_app/utility/Utility.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
@@ -14,7 +14,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
   const ArchiveModalSheetScreen({required this.models, Key? key})
       : super(key: key);
 
-  final List<CashBookModel> models;
+  final CashBookModelListDetails models;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: models.last.date.getFormattedDate(),
+                            text: models.startDate.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -89,7 +89,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: models.first.date.getFormattedDate(),
+                            text: models.endDate.getFormattedDate(),
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -110,7 +110,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           AppTextWithDot(
-                            text: '${models.length}',
+                            text: '${models.models.length}',
                             color: Colors.grey,
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -154,7 +154,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                       paddingLeft: 16,
                       paddingRight: 16,
                       onPressed: () {
-                        databaseRepository.archiveCashBooks();
+                        databaseRepository.archiveCashBooks(models);
                         Utility.createModalSheet(
                                 context, const ClosedBookAlertScreen())
                             .then((value) {
@@ -174,7 +174,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
 
   NetBalanceWidget buildNetBalanceWidget() {
     return NetBalanceWidget(
-      netBalance: models[0].getBalance(),
+      netBalance: models.getBalance(),
     );
   }
 }

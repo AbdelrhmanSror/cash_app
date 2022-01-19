@@ -1,17 +1,17 @@
-import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
 
 class InOutCashDetails extends StatelessWidget {
-  InOutCashDetails({required this.models, Key? key}) : super(key: key);
-  final List<CashBookModel> models;
+  const InOutCashDetails({required this.models, Key? key}) : super(key: key);
+  final CashBookModelListDetails models;
 
   @override
   Widget build(BuildContext context) {
     //getting the latest row in the table to get the recent info.
-    final double totalCashIn = models.isNotEmpty ? models[0].totalCashIn : 0;
-    final double totalCashOut = models.isNotEmpty ? models[0].totalCashOut : 0;
+    final double totalCashIn = models.totalCashIn;
+    final double totalCashOut = models.totalCashOut;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

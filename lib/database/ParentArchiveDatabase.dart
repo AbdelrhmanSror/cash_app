@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:debts_app/database/AppDatabase.dart';
-import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'models/ArchiveModel.dart';
 
-class ParentArchiveDatabase extends AppDatabase<ParentArchivedModel> {
+class ParentArchiveDatabase extends AppDatabase {
   ParentArchiveDatabase();
 
   // Define a function that inserts models into the database
-  Future<int> createParentId(List<CashBookModel> modelToInsert) async {
+  Future<int> createParentId(CashBookModelListDetails modelToInsert) async {
     final db = await init();
     //getting last parent archive models inserted in table.
     ParentArchivedModel parentArchivedModel = (await getLastParentModel());
@@ -21,9 +21,9 @@ class ParentArchiveDatabase extends AppDatabase<ParentArchivedModel> {
       parentArchiveTable,
       ParentArchivedModel(
               id: newParentId,
-              startDate: modelToInsert[0].date,
-              endDate: modelToInsert[modelToInsert.length - 1].date,
-              balance: modelToInsert[modelToInsert.length - 1].getBalance())
+              startDate: modelToInsert.startDate,
+              endDate: modelToInsert.endDate,
+              balance: modelToInsert.getBalance())
           .toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );

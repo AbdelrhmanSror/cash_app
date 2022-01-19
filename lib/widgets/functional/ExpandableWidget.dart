@@ -25,7 +25,7 @@ class _ExpandableWidgetState extends State<ExpandableWidget>
 
   void prepareAnimations() {
     expandController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 200));
     animation = CurvedAnimation(
       parent: expandController,
       curve: Curves.fastOutSlowIn,

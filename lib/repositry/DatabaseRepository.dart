@@ -4,6 +4,9 @@ import 'package:debts_app/database/CashBookDatabase.dart';
 import 'package:debts_app/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/database/models/ArchiveModel.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/dataClasses/Cash.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/utility/dataClasses/Date.dart';
 
 class DataBaseRepository {
@@ -34,63 +37,56 @@ class DataBaseRepository {
     _parentArchiveCashBookListeners.add(listener);
   }
 
-  void _alertOnCashBookInsertion(List<CashBookModel> model) {
+  void _alertOnCashBookChanged(CashBookModelListDetails model) {
     for (var listener in _cashBookListeners) {
-      listener.onInsertDatabase(model);
+      listener.onDatabaseChanged(model);
     }
   }
 
-  void _alertOnCashBooDeleteAll(List<CashBookModel> models) {
+  void _alertOnCashBookStart(CashBookModelListDetails model) {
     for (var listener in _cashBookListeners) {
-      listener.onDeleteAllDatabase(models);
-    }
-  }
-
-  void _alertOnCashBookUpdateAll(List<CashBookModel> models) {
-    for (var listener in _cashBookListeners) {
-      listener.onUpdateDatabase(models);
-    }
-  }
-
-  void _alertOnCashBookStart(List<CashBookModel> model) {
-    for (var listener in _cashBookListeners) {
-      listener.onRetrieveDatabase(model);
+      listener.onDatabaseStarted(model);
     }
   }
 
   void _alertOnParentArchiveCashBookStart(List<ParentArchivedModel> model) {
     for (var listener in _parentArchiveCashBookListeners) {
-      listener.onRetrieveDatabase(model);
+      listener.onDatabaseStarted(model);
     }
   }
 
-  void _alertOnArchiveCashBookStart(List<CashBookModel> model) {
+  void _alertOnArchiveCashBookStart(CashBookModelListDetails model) {
     for (var listener in _archiveCashBookListeners) {
-      listener.onRetrieveDatabase(model);
+      listener.onDatabaseStarted(model);
     }
   }
 
   void insertCashBook(CashBookModel modelToInsert) async {
     await _cashBookDatabase.insert(modelToInsert);
-    _alertOnCashBookInsertion(await _retrieveCashBooks());
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveCashBooks() async {
-    _alertOnCashBookStart(await _retrieveCashBooks());
+    _alertOnCashBookStart((await _retrieveCashBooks()));
   }
 
-  Future<List<CashBookModel>> _retrieveCashBooks() async {
-    return await _cashBookDatabase.retrieveAll(-1);
+  Future<CashBookModelListDetails> _retrieveCashBooks(
+      {Date? date,
+      TypeFilter? type,
+      CashRange? cashRange,
+      SortFilter? sortFilter}) async {
+    return await _cashBookDatabase.retrieveAll(
+        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter);
   }
 
   void updateCashBook(CashBookModel modelToUpdate) async {
     await _cashBookDatabase.updateModel(modelToUpdate);
-    _alertOnCashBookUpdateAll(await _retrieveCashBooks());
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void deleteCashBook(CashBookModel modelToDelete) async {
     await _cashBookDatabase.deleteModel(modelToDelete);
-    _alertOnCashBookUpdateAll(await _retrieveCashBooks());
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveArchivedCashBooks(int parentId) async {
@@ -102,20 +98,26 @@ class DataBaseRepository {
         await _parentArchiveDatabase.retrieveAll(-1));
   }
 
-  void archiveCashBooks() async {
-    final models = await _cashBookDatabase.retrieveAll(-1);
-    int parentId = await _parentArchiveDatabase.createParentId(models);
-    await _archiveDatabase.insert(models.reversed.toList(), parentId);
-    await _cashBookDatabase.deleteAll();
-    _alertOnCashBooDeleteAll(models);
-    _alertOnArchiveCashBookStart(models);
+  //remember to archive based on current filter
+  void archiveCashBooks(CashBookModelListDetails models) async {
+    final listOfIds = List.generate(models.models.length, (i) {
+      return models.models[i].id;
+    });
+    //because models may be ordered in some way so we need to revert it back to its genuine order which is in ascending by id
+    final orderedModels =
+        await _cashBookDatabase.getAllWithID(listOfIds: listOfIds);
+    int parentId = await _parentArchiveDatabase.createParentId(orderedModels);
+    await _archiveDatabase.insert(orderedModels.models, parentId);
+    await _cashBookDatabase.deleteAll(orderedModels.models);
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
-  void fetchByDateRange(Date date) async {
-    _alertOnCashBookInsertion(await _cashBookDatabase.fetchByDateRange(date));
-  }
-
-  void fetchByType(String type) async {
-    _alertOnCashBookInsertion(await _cashBookDatabase.fetchByType(type));
+  void filterCashBooks(
+      {Date? date,
+      TypeFilter? type,
+      CashRange? cashRange,
+      SortFilter? sortFilter}) async {
+    _alertOnCashBookChanged(await _retrieveCashBooks(
+        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter));
   }
 }

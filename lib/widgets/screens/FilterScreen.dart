@@ -3,10 +3,12 @@ import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/DateUtility.dart';
 import 'package:debts_app/utility/Utility.dart';
+import 'package:debts_app/utility/dataClasses/Cash.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/utility/dataClasses/Date.dart';
 import 'package:debts_app/widgets/functional/ExpandableWidget.dart';
+import 'package:debts_app/widgets/functional/RectangleTitleArea.dart';
 import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
-import 'package:debts_app/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +27,19 @@ class FilterScreen extends StatefulWidget {
 
 class _FilterState extends State<FilterScreen>
     implements CashBookDatabaseListener<CashBookModel> {
+  bool isLoadingFirst = true;
+
   String _fromDate = '';
   String _toDate = '';
 
   //the variable that controls the height of the current widget on the screen.
-  final double _screenPercentage = 0.5;
+  final double _screenPercentage = 0.4;
 
   //variable represents the state of date filter options list arrow
-  bool _expanded = false;
+  bool _dateExpanded = true;
+  bool _cashExpanded = true;
+  bool _sortExpanded = true;
+  bool _typeExpanded = true;
 
   double _maxCash = 1;
   double _minCash = 0;
@@ -55,86 +62,98 @@ class _FilterState extends State<FilterScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Material(
-          elevation: 0.5,
-          child: Padding(
-            padding:
-            const EdgeInsets.only(left: 16.0, right: 8, top: 8, bottom: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'FILTER',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue),
-                ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Close',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.blue)))
-              ],
-            ),
+    if (isLoadingFirst) {
+      return const SizedBox(
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 8),
-          child: Container(
-              alignment: Alignment.bottomCenter,
-              constraints: BoxConstraints.loose(Size(
-                  MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height * _screenPercentage)),
-              child: buildFilterWidget()),
-        ),
-        Material(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16, top: 4, bottom: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                RoundedTextButton(
-                    text: const Text(
-                      'Clear Filters',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    radius: 5,
-                    backgroundColor: Theme.of(context).canvasColor,
-                    paddingLeft: 8,
-                    paddingTop: 7,
-                    paddingRight: 8,
-                    paddingBottom: 8,
-                    elevation: 1,
-                    onPressed: () {}),
-                RoundedTextButton(
-                    text: Text(
-                      'Show $_count Results',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    radius: 5,
-                    backgroundColor: Colors.blue,
-                    paddingLeft: 8,
-                    paddingTop: 8,
-                    paddingRight: 8,
-                    paddingBottom: 8,
-                    onPressed: () {})
-              ],
+      );
+    } else {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Material(
+            color: Colors.blue,
+            elevation: 0.5,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 8, top: 8, bottom: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'FILTER',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Close',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.white)))
+                ],
+              ),
             ),
           ),
-        )
-      ],
-    );
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 8),
+            child: Container(
+                alignment: Alignment.bottomCenter,
+                constraints: BoxConstraints.loose(Size(
+                    MediaQuery.of(context).size.width,
+                    MediaQuery.of(context).size.height * _screenPercentage)),
+                child: buildFilterWidget()),
+          ),
+          Material(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 16, top: 4, bottom: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RoundedTextButton(
+                      text: const Text(
+                        'Clear Filters',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      radius: 5,
+                      backgroundColor: Theme.of(context).canvasColor,
+                      paddingLeft: 8,
+                      paddingTop: 7,
+                      paddingRight: 8,
+                      paddingBottom: 8,
+                      elevation: 1,
+                      onPressed: () {}),
+                  RoundedTextButton(
+                      text: Text(
+                        'Show $_count Results',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      radius: 5,
+                      backgroundColor: Colors.blue,
+                      paddingLeft: 8,
+                      paddingTop: 8,
+                      paddingRight: 8,
+                      paddingBottom: 8,
+                      onPressed: () {})
+                ],
+              ),
+            ),
+          )
+        ],
+      );
+    }
   }
 
   Widget buildFilterWidget() {
@@ -143,59 +162,18 @@ class _FilterState extends State<FilterScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Show Operations for',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black),
-                ),
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _expanded = !_expanded;
-                      });
-                    },
-                    icon: Icon(_expanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded))
-              ],
-            ),
-            buildDateSelection(_expanded),
+            buildDateTitle(),
+            buildDateSelection(),
             buildDivider(),
-            const Padding(
-              padding: EdgeInsets.only(top: 8.0),
-              child: Text(
-                'Type',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black),
-              ),
-            ),
+            buildTypeTitle(),
             buildTypeSelection(),
             buildDivider(),
-            const Text(
-              'Price',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.black),
-            ),
-            buildPriceSlider(),
+            buildCashTitle(),
+            buildCashSlider(),
             buildDivider(),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                'Sort By',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black),
-              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: buildSortTitle(),
             ),
             buildSortingSelection()
           ],
@@ -204,207 +182,119 @@ class _FilterState extends State<FilterScreen>
     );
   }
 
-  Divider buildDivider() {
-    return const Divider(
-      thickness: 0.2,
-      color: Colors.grey,
-    );
-  }
-
-  Widget buildSortingSelection() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 8.0),
-              child: FilterChip(
-                label: const Text('Cash: Low to High'),
-                selected: true,
-                onSelected: (value) {},
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 8.0),
-              child: FilterChip(
-                label: const Text('Cash: High to low'),
-                selected: false,
-                onSelected: (value) {},
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: FilterChip(
-                label: Text('Latest'),
-                selected: false,
-                onSelected: (value) {},
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: FilterChip(
-                label: Text('Older'),
-                selected: false,
-                onSelected: (value) {},
-              ),
-            ),
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget buildTypeSelection() {
+  Row buildDateTitle() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Padding(
-          padding: EdgeInsets.all(8.0),
-          child: FilterChip(
-            label: Text('Cash In'),
-            selected: true,
-            onSelected: (value) {
-              databaseRepository.fetchByType(CASH_IN);
-            },
-          ),
+        const Text(
+          'Date',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
         ),
-        Padding(
-          padding: EdgeInsets.all(8.0),
-          child: FilterChip(
-            label: Text('Cash Out'),
-            selected: false,
-            onSelected: (value) {
-              databaseRepository.fetchByType(CASH_OUT);
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _dateExpanded = !_dateExpanded;
+              });
             },
-          ),
-        )
+            icon: Icon(_dateExpanded
+                ? Icons.keyboard_arrow_up_rounded
+                : Icons.keyboard_arrow_down_rounded))
       ],
     );
   }
 
-  Widget buildPriceSlider() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Row buildTypeTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          constraints: const BoxConstraints(
-              minWidth: double.infinity, maxWidth: double.infinity),
-          child: SliderTheme(
-            data: const SliderThemeData(
-                trackHeight: 0.5, inactiveTrackColor: Colors.black),
-            child: RangeSlider(
-                values: RangeValues(_startPrice, _endPrice),
-                min: _minCash,
-                max: _maxCash,
-                divisions: _maxCash.toInt(),
-                onChanged: (value) {
-                  setState(() {
-                    _startPrice = value.start;
-                    _endPrice = value.end;
-                  });
-                }),
-          ),
+        const Text(
+          'Type',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _typeExpanded = !_typeExpanded;
+              });
+            },
+            icon: Icon(_typeExpanded
+                ? Icons.keyboard_arrow_up_rounded
+                : Icons.keyboard_arrow_down_rounded))
+      ],
+    );
+  }
+
+  Row buildCashTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Cash',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
+        ),
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _cashExpanded = !_cashExpanded;
+              });
+            },
+            icon: Icon(_cashExpanded
+                ? Icons.keyboard_arrow_up_rounded
+                : Icons.keyboard_arrow_down_rounded))
+      ],
+    );
+  }
+
+  Row buildSortTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Sort By',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
+        ),
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _sortExpanded = !_sortExpanded;
+              });
+            },
+            icon: Icon(_sortExpanded
+                ? Icons.keyboard_arrow_up_rounded
+                : Icons.keyboard_arrow_down_rounded))
+      ],
+    );
+  }
+
+  Divider buildDivider() {
+    return Divider(
+      thickness: 1,
+      color: Colors.grey.shade300,
+    );
+  }
+
+  Widget buildDateSelection() {
+    return ExpandableWidget(
+      expand: _dateExpanded,
+      child: Column(
+        children: [
+          buildDateFilterSystem(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              TextButton(
-                  onPressed: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        final focusNode = FocusNode();
-                        final dialog = AlertDialog(
-                          content: TextField(
-                            focusNode: focusNode,
-                            onSubmitted: (number) {
-                              setState(() {
-                                if (cashInRange(number)) {
-                                  _startPrice = double.parse(number);
-                                }
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration.collapsed(
-                                hintText: 'Start Price',
-                                fillColor: Colors.grey.shade50),
-                          ),
-                        );
-                        Utility.showKeyboard(focusNode, duration: 100);
-                        return dialog;
-                      },
-                    );
-                  },
-                  child: Text('${_startPrice.toInt()} EGP',
-                      style: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold))),
-              TextButton(
-                  onPressed: () {
-                    final focusNode = FocusNode();
-                    showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        final dialog = AlertDialog(
-                          content: TextField(
-                            focusNode: focusNode,
-                            onSubmitted: (number) {
-                              setState(() {
-                                //only if the number is bigger than the least number
-                                if (cashInRange(number)) {
-                                  _endPrice = double.parse(number);
-                                }
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration.collapsed(
-                                hintText: 'End Price',
-                                fillColor: Colors.grey.shade50),
-                          ),
-                        );
-                        Utility.showKeyboard(focusNode, duration: 100);
-                        return dialog;
-                      },
-                    );
-                  },
-                  child: Text(
-                    '${_endPrice.toInt()} EGP',
-                    style: const TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold),
-                  )),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  bool cashInRange(String number) {
-    return double.parse(number) <= _maxCash && double.parse(number) >= _minCash;
-  }
-
-  Widget buildDateSelection(bool expand) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        buildDateFilterSystem(expand),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: CompositeWidget(
-                width: 150,
-                widgets: [
+              const Icon(
+                Icons.date_range_rounded,
+                color: Colors.blue,
+                size: 30,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2.0),
                     child: AppTextWithDot(
@@ -421,23 +311,25 @@ class _FilterState extends State<FilterScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ],
-                vertical: true,
               ),
-            ),
-            SizedBox(
-              height: 60,
-              child: VerticalDivider(
-                color: Colors.blueGrey.shade200,
-                thickness: 1,
-                indent: 15,
-                endIndent: 15,
+              SizedBox(
+                height: 60,
+                child: VerticalDivider(
+                  color: Colors.blueGrey.shade200,
+                  thickness: 1,
+                  indent: 15,
+                  endIndent: 15,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: CompositeWidget(
-                width: 200,
-                widgets: [
+              const Icon(
+                Icons.date_range_rounded,
+                color: Colors.blue,
+                size: 30,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2.0),
                     child: AppTextWithDot(
@@ -454,120 +346,358 @@ class _FilterState extends State<FilterScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ],
-                vertical: true,
-              ),
-            )
-          ],
-        ),
-      ],
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget buildDateFilterSystem(bool expand) {
+  Widget buildTypeSelection() {
     return ExpandableWidget(
-      expand: expand,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            buildDateChoiceChip(_dateOptionSelections[0], 'This Week', () {
-              final date = DateUtility.getFirstAndLastDateInCurrentWeek();
-              setState(() {
-                //unselect the previously selected chip
-                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
-                previousDateSelectedOptionIndex = 0;
-                _dateOptionSelections[0] = true;
-                _fromDate = date.firstDate;
-                _toDate = date.lastDate;
-              });
-              //fetch date by data in this week
-              databaseRepository.fetchByDateRange(date);
+      expand: _typeExpanded,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: FilterChip(
+              label: Text('Cash In'),
+              selected: true,
+              onSelected: (value) {
+                showLoadingBar();
+                databaseRepository.filterCashBooks(type: TypeFilter.CASH_IN);
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: FilterChip(
+              label: Text('Cash Out'),
+              selected: false,
+              onSelected: (value) {
+                showLoadingBar();
+                databaseRepository.filterCashBooks(type: TypeFilter.CASH_OUT);
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildCashSlider() {
+    return ExpandableWidget(
+      expand: _cashExpanded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RectangleTitleArea(
+            title1: const AppTextWithDot(
+              text: 'Start Cash',
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            subTitle1: TextButton(
+                onPressed: () {
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      final focusNode = FocusNode();
+                      final dialog = AlertDialog(
+                        content: TextField(
+                          focusNode: focusNode,
+                          onSubmitted: (number) {
+                            setState(() {
+                              final value = double.parse(number);
+                              if (cashInRange(number) && value <= _endPrice) {
+                                showLoadingBar();
+                                _startPrice = value;
+                                databaseRepository.filterCashBooks(
+                                    cashRange:
+                                        CashRange(_startPrice, _endPrice));
+                                return;
+                              }
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration.collapsed(
+                              hintText: 'Start Cash',
+                              fillColor: Colors.grey.shade50),
+                        ),
+                      );
+                      Utility.showKeyboard(focusNode, duration: 100);
+                      return dialog;
+                    },
+                  );
+                },
+                child: Text('${_startPrice.toInt()} EGP',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.normal))),
+            title2: const AppTextWithDot(
+              text: 'End Cash',
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            subTitle2: TextButton(
+                onPressed: () {
+                  final focusNode = FocusNode();
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      final dialog = AlertDialog(
+                        content: TextField(
+                          focusNode: focusNode,
+                          onSubmitted: (number) {
+                            setState(() {
+                              final value = double.parse(number);
+                              //only if the number is bigger than the least number
+                              if (cashInRange(number) && value >= _startPrice) {
+                                showLoadingBar();
+                                _endPrice = value;
+                                databaseRepository.filterCashBooks(
+                                    cashRange:
+                                        CashRange(_startPrice, _endPrice));
+                                return;
+                              }
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration.collapsed(
+                              hintText: 'End Cash',
+                              fillColor: Colors.grey.shade50),
+                        ),
+                      );
+                      Utility.showKeyboard(focusNode, duration: 100);
+                      return dialog;
+                    },
+                  );
+                },
+                child: Text(
+                  '${_endPrice.toInt()} EGP',
+                  style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.normal),
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSortingSelection() {
+    return ExpandableWidget(
+      expand: _sortExpanded,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: FilterChip(
+                  label: const Text('Cash: Low to High'),
+                  selected: false,
+                  onSelected: (value) {
+                    showLoadingBar();
+                    databaseRepository.filterCashBooks(
+                        sortFilter: SortFilter.CASH_LOW_TO_HIGH);
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: FilterChip(
+                  label: const Text('Cash: High to low'),
+                  selected: false,
+                  onSelected: (value) {
+                    showLoadingBar();
+                    databaseRepository.filterCashBooks(
+                        sortFilter: SortFilter.CASH_HIGH_TO_LOW);
+                  },
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: FilterChip(
+                  label: Text('Latest'),
+                  selected: true,
+                  onSelected: (value) {
+                    showLoadingBar();
+                    databaseRepository.filterCashBooks(
+                        sortFilter: SortFilter.LATEST);
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: FilterChip(
+                  label: Text('Older'),
+                  selected: false,
+                  onSelected: (value) {
+                    showLoadingBar();
+                    databaseRepository.filterCashBooks(
+                        sortFilter: SortFilter.OLDER);
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  bool cashInRange(String number) {
+    return double.parse(number) <= _maxCash && double.parse(number) >= _minCash;
+  }
+
+  Widget buildDateFilterSystem() {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          buildDateChoiceChip(_dateOptionSelections[0], 'This Week', () {
+            onThisWeekSelected();
+          }),
+          buildDateChoiceChip(_dateOptionSelections[1], 'Last 7 Days', () {
+            onLast7DaysSelected();
+          }),
+          buildDateChoiceChip(_dateOptionSelections[2], 'This Year', () {
+            onThisYearSelected();
+          })
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          buildDateChoiceChip(_dateOptionSelections[3], 'Last 30 Days', () {
+            onLast30DaysSelected();
+          }),
+          buildDateChoiceChip(_dateOptionSelections[4], 'Last Month', () {
+            onLastMonthSelected();
+          }),
+          buildDateChoiceChip(_dateOptionSelections[5], 'Custom', () {
+            onCustomSelected();
+          })
+        ],
+      ),
+    ]);
+  }
+
+  void onCustomSelected() {
+    Utility.createModalSheet(
+        context,
+        Container(
+          height: 350,
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildDatePicker((startDate, endDate) {
+              showLoadingBar();
+              final date = Date(DateUtility.removeTimeFromDate(startDate),
+                  DateUtility.removeTimeFromDate(endDate));
+              //unselect the previously selected chip
+              _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+              previousDateSelectedOptionIndex = 5;
+              _dateOptionSelections[5] = true;
+              _fromDate =
+                  DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+              _toDate =
+                  DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+              databaseRepository.filterCashBooks(date: date);
             }),
-            buildDateChoiceChip(_dateOptionSelections[1], 'Last 7 Days', () {
-              final date = DateUtility.getFirstAndLastDateInLast7Days();
-              setState(() {
-                //unselect the previously selected chip
-                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
-                previousDateSelectedOptionIndex = 1;
-                _dateOptionSelections[1] = true;
-                _fromDate = date.firstDate;
-                _toDate = date.lastDate;
-              });
-              databaseRepository.fetchByDateRange(date);
-            }),
-            buildDateChoiceChip(_dateOptionSelections[2], 'This Year', () {
-              final date = DateUtility.getFirstAndLastDateInCurrentYear();
-              setState(() {
-                //unselect the previously selected chip
-                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
-                previousDateSelectedOptionIndex = 2;
-                _dateOptionSelections[2] = true;
-                _fromDate = date.firstDate;
-                _toDate = date.lastDate;
-              });
-              databaseRepository.fetchByDateRange(date);
-            })
-          ],
+          ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            buildDateChoiceChip(_dateOptionSelections[3], 'Last 30 Days', () {
-              final date = DateUtility.getFirstAndLastDateInLast30Days();
-              setState(() {
-                //unselect the previously selected chip
-                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
-                previousDateSelectedOptionIndex = 3;
-                _dateOptionSelections[3] = true;
-                _fromDate = date.firstDate;
-                _toDate = date.lastDate;
-              });
-              databaseRepository.fetchByDateRange(date);
-            }),
-            buildDateChoiceChip(_dateOptionSelections[4], 'Last Month', () {
-              final date = DateUtility.getFirstAndLastDateInLastMonth();
-              setState(() {
-                //unselect the previously selected chip
-                _dateOptionSelections[previousDateSelectedOptionIndex] = false;
-                previousDateSelectedOptionIndex = 4;
-                _dateOptionSelections[4] = true;
-                _fromDate = date.firstDate;
-                _toDate = date.lastDate;
-              });
-              databaseRepository.fetchByDateRange(date);
-            }),
-            buildDateChoiceChip(_dateOptionSelections[5], 'Custom', () {
-              Utility.createModalSheet(
-                  context,
-                  Container(
-                    height: 350,
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: buildDatePicker((startDate, endDate) {
-                        final date = Date(
-                            DateUtility.removeTimeFromDate(startDate),
-                            DateUtility.removeTimeFromDate(endDate));
-                        setState(() {
-                          setState(() {
-                            //unselect the previously selected chip
-                            _dateOptionSelections[
-                                previousDateSelectedOptionIndex] = false;
-                            previousDateSelectedOptionIndex = 5;
-                            _dateOptionSelections[5] = true;
-                            _fromDate = date.firstDate;
-                            _toDate = date.lastDate;
-                          });
-                          databaseRepository.fetchByDateRange(date);
-                        });
-                      }),
-                    ),
-                  ),
-                  enableDrag: true);
-            })
-          ],
-        ),
-      ]),
+        enableDrag: true);
+  }
+
+  void onLastMonthSelected() {
+    showLoadingBar();
+    final date = DateUtility.getFirstAndLastDateInLastMonth();
+    //unselect the previously selected chip
+    _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+    previousDateSelectedOptionIndex = 4;
+    _dateOptionSelections[4] = true;
+    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    databaseRepository.filterCashBooks(date: date);
+  }
+
+  void onLast30DaysSelected() {
+    showLoadingBar();
+    final date = DateUtility.getFirstAndLastDateInLast30Days();
+    //unselect the previously selected chip
+    _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+    previousDateSelectedOptionIndex = 3;
+    _dateOptionSelections[3] = true;
+    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    databaseRepository.filterCashBooks(date: date);
+  }
+
+  void onThisYearSelected() {
+    showLoadingBar();
+    final date = DateUtility.getFirstAndLastDateInCurrentYear();
+    //unselect the previously selected chip
+    _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+    previousDateSelectedOptionIndex = 2;
+    _dateOptionSelections[2] = true;
+    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    databaseRepository.filterCashBooks(date: date);
+  }
+
+  void onLast7DaysSelected() {
+    showLoadingBar();
+    final date = DateUtility.getFirstAndLastDateInLast7Days();
+    //unselect the previously selected chip
+    _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+    previousDateSelectedOptionIndex = 1;
+    _dateOptionSelections[1] = true;
+    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    databaseRepository.filterCashBooks(date: date);
+  }
+
+  void onThisWeekSelected() {
+    showLoadingBar();
+    final date = DateUtility.getFirstAndLastDateInCurrentWeek();
+    //unselect the previously selected chip
+    _dateOptionSelections[previousDateSelectedOptionIndex] = false;
+    previousDateSelectedOptionIndex = 0;
+    _dateOptionSelections[0] = true;
+    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    //fetch date by data in this week
+    databaseRepository.filterCashBooks(
+        date: date, sortFilter: SortFilter.LATEST);
+  }
+
+  void showLoadingBar() {
+    showDialog(
+      barrierDismissible: false,
+      builder: (ctx) {
+        return const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        );
+      },
+      context: context,
     );
   }
 
@@ -592,8 +722,8 @@ class _FilterState extends State<FilterScreen>
           return;
         }
         //submit
-        onDateSelected(value.startDate!, value.endDate!);
         Navigator.of(context).pop();
+        onDateSelected(value.startDate!, value.endDate!);
       },
     );
     return datePicker;
@@ -609,11 +739,14 @@ class _FilterState extends State<FilterScreen>
         borderRadius: BorderRadius.circular(5),
       ),
       backgroundColor: Theme.of(context).canvasColor,
-      label: Text(
-        text,
-        style: TextStyle(
-            color: selected ? Colors.blue : Colors.grey,
-            fontWeight: FontWeight.w500),
+      label: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          style: TextStyle(
+              color: selected ? Colors.blue : Colors.grey,
+              fontWeight: FontWeight.bold),
+        ),
       ),
       selectedColor: const Color(0xC6F2FDFF),
       onSelected: (bool value) {
@@ -623,28 +756,38 @@ class _FilterState extends State<FilterScreen>
   }
 
   @override
-  void onRetrieveDatabase(List<CashBookModel> models) {
+  void onDatabaseStarted(CashBookModelListDetails models) {
     if (!mounted) return;
-    setState(() {
-      _count = models.length;
-      _toDate = DateUtility.removeTimeFromDate(DateTime.parse(models[0].date));
-      _fromDate = DateUtility.removeTimeFromDate(
-          DateTime.parse(models[models.length - 1].date));
-      final cashRange = Utility.getMinAndMaxCash(models);
-      _minCash = cashRange.first;
-      _maxCash = cashRange.last;
-      _startPrice = cashRange.first;
-      _endPrice = cashRange.last;
-      print('models are $_maxCash  $_minCash  $_startPrice  $_endPrice');
+    Future.delayed(const Duration(milliseconds: 200), () {
+      //models.isEmpty ? DateTime.now()
+      //in case the database was empty we set initial date as the now date
+      setState(() {
+        isLoadingFirst = false;
+        final cashRange = Utility.getMinAndMaxCash(models.models);
+        _minCash = cashRange.first;
+        _maxCash = cashRange.last;
+        _startPrice = cashRange.first;
+        _endPrice = cashRange.last;
+        _toDate = DateUtility.removeTimeFromDate(models.models.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(models.models[0].date));
+        _fromDate = DateUtility.removeTimeFromDate(models.models.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(models.models[models.models.length - 1].date));
+        _count = models.models.length;
+      });
     });
   }
 
   @override
-  void onDeleteAllDatabase(List<CashBookModel> emptyModel) {}
-
-  @override
-  void onInsertDatabase(List<CashBookModel> insertedModels) {}
-
-  @override
-  void onUpdateDatabase(List<CashBookModel> updatedModels) {}
+  void onDatabaseChanged(CashBookModelListDetails models) {
+    if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 300), () {
+      //to dismiss the loading bar
+      Navigator.of(context).pop();
+      setState(() {
+        _count = models.models.length;
+      });
+    });
+  }
 }

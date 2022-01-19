@@ -86,6 +86,10 @@ class DateUtility {
     return '${DateFormat('d MMMM').format(dateTime)} at $roughTimeString';
   }
 
+  static String getAlphabeticDate(DateTime date) {
+    return DateFormat('dd MMMM y').format(date);
+  }
+
   static String getDateTimeRepresentation(DateTime dateTime) {
     DateTime now = DateTime.now();
     DateTime justNow = now.subtract(const Duration(minutes: 1));

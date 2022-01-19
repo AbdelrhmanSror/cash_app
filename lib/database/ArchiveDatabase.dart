@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'models/ArchiveModel.dart';
 
-class ArchiveDatabase extends AppDatabase<ArchivedModel> {
+class ArchiveDatabase extends AppDatabase {
   ArchiveDatabase();
 
   // Define a function that inserts models into the database
@@ -31,14 +32,33 @@ class ArchiveDatabase extends AppDatabase<ArchivedModel> {
     // Query the table for all The model.
     final db = await init();
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM "$childArchiveTable" WHERE parentModelId=$parentId ORDER BY "id" DESC');
+        'SELECT * FROM "$childArchiveTable" WHERE parentModelId=$parentId ORDER BY "id" ASC');
     return maps.toArchivedModels();
   }
 
   // A method that retrieves all the models from the  table.
-  @override
-  Future<List<ArchivedModel>> retrieveAll(int parentId) async {
-    final archivedModels = await _getArchivedModels(parentId);
-    return archivedModels;
+  Future<CashBookModelListDetails> retrieveAll(int parentId) async {
+    double totalCashIn = 0;
+    double totalCashOut = 0;
+    String startDate = '';
+    String endDate = '';
+    final models = (await _getArchivedModels(parentId)).toCashBookModels();
+    //delete the cash in and out date from first fetched model because it depends on operation in different  range
+    updateTotalCashInOut(models[0], EmptyCashBookModel());
+    if (models.length > 1) {
+      for (int i = 1; i < models.length; i++) {
+        updateTotalCashInOut(models[i], models[i - 1]);
+      }
+    }
+    totalCashIn = models[models.length - 1].totalCashIn;
+    totalCashOut = models[models.length - 1].totalCashOut;
+    startDate = models[0].date;
+    endDate = models[models.length - 1].date;
+
+    return CashBookModelListDetails(models,
+        totalCashIn: totalCashIn,
+        totalCashOut: totalCashOut,
+        startDate: startDate,
+        endDate: endDate);
   }
 }

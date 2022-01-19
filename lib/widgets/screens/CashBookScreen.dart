@@ -2,6 +2,7 @@ import 'package:debts_app/database/AppDatabaseCallback.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/Utility.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/widgets/functional/ArchiveButtonWidget.dart';
 import 'package:debts_app/widgets/functional/CashInButtonWidget.dart';
 import 'package:debts_app/widgets/functional/CashOutButtonWidget.dart';
@@ -10,7 +11,6 @@ import 'package:debts_app/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/widgets/functional/OperationsArchiveWidget.dart';
-import 'package:debts_app/widgets/functional/SyncButton.dart';
 import 'package:debts_app/widgets/screens/ArchiveModalSheetScreen.dart';
 import 'package:debts_app/widgets/screens/ListDetailScreen.dart';
 import 'package:debts_app/widgets/screens/OperationArchiveParentListScreen.dart';
@@ -32,28 +32,38 @@ class CashBookScreen extends StatefulWidget {
 
 class _CashBookScreenState extends State<CashBookScreen>
     implements CashBookDatabaseListener<CashBookModel> {
-  List<CashBookModel> models = [];
+  CashBookModelListDetails models = CashBookModelListDetails([]);
+  bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Theme.of(context).canvasColor,
-          elevation: 0,
-          title: const Text(
-            'DEBTS',
-            style: TextStyle(
-                color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24),
-          ),
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
         ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              databaseRepository.retrieveCashBooks();
-            });
-          },
-          child: Column(
+      );
+    }
+    return RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            databaseRepository.retrieveCashBooks();
+          });
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            backgroundColor: Theme.of(context).canvasColor,
+            elevation: 0,
+            title: const Text(
+              'DEBTS',
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24),
+            ),
+          ),
+          body: Column(
             children: [
               Column(children: [
                 buildInOutCashDetails(),
@@ -80,11 +90,11 @@ class _CashBookScreenState extends State<CashBookScreen>
                             Row(
                               children: [
                                 buildOperationNumberWidget(),
-                                SyncButton(
+                                /* SyncButton(
                                   onPressed: () async {
                                     databaseRepository.retrieveCashBooks();
                                   },
-                                )
+                                )*/
                               ],
                             ),
                             buildArchiveButtonWidget(),
@@ -136,7 +146,7 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
-        models: models,
+        models: models.models,
         onPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(
               ListDetailScreen(model: model),
@@ -151,18 +161,18 @@ class _CashBookScreenState extends State<CashBookScreen>
         Utility.createModalSheet(
             context, ArchiveModalSheetScreen(models: models));
       },
-      hide: (models.isEmpty));
+      hide: (models.models.isEmpty));
 
   OperationNumberWidget buildOperationNumberWidget() {
-    return OperationNumberWidget(countNumber: models.length);
+    return OperationNumberWidget(countNumber: models.models.length);
   }
 
   OperationsArchiveWidget buildOperationsArchiveWidget() =>
       OperationsArchiveWidget(onPressed: () {
         Navigator.of(context).push(Utility.createAnimationRoute(
             OperationArchiveParentListScreen(onPressed: (parentId) {
-              Navigator.of(context).push(Utility.createAnimationRoute(
-                  OperationArchiveScreen(parentId: parentId),
+          Navigator.of(context).push(Utility.createAnimationRoute(
+              OperationArchiveScreen(parentId: parentId),
               const Offset(1.0, 0.0),
               Offset.zero,
               Curves.ease));
@@ -171,7 +181,8 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   NetBalanceWidget buildNetBalanceWidget() {
     return NetBalanceWidget(
-      netBalance: models.isEmpty ? 0 : models[0].getBalance(),
+      netBalance:
+          models.models.isEmpty ? 0 : models.totalCashIn - models.totalCashOut,
     );
   }
 
@@ -201,7 +212,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onInsertDatabase(List<CashBookModel> insertedModels) {
+  void onDatabaseChanged(CashBookModelListDetails insertedModels) {
     if (!mounted) return;
     setState(() {
       models = insertedModels;
@@ -209,41 +220,12 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onRetrieveDatabase(List<CashBookModel> models) {
-/*
-    print('start cash book screen');
-*/
+  void onDatabaseStarted(CashBookModelListDetails models) {
     if (!mounted) return;
     setState(() {
+      isLoading = false;
       //initial setup for models
       this.models = models;
     });
-  }
-
-  @override
-  void onDeleteAllDatabase(List<CashBookModel> deletedModels) {
-    if (!mounted) return;
-    setState(() {
-      models.clear();
-    });
-  }
-
-  @override
-  void onUpdateDatabase(List<CashBookModel> updatedModels) {
-    if (!mounted) return;
-    setState(() {
-      models = updatedModels;
-    });
-  }
-
-  int getIndex(CashBookModel model) {
-    var index = 0;
-    for (int i = 0; i < models.length; i++) {
-      if (model.id == models[i].id) {
-        index = i;
-        break;
-      }
-    }
-    return index;
   }
 }

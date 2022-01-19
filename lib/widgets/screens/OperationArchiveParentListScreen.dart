@@ -67,7 +67,7 @@ class _OperationArchiveParentListScreenWidgetState
   }
 
   @override
-  void onRetrieveDatabase(List<ParentArchivedModel> models) {
+  void onDatabaseStarted(List<ParentArchivedModel> models) {
     if (mounted) {
       setState(() {
         this.models = models;

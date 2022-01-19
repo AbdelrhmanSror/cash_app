@@ -12,13 +12,10 @@ const String cashBookTable = 'CashBookModel';
 const String parentArchiveTable = 'ParentArchiveModels';
 const String childArchiveTable = 'archiveModels';
 
-abstract class AppDatabase<T> {
+abstract class AppDatabase {
   Future<Database>? _database;
 
   AppDatabase();
-
-  //default value is negative 1 so it means there is no parent .
-  Future<List<T>> retrieveAll(int parentId);
 
   void _createDb(Database db, int newVersion) async {
     // Run the CREATE TABLE statement on the database.

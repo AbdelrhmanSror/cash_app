@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:debts_app/database/AppDatabase.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/dataClasses/Cash.dart';
+import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/utility/dataClasses/Date.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'models/CashBookModel.dart';
 
-class CashBookDatabase extends AppDatabase<CashBookModel> {
+class CashBookDatabase extends AppDatabase {
   // Define a function that inserts models into the database
 
   Future<void> insert(CashBookModel modelToInsert) async {
@@ -31,13 +32,45 @@ class CashBookDatabase extends AppDatabase<CashBookModel> {
 
   final String _tableName = cashBookTable;
 
-  @override
-  Future<List<CashBookModel>> retrieveAll(int parentId) async {
+  //retrieve all models in ascending order by id
+  Future<CashBookModelListDetails> getAllWithID({List<int>? listOfIds}) async {
     // Query the table for all The model.
     final db = await init();
-    final List<Map<String, dynamic>> maps =
-        await db.rawQuery('SELECT * FROM "$_tableName" ORDER BY "id" DESC');
-    return maps.toCashBookModels();
+    double totalCashIn = 0;
+    double totalCashOut = 0;
+    String startDate = '';
+    String endDate = '';
+    final List<Map<String, dynamic>> maps;
+    if (listOfIds == null) {
+      maps =
+          await db.rawQuery('SELECT * FROM "$_tableName"  ORDER BY "id" ASC ');
+    } else {
+      maps = await db.rawQuery(
+          'SELECT * FROM "$_tableName"  WHERE "id" IN (${List.filled(listOfIds.length, '?').join(',')}) ORDER BY "id" ASC ',
+          listOfIds);
+    }
+    final models = maps.toCashBookModels();
+    if (models.isNotEmpty) {
+      //delete the cash in and out date from first fetched model because it depends on operation in different  range
+      updateTotalCashInOut(models[0], EmptyCashBookModel());
+
+      if (models.length > 1) {
+        for (int i = 1; i < models.length; i++) {
+          updateTotalCashInOut(models[i], models[i - 1]);
+        }
+      }
+      totalCashIn = models[models.length - 1].totalCashIn;
+      totalCashOut = models[models.length - 1].totalCashOut;
+      startDate = models[0].date;
+      endDate = models[models.length - 1].date;
+    }
+
+    //by default we return operation in descending order.
+    return CashBookModelListDetails(models,
+        totalCashIn: totalCashIn,
+        totalCashOut: totalCashOut,
+        startDate: startDate,
+        endDate: endDate);
   }
 
   // A method that retrieves  model from the  table based on range.
@@ -168,7 +201,7 @@ class CashBookDatabase extends AppDatabase<CashBookModel> {
     return models[0];
   }
 
-  Future<List<CashBookModel>> filter(
+  Future<CashBookModelListDetails> retrieveAll(
       {Date? date,
       TypeFilter? type,
       CashRange? cashRange,
@@ -176,8 +209,10 @@ class CashBookDatabase extends AppDatabase<CashBookModel> {
     final db = await init();
     final argumentList = [];
     String whereClause = 'Where';
-    String sortWhereClause = '';
-
+    double totalCashIn = 0;
+    double totalCashOut = 0;
+    String startDate = '';
+    String endDate = '';
     if (date != null) {
       whereClause += ' date(date) BETWEEN ? And ?';
       argumentList.add(date.firstDate);
@@ -194,96 +229,76 @@ class CashBookDatabase extends AppDatabase<CashBookModel> {
     }
     if (cashRange != null) {
       if (whereClause.length == 5) {
-        whereClause += ' cash>=? And <=?';
+        whereClause += ' cash>=? And cash <=?';
       } else {
-        whereClause += ' And cash>=? And <=?';
+        whereClause += ' And cash>=? And cash <=?';
       }
       argumentList.add(cashRange.first);
       argumentList.add(cashRange.last);
     }
-    if (sortFilter != null) {
-      if (sortFilter == SortFilter.CASH_HIGH_TO_LOW) {
-        //ORDER BY "id" DESC
-        sortWhereClause = 'ORDER BY "cash" DESC';
-      }
-      if (sortFilter == SortFilter.CASH_LOW_TO_HIGH) {
-        sortWhereClause = 'ORDER BY "cash" ASC';
-      }
-      if (sortFilter == SortFilter.OLDER) {
-        sortWhereClause = 'ORDER BY "id" ASC';
-      }
-    } else {
-      sortWhereClause = 'ORDER BY "id" DESC';
-    }
 
+    if (whereClause.length == 5) whereClause = '';
     // Query the table for  The last model in list.
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM "$_tableName" $whereClause $sortWhereClause ',
+        'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',
         argumentList);
     List<CashBookModel> modelsAfterModel = maps.toCashBookModels();
     //we propagate data based on the new fetched operations
     if (modelsAfterModel.isNotEmpty) {
-      //delete the cash in and out date from first fetched model because it depends on operation in different date range
+      //delete the cash in and out date from first fetched model because it depends on operation in different  range
       updateTotalCashInOut(modelsAfterModel[0], EmptyCashBookModel());
-    }
-    if (modelsAfterModel.length > 1) {
-      for (int i = 1; i < modelsAfterModel.length; i++) {
-        updateTotalCashInOut(modelsAfterModel[i], modelsAfterModel[i - 1]);
+
+      if (modelsAfterModel.length > 1) {
+        for (int i = 1; i < modelsAfterModel.length; i++) {
+          updateTotalCashInOut(modelsAfterModel[i], modelsAfterModel[i - 1]);
+        }
       }
+      totalCashIn = modelsAfterModel[modelsAfterModel.length - 1].totalCashIn;
+      totalCashOut = modelsAfterModel[modelsAfterModel.length - 1].totalCashOut;
+      startDate = modelsAfterModel[0].date;
+      endDate = modelsAfterModel[modelsAfterModel.length - 1].date;
     }
-    // Convert the List<Map<String, dynamic> into a List<AppModel>.
-    return modelsAfterModel;
+
+    if (sortFilter == SortFilter.OLDER) {
+      return CashBookModelListDetails(modelsAfterModel,
+          totalCashIn: totalCashIn,
+          totalCashOut: totalCashOut,
+          startDate: startDate,
+          endDate: endDate);
+    }
+
+    if (sortFilter == SortFilter.CASH_HIGH_TO_LOW) {
+      return CashBookModelListDetails(
+          modelsAfterModel..sort((a, b) => -1 * a.cash.compareTo(b.cash)),
+          totalCashIn: totalCashIn,
+          totalCashOut: totalCashOut,
+          startDate: startDate,
+          endDate: endDate);
+    }
+    if (sortFilter == SortFilter.CASH_LOW_TO_HIGH) {
+      return CashBookModelListDetails(
+          modelsAfterModel..sort((a, b) => a.cash.compareTo(b.cash)),
+          totalCashIn: totalCashIn,
+          totalCashOut: totalCashOut,
+          startDate: startDate,
+          endDate: endDate);
+    }
+    print('filtered modles $modelsAfterModel \n\n\n');
+
+    //by default we return operation in descending order.
+    return CashBookModelListDetails(modelsAfterModel.reversed.toList(),
+        totalCashIn: totalCashIn,
+        totalCashOut: totalCashOut,
+        startDate: startDate,
+        endDate: endDate);
   }
 
-  Future<List<CashBookModel>> fetchByDateRange(Date date) async {
+  Future<void> deleteAll(List<CashBookModel> models) async {
     final db = await init();
-    /* print(
-        'modelsAfterModelfrom filter ${await filter(sortFilter: SortFilter.CASH_HIGH_TO_LOW, type: TypeFilter.CASH_IN, date: Date(DateUtility.removeTimeFromDate(DateTime.now().subtract(Duration(days: 0))), DateUtility.removeTimeFromDate(DateTime.now())))}\n');
-*/
-    // Query the table for  The last model in list.
-    final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM "$_tableName" WHERE date(date) BETWEEN ? And ? ',
-        [date.firstDate, date.lastDate]);
-    List<CashBookModel> modelsAfterModel = maps.toCashBookModels();
-    //we propagate data based on the new fetched operations
-    if (modelsAfterModel.isNotEmpty) {
-      //delete the cash in and out date from first fetched model because it depends on operation in different date range
-      updateTotalCashInOut(modelsAfterModel[0], EmptyCashBookModel());
+    Batch batch = db.batch();
+    for (var model in models) {
+      batch.delete(_tableName, where: 'id = ?', whereArgs: [model.id]);
     }
-    if (modelsAfterModel.length > 1) {
-      for (int i = 1; i < modelsAfterModel.length; i++) {
-        updateTotalCashInOut(modelsAfterModel[i], modelsAfterModel[i - 1]);
-      }
-    }
-
-    // Convert the List<Map<String, dynamic> into a List<AppModel>.
-    return modelsAfterModel.reversed.toList();
-  }
-
-  Future<List<CashBookModel>> fetchByType(String type) async {
-    final db = await init();
-    // Query the table for  The last model in list.
-    final List<Map<String, dynamic>> maps =
-        await db.rawQuery('SELECT * FROM "$_tableName" WHERE type=?', [type]);
-    List<CashBookModel> modelsAfterModel = maps.toCashBookModels();
-    //we propagate data based on the new fetched operations
-    if (modelsAfterModel.isNotEmpty) {
-      //delete the cash in and out date from first fetched model because it depends on operation in different date range
-      updateTotalCashInOut(modelsAfterModel[0], EmptyCashBookModel());
-    }
-    if (modelsAfterModel.length > 1) {
-      for (int i = 1; i < modelsAfterModel.length; i++) {
-        updateTotalCashInOut(modelsAfterModel[i], modelsAfterModel[i - 1]);
-      }
-    }
-    // Convert the List<Map<String, dynamic> into a List<AppModel>.
-    return modelsAfterModel.reversed.toList();
-  }
-
-  Future<void> deleteAll() async {
-    final db = await init();
-    await db.delete(
-      _tableName,
-    );
+    await batch.commit(noResult: true);
   }
 }

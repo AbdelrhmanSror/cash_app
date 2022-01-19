@@ -28,7 +28,6 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   }
 
   Widget _buildSuggestions() {
-    print('LIST IS ${widget.models}');
     if (widget.models.isEmpty) return _buildEmptyWidget();
     return ListView.separated(
         itemCount: widget.models.length,
@@ -117,7 +116,7 @@ class OperationTile extends StatelessWidget {
               CompositeWidget(
                 width: 150,
                 widgets: [
-                  AppTextWithDot(text: 'Balance ', color: Colors.grey),
+                  const AppTextWithDot(text: 'Balance ', color: Colors.grey),
                   AppTextWithDot(
                       text: '${(balance).abs()} EGP',
                       color: balance < 0 ? Colors.red : Colors.greenAccent)
