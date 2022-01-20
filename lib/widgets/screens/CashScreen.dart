@@ -58,7 +58,7 @@ abstract class CashScreen extends StatefulWidget {
 
   final String type;
 
-  final String operationType;
+  final OperationType operationType;
   final CashBookModel? modelToEdit;
 
   @override
@@ -76,7 +76,7 @@ class _CashScreenState extends State<CashScreen> {
 
   TextFormField cashNumberField() {
     var numberTextField = TextFormField(
-      initialValue: widget.operationType == UPDATE
+      initialValue: widget.operationType == OperationType.UPDATE
           ? widget.modelToEdit?.cash.toString()
           : null,
       focusNode: _numberFieldFocusNode,
@@ -110,7 +110,7 @@ class _CashScreenState extends State<CashScreen> {
     var detailsTextField = Opacity(
         opacity: opacity,
         child: TextFormField(
-            initialValue: widget.operationType == UPDATE
+            initialValue: widget.operationType == OperationType.UPDATE
                 ? widget.modelToEdit?.description
                 : null,
             enabled: opacity >= 1.0,
@@ -139,7 +139,7 @@ class _CashScreenState extends State<CashScreen> {
     Utility.showKeyboard(_numberFieldFocusNode);
     //if the operation type is update so we show the description textFormField
     //initially setup the value with the value in model in case user did no changes.
-    if (widget.operationType == UPDATE) {
+    if (widget.operationType == OperationType.UPDATE) {
       setState(() {
         numberText = widget.modelToEdit!.cash.toString();
         descriptionText = widget.modelToEdit!.description.toString();
@@ -206,7 +206,7 @@ class _CashScreenState extends State<CashScreen> {
       paddingRight: 16,
       onPressed: () {
         if (numberText.isNotEmpty) {
-          if (widget.operationType == INSERT) {
+          if (widget.operationType == OperationType.INSERT) {
             databaseRepository.insertCashBook(CashBookModel(
                 date: '${DateTime.now()}',
                 description: descriptionText,

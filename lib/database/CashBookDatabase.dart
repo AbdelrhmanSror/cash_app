@@ -201,9 +201,26 @@ class CashBookDatabase extends AppDatabase {
     return models[0];
   }
 
+  // A method that retrieves max and min cash for the data in the database.
+  Future<CashRange?> getMinMaxCash() async {
+    final db = await init();
+    // Query the table for  The last model in list.
+    final max = (await db.rawQuery(
+            'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MAX(cash) FROM $_tableName) '))[
+        0]['cash'];
+    final min = (await db.rawQuery(
+            'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MIN(cash) FROM $_tableName) '))[
+        0]['cash'];
+
+    if (min == null || max == null) {
+      return null;
+    }
+    return CashRange(min as double, max as double);
+  }
+
   Future<CashBookModelListDetails> retrieveAll(
       {Date? date,
-      TypeFilter? type,
+      List<String>? types,
       CashRange? cashRange,
       SortFilter? sortFilter}) async {
     final db = await init();
@@ -214,18 +231,19 @@ class CashBookDatabase extends AppDatabase {
     String startDate = '';
     String endDate = '';
     if (date != null) {
-      whereClause += ' date(date) BETWEEN ? And ?';
+      whereClause += ' date(date) BETWEEN ? And ? ';
       argumentList.add(date.firstDate);
       argumentList.add(date.lastDate);
     }
-    if (type != null &&
-        (type == TypeFilter.CASH_IN || type == TypeFilter.CASH_OUT)) {
+    if (types != null) {
       if (whereClause.length == 5) {
-        whereClause += ' type=?';
+        whereClause +=
+            ' "type" IN (${List.filled(types.length, '?').join(',')}) ';
       } else {
-        whereClause += ' And type=?';
+        whereClause +=
+            ' And "type" IN (${List.filled(types.length, '?').join(',')})';
       }
-      argumentList.add(type.value);
+      argumentList.addAll(types);
     }
     if (cashRange != null) {
       if (whereClause.length == 5) {
@@ -238,6 +256,9 @@ class CashBookDatabase extends AppDatabase {
     }
 
     if (whereClause.length == 5) whereClause = '';
+    print(
+        'where caluse is SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC  $argumentList');
+
     // Query the table for  The last model in list.
     final List<Map<String, dynamic>> maps = await db.rawQuery(
         'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',

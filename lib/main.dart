@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 final databaseRepository = DataBaseRepository();
 
-void main() {
+void main() async {
   runApp(const MainStatelessWidget());
 }
 
@@ -45,7 +45,7 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
 
   //updating the index when tap on bar on bottom navigation so the widget rebuilds its self,
   // bottom navigation update its colors and status.
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
     setState(() {
       _selectedIndex = index;
       controller.animateToPage(index,

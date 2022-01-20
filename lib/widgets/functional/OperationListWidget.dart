@@ -127,7 +127,7 @@ class OperationTile extends StatelessWidget {
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
               padding: const EdgeInsets.only(bottom: 4),
-              constraints: const BoxConstraints(minWidth: 1, maxWidth: 100),
+              constraints: const BoxConstraints(minWidth: 1, maxWidth: 150),
               child: AppTextWithDot(
                   text: '${model.cash} EGP',
                   fontWeight: FontWeight.bold,

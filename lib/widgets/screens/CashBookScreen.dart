@@ -46,9 +46,7 @@ class _CashBookScreenState extends State<CashBookScreen>
     }
     return RefreshIndicator(
         onRefresh: () async {
-          setState(() {
-            databaseRepository.retrieveCashBooks();
-          });
+          databaseRepository.retrieveCashBooks();
         },
         child: Scaffold(
           appBar: AppBar(
@@ -127,7 +125,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          const CashOutScreen(operationType: INSERT),
+          const CashOutScreen(operationType: OperationType.INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -137,7 +135,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
       Navigator.of(context).push(Utility.createAnimationRoute(
-          const CashInScreen(operationType: INSERT),
+          const CashInScreen(operationType: OperationType.INSERT),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
@@ -188,11 +186,7 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   Widget buildInOutCashDetails() => InkWell(
         onTap: () {
-          Utility.createModalSheet(
-              context,
-              FilterScreen(
-                onDateSelected: (startDate, endDate) {},
-              ),
+          Utility.createModalSheet(context, const FilterScreen(),
               enableDrag: false);
         },
         child: InOutCashDetails(
@@ -212,7 +206,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onDatabaseChanged(CashBookModelListDetails insertedModels) {
+  void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
     setState(() {
       models = insertedModels;
@@ -220,7 +214,8 @@ class _CashBookScreenState extends State<CashBookScreen>
   }
 
   @override
-  void onDatabaseStarted(CashBookModelListDetails models) {
+  void onDatabaseStarted(CashBookModelListDetails models) async {
+    // obtain shared preferences
     if (!mounted) return;
     setState(() {
       isLoading = false;

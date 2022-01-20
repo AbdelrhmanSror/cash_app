@@ -5,9 +5,11 @@ import 'package:debts_app/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/database/models/ArchiveModel.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
+import 'package:debts_app/utility/FilterSharedPreferences.dart';
 import 'package:debts_app/utility/dataClasses/Cash.dart';
 import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 import 'package:debts_app/utility/dataClasses/Date.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DataBaseRepository {
   final _cashBookDatabase = CashBookDatabase();
@@ -61,22 +63,34 @@ class DataBaseRepository {
     }
   }
 
+  // A method that retrieves max and min cash for the data in the database.
+  Future<CashRange?> getMinMaxCash() {
+    return _cashBookDatabase.getMinMaxCash();
+  }
+
   void insertCashBook(CashBookModel modelToInsert) async {
     await _cashBookDatabase.insert(modelToInsert);
     _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveCashBooks() async {
-    _alertOnCashBookStart((await _retrieveCashBooks()));
+    FilterSharedPreferences.retrievedFilterPreferences(
+        (date, type, cashRange, sortFilter, dateType) async {
+      _alertOnCashBookStart((await _retrieveCashBooks(
+          date: date,
+          type: type,
+          cashRange: cashRange,
+          sortFilter: sortFilter)));
+    });
   }
 
   Future<CashBookModelListDetails> _retrieveCashBooks(
       {Date? date,
-      TypeFilter? type,
+      List<String>? type,
       CashRange? cashRange,
       SortFilter? sortFilter}) async {
     return await _cashBookDatabase.retrieveAll(
-        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter);
+        date: date, types: type, cashRange: cashRange, sortFilter: sortFilter);
   }
 
   void updateCashBook(CashBookModel modelToUpdate) async {
@@ -112,12 +126,41 @@ class DataBaseRepository {
     _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
-  void filterCashBooks(
-      {Date? date,
-      TypeFilter? type,
-      CashRange? cashRange,
-      SortFilter? sortFilter}) async {
-    _alertOnCashBookChanged(await _retrieveCashBooks(
-        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter));
+  void retrieveFilteredCashBooks() async {
+    FilterSharedPreferences.retrievedFilterPreferences(
+        (date, type, cashRange, sortFilter, dateType) async {
+      _alertOnCashBookChanged(await _retrieveCashBooks(
+          date: date,
+          type: type,
+          cashRange: cashRange,
+          sortFilter: sortFilter));
+    });
+  }
+
+  void setDateTypeInPreferences(DateFilter dateFilter) async {
+    FilterSharedPreferences.setDateTypeInPreferences(dateFilter);
+  }
+
+  void setTypeInPreferences(TypeFilter typeFilter) async {
+    FilterSharedPreferences.setTypesInPreferences(
+        [typeFilter], OperationType.INSERT);
+  }
+
+  void removeTypeFromPreferences(TypeFilter typeFilter) async {
+    FilterSharedPreferences.setTypesInPreferences(
+        [typeFilter], OperationType.DELETE);
+  }
+
+  void setCashRangeInPreferences(CashRange cashRange) async {
+    final prefs = await SharedPreferences.getInstance();
+    FilterSharedPreferences.setCashRangeInPreferences(prefs, cashRange);
+  }
+
+  void setDateRangeInPreferences(Date date) async {
+    FilterSharedPreferences.setDateInPreferences(date);
+  }
+
+  void setSortInPreferences(SortFilter sortFilter) async {
+    FilterSharedPreferences.setSortInPreferences(sortFilter);
   }
 }

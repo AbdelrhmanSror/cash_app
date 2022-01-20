@@ -97,7 +97,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           if (widget.model.type == CASH_IN) {
             await Navigator.of(context).push(Utility.createAnimationRoute(
                 CashInScreen(
-                  operationType: UPDATE,
+                  operationType: OperationType.UPDATE,
                   modelToEdit: widget.model,
                 ),
                 const Offset(0.0, 1.0),
@@ -105,7 +105,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 Curves.ease));
           } else {
             await Navigator.of(context).push(Utility.createAnimationRoute(
-                CashOutScreen(operationType: UPDATE, modelToEdit: widget.model),
+                CashOutScreen(
+                    operationType: OperationType.UPDATE,
+                    modelToEdit: widget.model),
                 const Offset(0.0, 1.0),
                 Offset.zero,
                 Curves.ease));

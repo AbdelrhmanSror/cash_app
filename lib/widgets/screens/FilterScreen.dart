@@ -2,6 +2,7 @@ import 'package:debts_app/database/AppDatabaseCallback.dart';
 import 'package:debts_app/database/models/CashBookModel.dart';
 import 'package:debts_app/utility/Constants.dart';
 import 'package:debts_app/utility/DateUtility.dart';
+import 'package:debts_app/utility/FilterSharedPreferences.dart';
 import 'package:debts_app/utility/Utility.dart';
 import 'package:debts_app/utility/dataClasses/Cash.dart';
 import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
@@ -12,14 +13,13 @@ import 'package:debts_app/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/widgets/partial/RoundedButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../main.dart';
 
 class FilterScreen extends StatefulWidget {
-  FilterScreen({required this.onDateSelected, Key? key}) : super(key: key);
-
-  Function(DateTime, DateTime) onDateSelected;
+  const FilterScreen({Key? key}) : super(key: key);
 
   @override
   _FilterState createState() => _FilterState();
@@ -41,7 +41,7 @@ class _FilterState extends State<FilterScreen>
   bool _sortExpanded = true;
   bool _typeExpanded = true;
 
-  double _maxCash = 1;
+  double _maxCash = 0;
   double _minCash = 0;
   double _startPrice = 0;
   double _endPrice = 0;
@@ -51,6 +51,11 @@ class _FilterState extends State<FilterScreen>
 
   final _dateOptionSelections = [false, false, false, false, false, false];
   int previousDateSelectedOptionIndex = 0;
+
+  final List<bool> _typeOptionSelections = [false, false];
+
+  final _sortOptionSelections = [false, false, false, false];
+  int previousSortSelectedOptionIndex = 0;
 
   @override
   void initState() {
@@ -134,7 +139,10 @@ class _FilterState extends State<FilterScreen>
                       paddingRight: 8,
                       paddingBottom: 8,
                       elevation: 1,
-                      onPressed: () {}),
+                      onPressed: () async {
+                        //clear all data in preferences
+                        await clearFilter();
+                      }),
                   RoundedTextButton(
                       text: Text(
                         'Show $_count Results',
@@ -154,6 +162,18 @@ class _FilterState extends State<FilterScreen>
         ],
       );
     }
+  }
+
+  Future<void> clearFilter() async {
+    //clear all data in preferences
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove(SORT);
+    preferences.remove(TYPE);
+    preferences.remove(CASH_START_RANGE);
+    preferences.remove(CASH_END_RANGE);
+    preferences.remove(DATE_START_RANGE);
+    preferences.remove(DATE_END_RANGE);
+    preferences.remove(DATE);
   }
 
   Widget buildFilterWidget() {
@@ -361,24 +381,78 @@ class _FilterState extends State<FilterScreen>
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: FilterChip(
-              label: Text('Cash In'),
-              selected: true,
-              onSelected: (value) {
+              label: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text(
+                  'Cash In',
+                  style: TextStyle(
+                      color:
+                          _typeOptionSelections[0] ? Colors.blue : Colors.black,
+                      fontWeight: FontWeight.normal),
+                ),
+              ),
+              selected: _typeOptionSelections[0],
+              checkmarkColor: Colors.blue,
+              backgroundColor: Colors.grey.shade200,
+              selectedColor: Colors.blue.shade50,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                    color: _typeOptionSelections[0]
+                        ? Colors.blue.shade200
+                        : Colors.grey.shade50,
+                    width: 0.5),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              onSelected: (value) async {
                 showLoadingBar();
-                databaseRepository.filterCashBooks(type: TypeFilter.CASH_IN);
+                _typeOptionSelections[0] = !_typeOptionSelections[0];
+                if (_typeOptionSelections[0]) {
+                  databaseRepository.setTypeInPreferences(TypeFilter.CASH_IN);
+                } else {
+                  databaseRepository
+                      .removeTypeFromPreferences(TypeFilter.CASH_IN);
+                }
+                databaseRepository.retrieveFilteredCashBooks();
               },
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: FilterChip(
-              label: Text('Cash Out'),
-              selected: false,
-              onSelected: (value) {
+              label: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text('Cash Out',
+                    style: TextStyle(
+                        color: _typeOptionSelections[1]
+                            ? Colors.blue
+                            : Colors.black,
+                        fontWeight: FontWeight.normal)),
+              ),
+              selected: _typeOptionSelections[1],
+              selectedColor: Colors.blue.shade50,
+              checkmarkColor: Colors.blue,
+              backgroundColor: Colors.grey.shade200,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                    color: _typeOptionSelections[1]
+                        ? Colors.blue.shade200
+                        : Colors.grey.shade50,
+                    width: 0.5),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              onSelected: (value) async {
                 showLoadingBar();
-                databaseRepository.filterCashBooks(type: TypeFilter.CASH_OUT);
+                _typeOptionSelections[1] = !_typeOptionSelections[1];
+
+                if (_typeOptionSelections[1]) {
+                  databaseRepository.setTypeInPreferences(TypeFilter.CASH_OUT);
+                } else {
+                  databaseRepository
+                      .removeTypeFromPreferences(TypeFilter.CASH_OUT);
+                }
+                databaseRepository.retrieveFilteredCashBooks();
               },
             ),
           )
@@ -415,9 +489,9 @@ class _FilterState extends State<FilterScreen>
                               if (cashInRange(number) && value <= _endPrice) {
                                 showLoadingBar();
                                 _startPrice = value;
-                                databaseRepository.filterCashBooks(
-                                    cashRange:
-                                        CashRange(_startPrice, _endPrice));
+                                databaseRepository.setCashRangeInPreferences(
+                                    CashRange(_startPrice, _endPrice));
+                                databaseRepository.retrieveFilteredCashBooks();
                                 return;
                               }
                             });
@@ -462,9 +536,9 @@ class _FilterState extends State<FilterScreen>
                               if (cashInRange(number) && value >= _startPrice) {
                                 showLoadingBar();
                                 _endPrice = value;
-                                databaseRepository.filterCashBooks(
-                                    cashRange:
-                                        CashRange(_startPrice, _endPrice));
+                                databaseRepository.setCashRangeInPreferences(
+                                    CashRange(_startPrice, _endPrice));
+                                databaseRepository.retrieveFilteredCashBooks();
                                 return;
                               }
                             });
@@ -503,26 +577,41 @@ class _FilterState extends State<FilterScreen>
           Row(
             children: [
               Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: FilterChip(
-                  label: const Text('Cash: Low to High'),
-                  selected: false,
-                  onSelected: (value) {
-                    showLoadingBar();
-                    databaseRepository.filterCashBooks(
-                        sortFilter: SortFilter.CASH_LOW_TO_HIGH);
+                padding: const EdgeInsets.only(left: 8.0),
+                child: buildChoiceChip(
+                  _sortOptionSelections[0],
+                  'Cash:Low to high',
+                  () {
+                    setState(() {
+                      showLoadingBar();
+                      _sortOptionSelections[previousSortSelectedOptionIndex] =
+                          false;
+                      previousSortSelectedOptionIndex = 0;
+                      _sortOptionSelections[0] = true;
+                      databaseRepository
+                          .setSortInPreferences(SortFilter.CASH_LOW_TO_HIGH);
+                      databaseRepository.retrieveFilteredCashBooks(
+                          /*sortFilter: SortFilter.CASH_LOW_TO_HIGH*/);
+                    });
                   },
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: FilterChip(
-                  label: const Text('Cash: High to low'),
-                  selected: false,
-                  onSelected: (value) {
+                padding: const EdgeInsets.only(left: 8.0),
+                child: buildChoiceChip(
+                  _sortOptionSelections[1],
+                  'Cash:High to low',
+                  () {
+                    _sortOptionSelections[previousSortSelectedOptionIndex] =
+                        false;
+                    previousSortSelectedOptionIndex = 1;
+                    _sortOptionSelections[1] = true;
                     showLoadingBar();
-                    databaseRepository.filterCashBooks(
-                        sortFilter: SortFilter.CASH_HIGH_TO_LOW);
+                    databaseRepository
+                        .setSortInPreferences(SortFilter.CASH_HIGH_TO_LOW);
+
+                    databaseRepository.retrieveFilteredCashBooks(
+                        /* sortFilter: SortFilter.CASH_HIGH_TO_LOW*/);
                   },
                 ),
               ),
@@ -532,25 +621,36 @@ class _FilterState extends State<FilterScreen>
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: FilterChip(
-                  label: Text('Latest'),
-                  selected: true,
-                  onSelected: (value) {
+                child: buildChoiceChip(
+                  _sortOptionSelections[2],
+                  'Latest',
+                  () {
+                    _sortOptionSelections[previousSortSelectedOptionIndex] =
+                        false;
+                    previousSortSelectedOptionIndex = 2;
+                    _sortOptionSelections[2] = true;
                     showLoadingBar();
-                    databaseRepository.filterCashBooks(
-                        sortFilter: SortFilter.LATEST);
+                    databaseRepository.setSortInPreferences(SortFilter.LATEST);
+
+                    databaseRepository.retrieveFilteredCashBooks(
+                        /* sortFilter: SortFilter.LATEST*/);
                   },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: FilterChip(
-                  label: Text('Older'),
-                  selected: false,
-                  onSelected: (value) {
+                child: buildChoiceChip(
+                  _sortOptionSelections[3],
+                  'Older',
+                  () {
+                    _sortOptionSelections[previousSortSelectedOptionIndex] =
+                        false;
+                    previousSortSelectedOptionIndex = 3;
+                    _sortOptionSelections[3] = true;
                     showLoadingBar();
-                    databaseRepository.filterCashBooks(
-                        sortFilter: SortFilter.OLDER);
+                    databaseRepository.setSortInPreferences(SortFilter.OLDER);
+                    databaseRepository.retrieveFilteredCashBooks(
+                        /* sortFilter: SortFilter.OLDER*/);
                   },
                 ),
               ),
@@ -570,13 +670,13 @@ class _FilterState extends State<FilterScreen>
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buildDateChoiceChip(_dateOptionSelections[0], 'This Week', () {
+          buildChoiceChip(_dateOptionSelections[0], 'This Week', () {
             onThisWeekSelected();
           }),
-          buildDateChoiceChip(_dateOptionSelections[1], 'Last 7 Days', () {
+          buildChoiceChip(_dateOptionSelections[1], 'Last 7 Days', () {
             onLast7DaysSelected();
           }),
-          buildDateChoiceChip(_dateOptionSelections[2], 'This Year', () {
+          buildChoiceChip(_dateOptionSelections[2], 'This Year', () {
             onThisYearSelected();
           })
         ],
@@ -584,13 +684,13 @@ class _FilterState extends State<FilterScreen>
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buildDateChoiceChip(_dateOptionSelections[3], 'Last 30 Days', () {
+          buildChoiceChip(_dateOptionSelections[3], 'Last 30 Days', () {
             onLast30DaysSelected();
           }),
-          buildDateChoiceChip(_dateOptionSelections[4], 'Last Month', () {
+          buildChoiceChip(_dateOptionSelections[4], 'Last Month', () {
             onLastMonthSelected();
           }),
-          buildDateChoiceChip(_dateOptionSelections[5], 'Custom', () {
+          buildChoiceChip(_dateOptionSelections[5], 'Custom', () {
             onCustomSelected();
           })
         ],
@@ -618,7 +718,10 @@ class _FilterState extends State<FilterScreen>
                   DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
               _toDate =
                   DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
-              databaseRepository.filterCashBooks(date: date);
+              databaseRepository.setDateTypeInPreferences(DateFilter.CUSTOM);
+              databaseRepository.setDateRangeInPreferences(
+                  Date(date.firstDate, date.lastDate));
+              databaseRepository.retrieveFilteredCashBooks();
             }),
           ),
         ),
@@ -634,7 +737,11 @@ class _FilterState extends State<FilterScreen>
     _dateOptionSelections[4] = true;
     _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
     _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
-    databaseRepository.filterCashBooks(date: date);
+    databaseRepository
+        .setDateRangeInPreferences(Date(date.firstDate, date.lastDate));
+    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_MONTH);
+
+    databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
 
   void onLast30DaysSelected() {
@@ -646,7 +753,11 @@ class _FilterState extends State<FilterScreen>
     _dateOptionSelections[3] = true;
     _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
     _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
-    databaseRepository.filterCashBooks(date: date);
+    databaseRepository
+        .setDateRangeInPreferences(Date(date.firstDate, date.lastDate));
+    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_30_DAYS);
+
+    databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
 
   void onThisYearSelected() {
@@ -658,7 +769,11 @@ class _FilterState extends State<FilterScreen>
     _dateOptionSelections[2] = true;
     _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
     _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
-    databaseRepository.filterCashBooks(date: date);
+    databaseRepository
+        .setDateRangeInPreferences(Date(date.firstDate, date.lastDate));
+    databaseRepository.setDateTypeInPreferences(DateFilter.THIS_YEAR);
+
+    databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
 
   void onLast7DaysSelected() {
@@ -670,7 +785,11 @@ class _FilterState extends State<FilterScreen>
     _dateOptionSelections[1] = true;
     _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
     _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
-    databaseRepository.filterCashBooks(date: date);
+    databaseRepository
+        .setDateRangeInPreferences(Date(date.firstDate, date.lastDate));
+    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_7_DAYS);
+
+    databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
 
   void onThisWeekSelected() {
@@ -682,9 +801,13 @@ class _FilterState extends State<FilterScreen>
     _dateOptionSelections[0] = true;
     _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
     _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    databaseRepository
+        .setDateRangeInPreferences(Date(date.firstDate, date.lastDate));
+    databaseRepository.setDateTypeInPreferences(DateFilter.THIS_WEEK);
+
     //fetch date by data in this week
-    databaseRepository.filterCashBooks(
-        date: date, sortFilter: SortFilter.LATEST);
+    databaseRepository.retrieveFilteredCashBooks(
+        /*date: date, sortFilter: SortFilter.LATEST*/);
   }
 
   void showLoadingBar() {
@@ -729,26 +852,27 @@ class _FilterState extends State<FilterScreen>
     return datePicker;
   }
 
-  Widget buildDateChoiceChip(bool selected, String text, Function onSelected) {
-    return ChoiceChip(
+  Widget buildChoiceChip(bool selected, String text, Function onSelected) {
+    return FilterChip(
       selected: selected,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-            color: selected ? Colors.blue : Theme.of(context).canvasColor,
+            color: selected ? Colors.blue.shade200 : Colors.grey.shade50,
             width: 1),
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(10),
       ),
-      backgroundColor: Theme.of(context).canvasColor,
+      backgroundColor: Colors.grey.shade200,
+      checkmarkColor: Colors.blue,
       label: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Text(
           text,
           style: TextStyle(
-              color: selected ? Colors.blue : Colors.grey,
-              fontWeight: FontWeight.bold),
+              color: selected ? Colors.blue : Colors.black,
+              fontWeight: FontWeight.normal),
         ),
       ),
-      selectedColor: const Color(0xC6F2FDFF),
+      selectedColor: Colors.blue.shade50,
       onSelected: (bool value) {
         onSelected();
       },
@@ -756,31 +880,57 @@ class _FilterState extends State<FilterScreen>
   }
 
   @override
-  void onDatabaseStarted(CashBookModelListDetails models) {
+  void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
+    final cash = await databaseRepository.getMinMaxCash();
     Future.delayed(const Duration(milliseconds: 200), () {
-      //models.isEmpty ? DateTime.now()
-      //in case the database was empty we set initial date as the now date
       setState(() {
         isLoadingFirst = false;
-        final cashRange = Utility.getMinAndMaxCash(models.models);
-        _minCash = cashRange.first;
-        _maxCash = cashRange.last;
-        _startPrice = cashRange.first;
-        _endPrice = cashRange.last;
-        _toDate = DateUtility.removeTimeFromDate(models.models.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(models.models[0].date));
-        _fromDate = DateUtility.removeTimeFromDate(models.models.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(models.models[models.models.length - 1].date));
-        _count = models.models.length;
+        _minCash = cash!.first;
+        _maxCash = cash.last;
+        FilterSharedPreferences.retrievedFilterPreferences(
+            (date, type, cashRange, sortFilter, dateType) {
+          _startPrice = (cashRange == null) ? _minCash : cashRange.first;
+          _endPrice = (cashRange == null) ? _maxCash : cashRange.last;
+          _fromDate = DateUtility.getAlphabeticDate(
+              date == null ? DateTime.now() : DateTime.parse(date.firstDate));
+          _toDate = DateUtility.getAlphabeticDate(
+              date == null ? DateTime.now() : DateTime.parse(date.lastDate));
+          if (dateType == DateFilter.THIS_WEEK) {
+            _dateOptionSelections[0] = true;
+            previousDateSelectedOptionIndex = 0;
+          } else if (dateType == DateFilter.LAST_7_DAYS) {
+            _dateOptionSelections[1] = true;
+            previousDateSelectedOptionIndex = 1;
+          } else if (dateType == DateFilter.THIS_YEAR) {
+            _dateOptionSelections[2] = true;
+            previousDateSelectedOptionIndex = 2;
+          } else if (dateType == DateFilter.LAST_30_DAYS) {
+            _dateOptionSelections[3] = true;
+            previousDateSelectedOptionIndex = 3;
+          } else if (dateType == DateFilter.LAST_MONTH) {
+            _dateOptionSelections[4] = true;
+            previousDateSelectedOptionIndex = 4;
+          } else {
+            _dateOptionSelections[5] = true;
+            previousDateSelectedOptionIndex = 5;
+          }
+          _count = models.models.length;
+        });
       });
     });
   }
 
   @override
-  void onDatabaseChanged(CashBookModelListDetails models) {
+  void onDatabaseChanged(CashBookModelListDetails models) async {
+    /* final prefs = await SharedPreferences.getInstance();
+    final type = FilterSharedPreferences.getTypesFromPreferences(prefs);
+    final sort = FilterSharedPreferences.getSortFromPreferences(prefs);
+    final date = FilterSharedPreferences.getDateFromPreferences(prefs);
+    final cash = FilterSharedPreferences.getCashRangeFromPreferences(prefs);*/
+    /*  print(
+        '  from changes type:$type   sort:$sort   date:${date?.firstDate}  date:${date?.lastDate}   cash:${cash?.first}  cash:${cash?.last} \n');
+*/
     if (!mounted) return;
     Future.delayed(const Duration(milliseconds: 300), () {
       //to dismiss the loading bar
