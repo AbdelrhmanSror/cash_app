@@ -7,16 +7,15 @@ import 'dataClasses/Date.dart';
 class FilterSharedPreferences {
   static void retrievedFilterPreferences(
       Function(Date? date, TypeFilter? type, CashRange? cashRange,
-              SortFilter? sortFilter, DateFilter? dateFilter)
+              SortFilter? sortFilter)
           onReady) async {
     final prefs = await SharedPreferences.getInstance();
-    final type = FilterSharedPreferences._getTypesFromPreferences(prefs);
-    final sort = FilterSharedPreferences._getSortFromPreferences(prefs);
-    final date = FilterSharedPreferences._getDateFromPreferences(prefs);
-    final cash = FilterSharedPreferences._getCashRangeFromPreferences(prefs);
-    final dateType = FilterSharedPreferences._getDateTypeFromPreferences(prefs);
+    final type = _getTypesFromPreferences(prefs);
+    final sort = _getSortFromPreferences(prefs);
+    final date = _getDateFromPreferences(prefs);
+    final cash = _getCashRangeFromPreferences(prefs);
 
-    onReady(date, type, cash, sort, dateType);
+    onReady(date, type, cash, sort);
   }
 
   static Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
@@ -24,7 +23,8 @@ class FilterSharedPreferences {
     prefs.setString(DATE, dateFilter.value);
   }
 
-  static DateFilter? _getDateTypeFromPreferences(SharedPreferences prefs) {
+  static Future<DateFilter?> getDateTypeFromPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final dateFilter = prefs.getString(DATE);
     if (dateFilter == null) {
       return null;
@@ -115,6 +115,17 @@ class FilterSharedPreferences {
     return cash;
   }
 
+  static Future<void> flipArrowState(FilterArrowState filterArrowState) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final previousState = await getArrowState(filterArrowState);
+    preferences.setBool(filterArrowState.value, !previousState);
+  }
+
+  static Future<bool> getArrowState(FilterArrowState filterArrowState) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.getBool(filterArrowState.value) ?? true;
+  }
+
   static Future<void> clearFilter() async {
     //clear all data in preferences
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -125,5 +136,9 @@ class FilterSharedPreferences {
     preferences.remove(DATE_START_RANGE);
     preferences.remove(DATE_END_RANGE);
     preferences.remove(DATE);
+    preferences.remove(FilterArrowState.SORT_ARROW.value);
+    preferences.remove(FilterArrowState.DATE_ARROW.value);
+    preferences.remove(FilterArrowState.TYPE_ARROW.value);
+    preferences.remove(FilterArrowState.CASH_ARROW.value);
   }
 }

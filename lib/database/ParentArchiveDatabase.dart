@@ -61,7 +61,6 @@ class ParentArchiveDatabase extends AppDatabase {
   }
 
   // A method that retrieves all the models from the  table.
-  @override
   Future<List<ParentArchivedModel>> retrieveAll(int parentId) async {
     return await _getParentArchiveModels();
   }

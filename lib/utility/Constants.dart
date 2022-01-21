@@ -45,6 +45,42 @@ enum DateFilter {
   CUSTOM
 }
 
+enum ArrowState { EXPANDED, UNEXPANDED }
+
+extension ArrowStateExtension on ArrowState {
+  bool get value {
+    if (this == ArrowState.EXPANDED) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+enum FilterArrowState {
+//variable represents the state of filter options arrow
+  DATE_ARROW,
+  CASH_ARROW,
+  SORT_ARROW,
+  TYPE_ARROW
+}
+
+extension FilterArrowStateExtension on FilterArrowState {
+  String get value {
+    if (this == FilterArrowState.DATE_ARROW) {
+      return DATE_ARROW;
+    }
+    if (this == FilterArrowState.CASH_ARROW) {
+      return CASH_ARROW;
+    }
+    if (this == FilterArrowState.SORT_ARROW) {
+      return SORT_ARROW;
+    } else {
+      return TYPE_ARROW;
+    }
+  }
+}
+
 extension DateTypeExtension on DateFilter {
   String get value {
     if (this == DateFilter.THIS_WEEK) {
@@ -114,3 +150,9 @@ const String CASH_START_RANGE = 'start cash range';
 const String CASH_END_RANGE = 'end cash range';
 const String DATE_START_RANGE = 'start date range';
 const String DATE_END_RANGE = 'end date range';
+
+//variable represents the state of filter options arrow
+const String DATE_ARROW = "date arrow ";
+const String CASH_ARROW = 'cash arrow ';
+const String SORT_ARROW = 'sort arrow ';
+const String TYPE_ARROW = 'type arrow ';

@@ -209,6 +209,8 @@ class _FilterState extends State<FilterScreen>
         IconButton(
             onPressed: () {
               setState(() {
+                FilterSharedPreferences.flipArrowState(
+                    FilterArrowState.DATE_ARROW);
                 _dateExpanded = !_dateExpanded;
               });
             },
@@ -231,6 +233,9 @@ class _FilterState extends State<FilterScreen>
         IconButton(
             onPressed: () {
               setState(() {
+                FilterSharedPreferences.flipArrowState(
+                    FilterArrowState.TYPE_ARROW);
+
                 _typeExpanded = !_typeExpanded;
               });
             },
@@ -253,6 +258,9 @@ class _FilterState extends State<FilterScreen>
         IconButton(
             onPressed: () {
               setState(() {
+                FilterSharedPreferences.flipArrowState(
+                    FilterArrowState.CASH_ARROW);
+
                 _cashExpanded = !_cashExpanded;
               });
             },
@@ -275,6 +283,8 @@ class _FilterState extends State<FilterScreen>
         IconButton(
             onPressed: () {
               setState(() {
+                FilterSharedPreferences.flipArrowState(
+                    FilterArrowState.SORT_ARROW);
                 _sortExpanded = !_sortExpanded;
               });
             },
@@ -803,11 +813,23 @@ class _FilterState extends State<FilterScreen>
   void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
     await updateFilterUi(models);
+    await initArrowState();
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         isLoadingFirst = false;
       });
     });
+  }
+
+  Future<void> initArrowState() async {
+    _dateExpanded = await FilterSharedPreferences.getArrowState(
+        FilterArrowState.DATE_ARROW);
+    _typeExpanded = await FilterSharedPreferences.getArrowState(
+        FilterArrowState.TYPE_ARROW);
+    _sortExpanded = await FilterSharedPreferences.getArrowState(
+        FilterArrowState.SORT_ARROW);
+    _cashExpanded = await FilterSharedPreferences.getArrowState(
+        FilterArrowState.CASH_ARROW);
   }
 
   @override
@@ -826,17 +848,15 @@ class _FilterState extends State<FilterScreen>
     // to initialize our date ui if there was no preferences
     final dateMinMax = await databaseRepository.getMinMaxDate();
     final cash = await databaseRepository.getMinMaxCash();
-    _minCash = cash!.first;
+    final dateType = await FilterSharedPreferences.getDateTypeFromPreferences();
+    _minCash = cash.first;
     _maxCash = cash.last;
     FilterSharedPreferences.retrievedFilterPreferences(
-        (date, type, cashRange, sortFilter, dateType) {
+        (date, type, cashRange, sortFilter) async {
       //if all is null then all is either cleared or not yet filtered
-      if (date == null &&
-          type == null &&
-          cashRange == null &&
-          sortFilter == null &&
-          dateType == null) {
+      if (clearedOrNotFiltered(date, type, cashRange, sortFilter, dateType)) {
         isCleared = true;
+        await initArrowState();
       } else {
         isCleared = false;
       }
@@ -850,6 +870,15 @@ class _FilterState extends State<FilterScreen>
 
       _count = models.models.length;
     });
+  }
+
+  bool clearedOrNotFiltered(Date? date, TypeFilter? type, CashRange? cashRange,
+      SortFilter? sortFilter, DateFilter? dateType) {
+    return (date == null &&
+        type == null &&
+        cashRange == null &&
+        sortFilter == null &&
+        dateType == null);
   }
 
   void updateCashFilter(CashRange? cashRange) {

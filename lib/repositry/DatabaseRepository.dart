@@ -64,48 +64,57 @@ class DataBaseRepository {
   }
 
   // A method that retrieves max and min cash for the data in the database.
-  Future<CashRange?> getMinMaxCash() {
-    return _cashBookDatabase.getMinMaxCash();
+  Future<CashRange> getMinMaxCash() async {
+    return (await _cashBookDatabase.getMinMaxCash()) ?? CashRange(0, 0);
   }
 
   // A method that retrieves max and min cash for the data in the database.
-  Future<Date?> getMinMaxDate() {
-    return _cashBookDatabase.getMinMaxDate();
+  Future<Date> getMinMaxDate() async {
+    return (await _cashBookDatabase.getMinMaxDate()) ??
+        Date(DateTime.now().toString(), DateTime.now().toString());
   }
 
   void insertCashBook(CashBookModel modelToInsert) async {
     await _cashBookDatabase.insert(modelToInsert);
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
+    });
   }
 
   void retrieveCashBooks() async {
     FilterSharedPreferences.retrievedFilterPreferences(
-        (date, type, cashRange, sortFilter, dateType) async {
-      _alertOnCashBookStart((await _retrieveCashBooks(
-          date: date,
-          type: type,
-          cashRange: cashRange,
-          sortFilter: sortFilter)));
+        (date, type, cashRange, sortFilter) {
+      _retrieveCashBooks((cashBookModelListDetails) {
+        _alertOnCashBookStart(cashBookModelListDetails);
+      });
     });
   }
 
-  Future<CashBookModelListDetails> _retrieveCashBooks(
-      {Date? date,
-      TypeFilter? type,
-      CashRange? cashRange,
-      SortFilter? sortFilter}) async {
-    return await _cashBookDatabase.retrieveAll(
-        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter);
+  void _retrieveCashBooks(Function(CashBookModelListDetails) onReady) async {
+    FilterSharedPreferences.retrievedFilterPreferences(
+        (date, type, cashRange, sortFilter) async {
+      CashBookModelListDetails cashBookModelListDetails =
+          await _cashBookDatabase.retrieveAll(
+              date: date,
+              type: type,
+              cashRange: cashRange,
+              sortFilter: sortFilter);
+      onReady(cashBookModelListDetails);
+    });
   }
 
   void updateCashBook(CashBookModel modelToUpdate) async {
     await _cashBookDatabase.updateModel(modelToUpdate);
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
+    });
   }
 
   void deleteCashBook(CashBookModel modelToDelete) async {
     await _cashBookDatabase.deleteModel(modelToDelete);
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
+    });
   }
 
   void retrieveArchivedCashBooks(int parentId) async {
@@ -128,26 +137,22 @@ class DataBaseRepository {
     int parentId = await _parentArchiveDatabase.createParentId(orderedModels);
     await _archiveDatabase.insert(orderedModels.models, parentId);
     await _cashBookDatabase.deleteAll(orderedModels.models);
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
+    });
   }
 
   void retrieveFilteredCashBooks() async {
-    FilterSharedPreferences.retrievedFilterPreferences(
-        (date, type, cashRange, sortFilter, dateType) async {
-      print(
-          'database changed $date  $type   $cashRange $sortFilter  $dateType ');
-
-      _alertOnCashBookChanged(await _retrieveCashBooks(
-          date: date,
-          type: type,
-          cashRange: cashRange,
-          sortFilter: sortFilter));
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
     });
   }
 
   Future<void> clearFilter() async {
     await FilterSharedPreferences.clearFilter();
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+    _retrieveCashBooks((cashBookModelListDetails) {
+      _alertOnCashBookChanged(cashBookModelListDetails);
+    });
   }
 
   Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {

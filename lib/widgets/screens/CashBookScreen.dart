@@ -50,109 +50,104 @@ class _CashBookScreenState extends State<CashBookScreen>
           databaseRepository.retrieveCashBooks();
         },
         child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 60,
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _filterExpanded = true;
-                    });
-                    Utility.createModalSheet(context, FilterScreen(),
-                        enableDrag: false, onComplete: () {
+            appBar: AppBar(
+              toolbarHeight: 60,
+              actions: [
+                TextButton(
+                    onPressed: () {
                       setState(() {
-                        _filterExpanded = false;
+                        _filterExpanded = true;
                       });
-                    });
-                  },
-                  child: Row(
+                      Utility.createModalSheet(context, const FilterScreen(),
+                          enableDrag: false, onComplete: () {
+                        setState(() {
+                          _filterExpanded = false;
+                        });
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          'Filters (${models.models.length})',
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0, left: 2),
+                          child: Icon(
+                            _filterExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
+                            color: Colors.blue,
+                            size: 16,
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+              backgroundColor: Theme.of(context).canvasColor,
+              elevation: 0,
+              title: const Text(
+                'DEBTS',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24),
+              ),
+            ),
+            body: Column(
+              children: [
+                Column(children: [
+                  buildInOutCashDetails(),
+                  const Divider(
+                    thickness: 0.2,
+                    color: Colors.blueGrey,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  buildNetBalanceWidget(),
+                  Container(
+                      padding: const EdgeInsets.all(16.0),
+                      child: buildOperationsArchiveWidget())
+                ]),
+                Expanded(
+                  flex: 2,
+                  child: Column(
                     children: [
-                      Text(
-                        'Filters (${models.models.length})',
-                        style: const TextStyle(fontSize: 15),
-                      ),
                       Padding(
-                        padding: EdgeInsets.only(top: 2.0, left: 2),
-                        child: Icon(
-                          _filterExpanded
-                              ? Icons.keyboard_arrow_up_rounded
-                              : Icons.keyboard_arrow_down_rounded,
-                          color: Colors.blue,
-                          size: 16,
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  buildOperationNumberWidget(),
+                                ],
+                              ),
+                              buildArchiveButtonWidget(),
+                            ]),
+                      ),
+                      Expanded(child: buildOperationListWidget(context)),
+                      Container(
+                        constraints: const BoxConstraints(
+                            minWidth: double.infinity,
+                            maxWidth: double.infinity),
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 16, top: 8, bottom: 16),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Expanded(child: buildCashInButton(context)),
+                            const VerticalDivider(),
+                            Expanded(child: buildCashOutButton(context))
+                          ],
                         ),
                       ),
                     ],
-                  )),
-            ],
-            backgroundColor: Theme.of(context).canvasColor,
-            elevation: 0,
-            title: const Text(
-              'DEBTS',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24),
-            ),
-          ),
-          body: Column(
-            children: [
-              Column(children: [
-                buildInOutCashDetails(),
-                const Divider(
-                  thickness: 0.2,
-                  color: Colors.blueGrey,
-                  indent: 20,
-                  endIndent: 20,
-                ),
-                buildNetBalanceWidget(),
-                Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: buildOperationsArchiveWidget())
-              ]),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                buildOperationNumberWidget(),
-                                /* SyncButton(
-                                  onPressed: () async {
-                                    databaseRepository.retrieveCashBooks();
-                                  },
-                                )*/
-                              ],
-                            ),
-                            buildArchiveButtonWidget(),
-                          ]),
-                    ),
-                    Expanded(child: buildOperationListWidget(context)),
-                    Container(
-                      constraints: const BoxConstraints(
-                          minWidth: double.infinity, maxWidth: double.infinity),
-                      padding: const EdgeInsets.only(
-                          left: 16, right: 16, top: 8, bottom: 16),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Expanded(child: buildCashInButton(context)),
-                          const VerticalDivider(),
-                          Expanded(child: buildCashOutButton(context))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ));
+                  ),
+                )
+              ],
+            )));
   }
 
   CashOutButton buildCashOutButton(BuildContext context) {
@@ -240,7 +235,6 @@ class _CashBookScreenState extends State<CashBookScreen>
 
   @override
   void onDatabaseStarted(CashBookModelListDetails models) async {
-    // obtain shared preferences
     if (!mounted) return;
     setState(() {
       _isLoading = false;

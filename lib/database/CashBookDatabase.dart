@@ -205,34 +205,34 @@ class CashBookDatabase extends AppDatabase {
   Future<CashRange?> getMinMaxCash() async {
     final db = await init();
     // Query the table for  The last model in list.
-    final max = (await db.rawQuery(
-            'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MAX(cash) FROM $_tableName) '))[
-        0]['cash'];
-    final min = (await db.rawQuery(
-            'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MIN(cash) FROM $_tableName) '))[
-        0]['cash'];
-
-    if (min == null || max == null) {
+    try {
+      final max = (await db.rawQuery(
+              'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MAX(cash) FROM $_tableName) '))[
+          0]['cash'];
+      final min = (await db.rawQuery(
+              'SELECT cash FROM "$_tableName" WHERE cash=(SELECT MIN(cash) FROM $_tableName) '))[
+          0]['cash'];
+      return CashRange(min as double, max as double);
+    } catch (nullPointerException) {
       return null;
     }
-    return CashRange(min as double, max as double);
   }
 
   // A method that retrieves max and min cash for the data in the database.
   Future<Date?> getMinMaxDate() async {
     final db = await init();
     // Query the table for  The last model in list.
-    final lastDate = (await db.rawQuery(
-            'SELECT date FROM "$_tableName" WHERE date=(SELECT MAX(date) FROM $_tableName) '))[
-        0]['date'];
-    final firstDate = (await db.rawQuery(
-            'SELECT date FROM "$_tableName" WHERE date=(SELECT MIN(date) FROM $_tableName) '))[
-        0]['date'];
-
-    if (lastDate == null || firstDate == null) {
+    try {
+      final lastDate = (await db.rawQuery(
+              'SELECT date FROM "$_tableName" WHERE date=(SELECT MAX(date) FROM $_tableName) '))[
+          0]['date'];
+      final firstDate = (await db.rawQuery(
+              'SELECT date FROM "$_tableName" WHERE date=(SELECT MIN(date) FROM $_tableName) '))[
+          0]['date'];
+      return Date(firstDate as String, lastDate as String);
+    } catch (nullPointerException) {
       return null;
     }
-    return Date(firstDate as String, lastDate as String);
   }
 
   Future<CashBookModelListDetails> retrieveAll(
@@ -271,9 +271,6 @@ class CashBookDatabase extends AppDatabase {
     }
 
     if (whereClause.length == 5) whereClause = '';
-    print(
-        'where caluse is SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC  $argumentList');
-
     // Query the table for  The last model in list.
     final List<Map<String, dynamic>> maps = await db.rawQuery(
         'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',
@@ -319,8 +316,6 @@ class CashBookDatabase extends AppDatabase {
           startDate: startDate,
           endDate: endDate);
     }
-    print('filtered modles $modelsAfterModel \n\n\n');
-
     //by default we return operation in descending order.
     return CashBookModelListDetails(modelsAfterModel.reversed.toList(),
         totalCashIn: totalCashIn,

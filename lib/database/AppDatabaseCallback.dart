@@ -2,11 +2,6 @@
 
 import 'package:debts_app/utility/dataClasses/CashbookModeldetails.dart';
 
-abstract class AppDatabaseListener<T> {
-  //called when database is first initialized,returning all models in the database
-  void onDatabaseStarted(List<T> models);
-}
-
 abstract class CashBookDatabaseListener<CashBookModel> {
   void onDatabaseStarted(CashBookModelListDetails models);
 
@@ -18,5 +13,7 @@ abstract class ArchiveDatabaseListener<CashBookModel> {
   void onDatabaseStarted(CashBookModelListDetails models);
 }
 
-abstract class ParentArchiveDatabaseListener<ParentArchivedModel>
-    extends AppDatabaseListener<ParentArchivedModel> {}
+abstract class ParentArchiveDatabaseListener<ParentArchivedModel> {
+  //called when database is first initialized,returning all models in the database
+  void onDatabaseStarted(List<ParentArchivedModel> models);
+}

@@ -68,24 +68,30 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           title1: const AppTextWithDot(
             text: 'Starting date',
             color: Colors.black,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
-          subTitle1: AppTextWithDot(
-            text: models.startDate.getFormattedDateTime2(),
-            color: Colors.blueGrey.shade300,
-            fontSize: 12,
+          subTitle1: Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: AppTextWithDot(
+              text: models.startDate.getFormattedDateTime2(),
+              color: Colors.blueGrey.shade300,
+              fontSize: 12,
+            ),
           ),
           title2: const AppTextWithDot(
             text: 'Closing date',
             color: Colors.black,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
-          subTitle2: AppTextWithDot(
-            text: models.endDate.getFormattedDateTime2(),
-            color: Colors.blueGrey.shade300,
-            fontSize: 12,
+          subTitle2: Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: AppTextWithDot(
+              text: models.endDate.getFormattedDateTime2(),
+              color: Colors.blueGrey.shade300,
+              fontSize: 12,
+            ),
           ),
         ),
         Expanded(
