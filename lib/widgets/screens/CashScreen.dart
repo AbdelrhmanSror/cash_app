@@ -208,7 +208,7 @@ class _CashScreenState extends State<CashScreen> {
         if (numberText.isNotEmpty) {
           if (widget.operationType == OperationType.INSERT) {
             databaseRepository.insertCashBook(CashBookModel(
-                date: '${DateTime.now()}',
+                date: '${DateTime.now() /*.subtract(Duration(days: 3))*/}',
                 description: descriptionText,
                 cash: (double.parse(numberText)),
                 type: widget.type));

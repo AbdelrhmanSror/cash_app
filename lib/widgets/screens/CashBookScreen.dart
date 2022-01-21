@@ -33,11 +33,12 @@ class CashBookScreen extends StatefulWidget {
 class _CashBookScreenState extends State<CashBookScreen>
     implements CashBookDatabaseListener<CashBookModel> {
   CashBookModelListDetails models = CashBookModelListDetails([]);
-  bool isLoading = true;
+  bool _isLoading = true;
+  bool _filterExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
           strokeWidth: 2,
@@ -51,6 +52,38 @@ class _CashBookScreenState extends State<CashBookScreen>
         child: Scaffold(
           appBar: AppBar(
             toolbarHeight: 60,
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _filterExpanded = true;
+                    });
+                    Utility.createModalSheet(context, FilterScreen(),
+                        enableDrag: false, onComplete: () {
+                      setState(() {
+                        _filterExpanded = false;
+                      });
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'Filters (${models.models.length})',
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 2.0, left: 2),
+                        child: Icon(
+                          _filterExpanded
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                    ],
+                  )),
+            ],
             backgroundColor: Theme.of(context).canvasColor,
             elevation: 0,
             title: const Text(
@@ -184,15 +217,7 @@ class _CashBookScreenState extends State<CashBookScreen>
     );
   }
 
-  Widget buildInOutCashDetails() => InkWell(
-        onTap: () {
-          Utility.createModalSheet(context, const FilterScreen(),
-              enableDrag: false);
-        },
-        child: InOutCashDetails(
-          models: models,
-        ),
-      );
+  Widget buildInOutCashDetails() => InOutCashDetails(models: models);
 
   // Utility.createModalSheet(context, CashInFilterScreen());
 
@@ -218,7 +243,7 @@ class _CashBookScreenState extends State<CashBookScreen>
     // obtain shared preferences
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+      _isLoading = false;
       //initial setup for models
       this.models = models;
     });

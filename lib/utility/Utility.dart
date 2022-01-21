@@ -63,7 +63,7 @@ class Utility {
   }
 
   static Future<void> createModalSheet(BuildContext context, Widget widget,
-      {bool enableDrag = true}) {
+      {bool enableDrag = true, VoidCallback? onComplete}) {
     return showBarModalBottomSheet<void>(
       context: context,
       enableDrag: enableDrag,
@@ -77,6 +77,10 @@ class Utility {
       builder: (BuildContext context) {
         return widget;
       },
-    );
+    ).whenComplete(() {
+      if (onComplete != null) {
+        onComplete();
+      }
+    });
   }
 }

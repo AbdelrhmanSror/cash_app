@@ -218,9 +218,26 @@ class CashBookDatabase extends AppDatabase {
     return CashRange(min as double, max as double);
   }
 
+  // A method that retrieves max and min cash for the data in the database.
+  Future<Date?> getMinMaxDate() async {
+    final db = await init();
+    // Query the table for  The last model in list.
+    final lastDate = (await db.rawQuery(
+            'SELECT date FROM "$_tableName" WHERE date=(SELECT MAX(date) FROM $_tableName) '))[
+        0]['date'];
+    final firstDate = (await db.rawQuery(
+            'SELECT date FROM "$_tableName" WHERE date=(SELECT MIN(date) FROM $_tableName) '))[
+        0]['date'];
+
+    if (lastDate == null || firstDate == null) {
+      return null;
+    }
+    return Date(firstDate as String, lastDate as String);
+  }
+
   Future<CashBookModelListDetails> retrieveAll(
       {Date? date,
-      List<String>? types,
+      TypeFilter? type,
       CashRange? cashRange,
       SortFilter? sortFilter}) async {
     final db = await init();
@@ -235,15 +252,13 @@ class CashBookDatabase extends AppDatabase {
       argumentList.add(date.firstDate);
       argumentList.add(date.lastDate);
     }
-    if (types != null) {
+    if (type != null) {
       if (whereClause.length == 5) {
-        whereClause +=
-            ' "type" IN (${List.filled(types.length, '?').join(',')}) ';
+        whereClause += ' "type" =?';
       } else {
-        whereClause +=
-            ' And "type" IN (${List.filled(types.length, '?').join(',')})';
+        whereClause += ' And "type" =?';
       }
-      argumentList.addAll(types);
+      argumentList.add(type.value);
     }
     if (cashRange != null) {
       if (whereClause.length == 5) {

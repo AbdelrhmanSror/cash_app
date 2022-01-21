@@ -68,6 +68,11 @@ class DataBaseRepository {
     return _cashBookDatabase.getMinMaxCash();
   }
 
+  // A method that retrieves max and min cash for the data in the database.
+  Future<Date?> getMinMaxDate() {
+    return _cashBookDatabase.getMinMaxDate();
+  }
+
   void insertCashBook(CashBookModel modelToInsert) async {
     await _cashBookDatabase.insert(modelToInsert);
     _alertOnCashBookChanged(await _retrieveCashBooks());
@@ -86,11 +91,11 @@ class DataBaseRepository {
 
   Future<CashBookModelListDetails> _retrieveCashBooks(
       {Date? date,
-      List<String>? type,
+      TypeFilter? type,
       CashRange? cashRange,
       SortFilter? sortFilter}) async {
     return await _cashBookDatabase.retrieveAll(
-        date: date, types: type, cashRange: cashRange, sortFilter: sortFilter);
+        date: date, type: type, cashRange: cashRange, sortFilter: sortFilter);
   }
 
   void updateCashBook(CashBookModel modelToUpdate) async {
@@ -129,6 +134,9 @@ class DataBaseRepository {
   void retrieveFilteredCashBooks() async {
     FilterSharedPreferences.retrievedFilterPreferences(
         (date, type, cashRange, sortFilter, dateType) async {
+      print(
+          'database changed $date  $type   $cashRange $sortFilter  $dateType ');
+
       _alertOnCashBookChanged(await _retrieveCashBooks(
           date: date,
           type: type,
@@ -137,30 +145,29 @@ class DataBaseRepository {
     });
   }
 
-  void setDateTypeInPreferences(DateFilter dateFilter) async {
+  Future<void> clearFilter() async {
+    await FilterSharedPreferences.clearFilter();
+    _alertOnCashBookChanged(await _retrieveCashBooks());
+  }
+
+  Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
     FilterSharedPreferences.setDateTypeInPreferences(dateFilter);
   }
 
-  void setTypeInPreferences(TypeFilter typeFilter) async {
-    FilterSharedPreferences.setTypesInPreferences(
-        [typeFilter], OperationType.INSERT);
+  Future<void> setTypeInPreferences(TypeFilter typeFilter) async {
+    FilterSharedPreferences.setTypesInPreferences(typeFilter);
   }
 
-  void removeTypeFromPreferences(TypeFilter typeFilter) async {
-    FilterSharedPreferences.setTypesInPreferences(
-        [typeFilter], OperationType.DELETE);
-  }
-
-  void setCashRangeInPreferences(CashRange cashRange) async {
+  Future<void> setCashRangeInPreferences(CashRange cashRange) async {
     final prefs = await SharedPreferences.getInstance();
     FilterSharedPreferences.setCashRangeInPreferences(prefs, cashRange);
   }
 
-  void setDateRangeInPreferences(Date date) async {
+  Future<void> setDateRangeInPreferences(Date date) async {
     FilterSharedPreferences.setDateInPreferences(date);
   }
 
-  void setSortInPreferences(SortFilter sortFilter) async {
+  Future<void> setSortInPreferences(SortFilter sortFilter) async {
     FilterSharedPreferences.setSortInPreferences(sortFilter);
   }
 }

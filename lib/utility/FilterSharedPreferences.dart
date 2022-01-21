@@ -6,8 +6,8 @@ import 'dataClasses/Date.dart';
 
 class FilterSharedPreferences {
   static void retrievedFilterPreferences(
-      Function(Date? date, List<String>? type, CashRange? cashRange,
-              SortFilter? sortFilter, DateFilter dateFilter)
+      Function(Date? date, TypeFilter? type, CashRange? cashRange,
+              SortFilter? sortFilter, DateFilter? dateFilter)
           onReady) async {
     final prefs = await SharedPreferences.getInstance();
     final type = FilterSharedPreferences._getTypesFromPreferences(prefs);
@@ -19,79 +19,72 @@ class FilterSharedPreferences {
     onReady(date, type, cash, sort, dateType);
   }
 
-  static void setDateTypeInPreferences(DateFilter dateFilter) async {
+  static Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(DATE, dateFilter.value);
   }
 
-  static DateFilter _getDateTypeFromPreferences(SharedPreferences prefs) {
+  static DateFilter? _getDateTypeFromPreferences(SharedPreferences prefs) {
     final dateFilter = prefs.getString(DATE);
     if (dateFilter == null) {
-      return DateFilter.CUSTOM;
+      return null;
     } else {
       return dateFilter.dateFilter;
     }
   }
 
-  static void setTypesInPreferences(
-      List<TypeFilter> typeFilters, OperationType operationType) async {
+  static Future<void> setTypesInPreferences(TypeFilter typeFilter) async {
     final prefs = await SharedPreferences.getInstance();
-    var types = prefs.getStringList(TYPE);
-    for (var type in typeFilters) {
-      if (types == null || types.isEmpty) {
-        if (operationType == OperationType.INSERT) {
-          types = [type.value];
-          prefs.setStringList(TYPE, types);
-        }
-      } else {
-        if (operationType == OperationType.INSERT &&
-            !types.contains(type.value)) {
-          types.add(type.value);
-          prefs.setStringList(TYPE, types);
-        }
-        if (operationType == OperationType.DELETE) {
-          types.removeAt(types.indexOf(type.value));
-          prefs.setStringList(TYPE, types);
-        }
+    final previousType = _getTypesFromPreferences(prefs);
+    //if the type exist in the prefs then delete it
+    if (previousType == typeFilter) {
+      prefs.remove(TYPE);
+    } else {
+      prefs.setString(TYPE, typeFilter.value);
+    }
+  }
+
+  static TypeFilter? _getTypesFromPreferences(SharedPreferences prefs) {
+    final type = prefs.getString(TYPE);
+    return type?.typeFilter;
+  }
+
+  static Future<void> setSortInPreferences(SortFilter sortFilter) async {
+    final prefs = await SharedPreferences.getInstance();
+    final previousSort = _getSortFromPreferences(prefs);
+    //if the type exist in the prefs then delete it
+    if (previousSort == sortFilter) {
+      prefs.remove(SORT);
+    } else {
+      if (sortFilter.value == LATEST) {
+        prefs.setString(SORT, LATEST);
+      } else if (sortFilter.value == OLDER) {
+        prefs.setString(SORT, OLDER);
+      } else if (sortFilter.value == CASH_HIGH_TO_LOW) {
+        prefs.setString(SORT, CASH_HIGH_TO_LOW);
+      } else if (sortFilter.value == CASH_LOW_TO_HIGH) {
+        prefs.setString(SORT, CASH_LOW_TO_HIGH);
       }
     }
   }
 
-  static List<String> _getTypesFromPreferences(SharedPreferences prefs) {
-    final type = prefs.getStringList(TYPE);
-    if (type == null || type.isEmpty) {
-      return [CASH_IN, CASH_OUT];
-    }
-    return type;
-  }
-
-  static void setSortInPreferences(SortFilter sortFilter) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (sortFilter.value == LATEST) {
-      prefs.setString(SORT, LATEST);
-    } else if (sortFilter.value == OLDER) {
-      prefs.setString(SORT, OLDER);
-    } else if (sortFilter.value == CASH_HIGH_TO_LOW) {
-      prefs.setString(SORT, CASH_HIGH_TO_LOW);
-    } else if (sortFilter.value == CASH_LOW_TO_HIGH) {
-      prefs.setString(SORT, CASH_LOW_TO_HIGH);
-    }
-  }
-
-  static SortFilter _getSortFromPreferences(SharedPreferences prefs) {
-    final sort = prefs.getString(SORT) ?? SortFilter.LATEST.value;
+  static SortFilter? _getSortFromPreferences(SharedPreferences prefs) {
+    //by default data is sorted in descending order.
+    final sort = prefs.getString(SORT);
     if (sort == LATEST) {
       return SortFilter.LATEST;
     } else if (sort == OLDER) {
       return SortFilter.OLDER;
     } else if (sort == CASH_HIGH_TO_LOW) {
       return SortFilter.CASH_HIGH_TO_LOW;
-    } else {
+    } else if (sort == CASH_LOW_TO_HIGH) {
       return SortFilter.CASH_LOW_TO_HIGH;
+    } else {
+      return null;
     }
   }
 
-  static void setDateInPreferences(Date date) async {
+  static Future<void> setDateInPreferences(Date date) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(DATE_START_RANGE, date.firstDate);
     prefs.setString(DATE_END_RANGE, date.lastDate);
@@ -106,7 +99,7 @@ class FilterSharedPreferences {
     return date;
   }
 
-  static void setCashRangeInPreferences(
+  static Future<void> setCashRangeInPreferences(
       SharedPreferences prefs, CashRange cashRange) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setDouble(CASH_START_RANGE, cashRange.first);
@@ -120,5 +113,17 @@ class FilterSharedPreferences {
         ? null
         : CashRange(startCash, endCash);
     return cash;
+  }
+
+  static Future<void> clearFilter() async {
+    //clear all data in preferences
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove(SORT);
+    preferences.remove(TYPE);
+    preferences.remove(CASH_START_RANGE);
+    preferences.remove(CASH_END_RANGE);
+    preferences.remove(DATE_START_RANGE);
+    preferences.remove(DATE_END_RANGE);
+    preferences.remove(DATE);
   }
 }
