@@ -30,6 +30,8 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.0.12
+  provider: ^5.0.0
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -39,10 +41,15 @@ dependencies:
   modal_bottom_sheet: ^2.0.0
   quiver: ^3.0.1+1
   syncfusion_flutter_datepicker: ^19.4.42
+  syncfusion_flutter_core: ^19.4.43+1
+  fl_chart: ^0.41.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
+  test: ^1.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

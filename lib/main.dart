@@ -1,7 +1,8 @@
 import 'package:debts_app/bottomNavigation.dart';
-import 'package:debts_app/repositry/DatabaseRepository.dart';
-import 'package:debts_app/widgets/screens/CashBookScreen.dart';
 import 'package:flutter/material.dart';
+
+import 'cashbook/repositry/DatabaseRepository.dart';
+import 'cashbook/widgets/screens/CashBookScreen.dart';
 
 final databaseRepository = DataBaseRepository();
 
