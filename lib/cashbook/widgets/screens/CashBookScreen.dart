@@ -9,8 +9,8 @@ import 'package:debts_app/cashbook/widgets/functional/OperationNumberWidget.dart
 import 'package:flutter/material.dart';
 
 import '../../../main.dart';
-import 'CashListScreen.dart';
 import 'FilterScreen.dart';
+import 'ScreenNavigation.dart';
 
 class MyCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget title;
@@ -33,8 +33,8 @@ class _MyCustomAppBarState extends State<MyCustomAppBar> {
       title: widget.title,
       backgroundColor: Theme.of(context).canvasColor,
       elevation: 0,
-      iconTheme: IconThemeData(
-        color: Color(0xFF3345A6), //change your color here
+      iconTheme: const IconThemeData(
+        color: const Color(0xFF3345A6), //change your color here
       ),
       centerTitle: true,
       actions: [
@@ -62,7 +62,7 @@ class _MyCustomAppBarState extends State<MyCustomAppBar> {
                     _filterExpanded
                         ? Icons.keyboard_arrow_up_rounded
                         : Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF3345A6),
+                    color: const Color(0xFF3345A6),
                     size: 16,
                   ),
                 ),
@@ -116,6 +116,7 @@ class _CashBookScreenState extends State<CashBookScreen>
                   padding:
                       const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
                   child: Column(
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Expanded(
                         flex: 1,
@@ -135,12 +136,8 @@ class _CashBookScreenState extends State<CashBookScreen>
                             buildOperationNumberWidget(),
                             IconButton(
                                 onPressed: () {
-                                  Navigator.of(context).push(
-                                      Utility.createAnimationRoute(
-                                          const CashListScreen(),
-                                          const Offset(1.0, 0.0),
-                                          Offset.zero,
-                                          Curves.ease));
+                                  ScreenNavigation.navigateToCashListScreen(
+                                      context);
                                 },
                                 icon: const Icon(
                                   Icons.arrow_forward_ios_rounded,

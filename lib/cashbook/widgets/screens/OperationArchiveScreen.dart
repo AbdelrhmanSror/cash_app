@@ -139,8 +139,11 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        onEditPressed: (_) {},
+        onDeletePressed: (_) {},
+        onArchivePressed: (_) {},
         models: models.models,
-        onPressed: (model) {
+        onItemPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(
               ListDetailScreen(
                   model: model, hideEditButton: true, hideDeleteButton: true),

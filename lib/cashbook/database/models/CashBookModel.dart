@@ -37,7 +37,6 @@ class CashBookModel {
   }
 
   double getBalance() {
-    print('total cash in $totalCashIn    $totalCashOut');
     return totalCashIn + totalCashOut;
   }
 

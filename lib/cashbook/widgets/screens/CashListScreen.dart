@@ -1,7 +1,6 @@
 import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
-import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/ArchiveButtonWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/CashInButtonWidget.dart';
@@ -12,14 +11,10 @@ import 'package:debts_app/cashbook/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationsArchiveWidget.dart';
 import 'package:debts_app/cashbook/widgets/screens/CashBookScreen.dart';
+import 'package:debts_app/cashbook/widgets/screens/ScreenNavigation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../main.dart';
-import 'ArchiveModalSheetScreen.dart';
-import 'CashScreen.dart';
-import 'ListDetailScreen.dart';
-import 'OperationArchiveParentListScreen.dart';
-import 'OperationArchiveScreen.dart';
 
 class CashListScreen extends StatefulWidget {
   const CashListScreen({Key? key}) : super(key: key);
@@ -70,7 +65,13 @@ class _CashListScreenState extends State<CashListScreen>
                       const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
                   child: Column(
                     children: [
-                      buildTypeFilter(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          buildTypeFilter(),
+                          buildOperationsArchiveWidget()
+                        ],
+                      ),
                       Expanded(child: buildOperationListWidget(context)),
                       buildCashInOutButton(context)
                     ],
@@ -136,40 +137,36 @@ class _CashListScreenState extends State<CashListScreen>
 
   CashOutButton buildCashOutButton(BuildContext context) {
     return CashOutButton(onCashOutPressed: () {
-      Navigator.of(context).push(Utility.createAnimationRoute(
-          const CashOutScreen(operationType: OperationType.INSERT),
-          const Offset(1.0, 0.0),
-          Offset.zero,
-          Curves.ease));
+      ScreenNavigation.navigateToCashOutScreen(context, OperationType.INSERT);
     });
   }
 
   CashInButton buildCashInButton(BuildContext context) {
     return CashInButton(onCashInPressed: () {
-      Navigator.of(context).push(Utility.createAnimationRoute(
-          const CashInScreen(operationType: OperationType.INSERT),
-          const Offset(1.0, 0.0),
-          Offset.zero,
-          Curves.ease));
+      ScreenNavigation.navigateToCashInScreen(context, OperationType.INSERT);
     });
   }
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        onDeletePressed: (element) {
+          databaseRepository.deleteCashBook(element);
+        },
+        onEditPressed: (element) {
+          ScreenNavigation.navigateToEditScreen(context, element);
+        },
+        onArchivePressed: (element) {
+          databaseRepository.archiveCashBooks([element]);
+        },
         models: models.models,
-        onPressed: (model) {
-          Navigator.of(context).push(Utility.createAnimationRoute(
-              ListDetailScreen(model: model),
-              const Offset(0.0, 1.0),
-              Offset.zero,
-              Curves.ease));
+        onItemPressed: (model) {
+          ScreenNavigation.navigateToListDetailScreen(context, model);
         });
   }
 
   ArchiveButtonWidget buildArchiveButtonWidget() => ArchiveButtonWidget(
       onPressed: () {
-        Utility.createModalSheet(
-            context, ArchiveModalSheetScreen(models: models));
+        ScreenNavigation.navigateToArchiveModalSheetScreen(context, models);
       },
       hide: (models.models.isEmpty));
 
@@ -179,14 +176,7 @@ class _CashListScreenState extends State<CashListScreen>
 
   OperationsArchiveWidget buildOperationsArchiveWidget() =>
       OperationsArchiveWidget(onPressed: () {
-        Navigator.of(context).push(Utility.createAnimationRoute(
-            OperationArchiveParentListScreen(onPressed: (parentId) {
-          Navigator.of(context).push(Utility.createAnimationRoute(
-              OperationArchiveScreen(parentId: parentId),
-              const Offset(1.0, 0.0),
-              Offset.zero,
-              Curves.ease));
-        }), const Offset(0.0, 1.0), Offset.zero, Curves.ease));
+        ScreenNavigation.navigateToParentArchiveScreen(context);
       });
 
   NetBalanceWidget buildNetBalanceWidget() {

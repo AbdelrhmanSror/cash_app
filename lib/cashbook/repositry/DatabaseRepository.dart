@@ -114,9 +114,9 @@ class DataBaseRepository {
   }
 
   //remember to archive based on current filter
-  void archiveCashBooks(CashBookModelListDetails models) async {
-    final listOfIds = List.generate(models.models.length, (i) {
-      return models.models[i].id;
+  void archiveCashBooks(List<CashBookModel> models) async {
+    final listOfIds = List.generate(models.length, (i) {
+      return models[i].id;
     });
     //because models may be ordered in some way so we need to revert it back to its genuine order which is in ascending by id
     final orderedModels =

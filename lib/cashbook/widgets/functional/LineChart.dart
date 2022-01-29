@@ -12,68 +12,66 @@ class HeadLineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Wrap(
-            children: [
-              RichText(
-                  text: TextSpan(children: [
-                const TextSpan(
-                  text: 'EGP  ',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                    text: (Utility.formatCashNumber(
-                        modelListDetails.getBalance().abs())),
-                    style: const TextStyle(
-                        fontSize: 30,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold))
-              ])),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '${modelListDetails.getPercentage().toStringAsFixed(1)}%',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Wrap(
+          children: [
+            RichText(
+                text: TextSpan(children: [
+              const TextSpan(
+                text: 'EGP  ',
                 style: TextStyle(
-                    fontSize: 16,
-                    color: modelListDetails.getPercentage() >= 0
-                        ? const Color(0xFF08A696)
-                        : const Color(0xFFF88D93),
+                    fontSize: 12,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold),
               ),
-              const SizedBox(width: 4),
-              RawMaterialButton(
-                onPressed: () {},
-                constraints: const BoxConstraints(),
-                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                child: Text(
-                  label,
+              TextSpan(
+                  text: (Utility.formatCashNumber(
+                      modelListDetails.getBalance().abs())),
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500),
-                ),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: Color(0xFF3345A6), width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                fillColor: const Color(0xFF3345A6),
+                      fontSize: 30,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold))
+            ])),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '${modelListDetails.getPercentage().toStringAsFixed(1)}%',
+              style: TextStyle(
+                  fontSize: 16,
+                  color: modelListDetails.getPercentage() >= 0
+                      ? const Color(0xFF08A696)
+                      : const Color(0xFFF88D93),
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 4),
+            RawMaterialButton(
+              elevation: 0,
+              onPressed: () {},
+              constraints: const BoxConstraints(),
+              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+              child: Text(
+                label,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500),
               ),
-            ],
-          ),
-          Expanded(
-              flex: 1, child: SpLineChart(modelListDetails: modelListDetails)),
-        ],
-      ),
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(color: Color(0xFF3345A6), width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              fillColor: const Color(0xFF3345A6),
+            ),
+          ],
+        ),
+        Expanded(
+            flex: 1, child: SpLineChart(modelListDetails: modelListDetails)),
+      ],
     );
   }
 }
@@ -83,14 +81,6 @@ class SpLineChart extends StatelessWidget {
       : super(key: key);
 
   final CashBookModelListDetails modelListDetails;
-
-  List<FlSpot> getSpots(CashBookModelListDetails models) {
-    final List<FlSpot> spots = [];
-    for (int i = 0; i < models.models.length; i++) {
-      spots.add(FlSpot((i).toDouble(), models.models[i].getBalance()));
-    }
-    return spots;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,10 +101,29 @@ class SpLineChart extends StatelessWidget {
                     const textStyle = TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.normal,
-                      fontSize: 10,
+                      fontSize: 0,
                     );
-                    return LineTooltipItem(
-                        'balance:EGP ${touchedSpot.y}', textStyle);
+                    return LineTooltipItem('', textStyle,
+                        textAlign: TextAlign.end,
+                        children: [
+                          TextSpan(
+                            text: 'EGP ',
+                            style: TextStyle(
+                                fontSize: 8,
+                                color: (touchedSpot.y) < 0
+                                    ? const Color(0xFFF56B73)
+                                    : const Color(0xFF09C7B4),
+                                fontWeight: FontWeight.normal),
+                          ),
+                          TextSpan(
+                              text: (Utility.formatCashNumber(touchedSpot.y)),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: (touchedSpot.y) < 0
+                                      ? const Color(0xFFF56B73)
+                                      : const Color(0xFF09C7B4),
+                                  fontWeight: FontWeight.normal))
+                        ]);
                   }).toList();
                 })),
         gridData: gridData,
@@ -156,7 +165,15 @@ class SpLineChart extends StatelessWidget {
         barWidth: 3,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
+        belowBarData: BarAreaData(show: true),
         spots: getSpots(modelListDetails),
       );
+
+  List<FlSpot> getSpots(CashBookModelListDetails models) {
+    final List<FlSpot> spots = [];
+    for (int i = 0; i < models.models.length; i++) {
+      spots.add(FlSpot((i).toDouble(), models.models[i].getBalance()));
+    }
+    return spots;
+  }
 }

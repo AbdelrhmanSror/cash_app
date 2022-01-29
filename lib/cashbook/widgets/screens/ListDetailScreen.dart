@@ -5,11 +5,11 @@ import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/cashbook/widgets/partial/RoundedButton.dart';
+import 'package:debts_app/cashbook/widgets/screens/CashListScreen.dart';
+import 'package:debts_app/cashbook/widgets/screens/ScreenNavigation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../main.dart';
-import 'CashBookScreen.dart';
-import 'CashScreen.dart';
 
 class ListDetailScreen extends StatefulWidget {
   ListDetailScreen(
@@ -96,24 +96,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingRight: 16,
         onPressed: () async {
           CashBookModel? result /*EmptyCashBookModel()*/;
-          if (widget.model.type == CASH_IN) {
-            await Navigator.of(context).push(Utility.createAnimationRoute(
-                CashInScreen(
-                  operationType: OperationType.UPDATE,
-                  modelToEdit: widget.model,
-                ),
-                const Offset(0.0, 1.0),
-                Offset.zero,
-                Curves.ease));
-          } else {
-            await Navigator.of(context).push(Utility.createAnimationRoute(
-                CashOutScreen(
-                    operationType: OperationType.UPDATE,
-                    modelToEdit: widget.model),
-                const Offset(0.0, 1.0),
-                Offset.zero,
-                Curves.ease));
-          }
+          ScreenNavigation.navigateToEditScreen(context, widget.model);
+
           //get updated model
           result = await databaseRepository.getById(widget.model.id);
           setState(() {
@@ -160,7 +144,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     databaseRepository.deleteCashBook(widget.model);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
-                        const CashBookScreen(),
+                        const CashListScreen(),
                         const Offset(0.1, 0.0),
                         Offset.zero,
                         Curves.ease));

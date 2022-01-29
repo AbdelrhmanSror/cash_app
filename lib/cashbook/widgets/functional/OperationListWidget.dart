@@ -10,11 +10,20 @@ import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 class OperationListWidget extends StatefulWidget {
   const OperationListWidget(
-      {required this.models, required this.onPressed, Key? key})
+      {required this.models,
+      required this.onItemPressed,
+      required this.onDeletePressed,
+      required this.onEditPressed,
+      required this.onArchivePressed,
+      Key? key})
       : super(key: key);
 
+  final Function(CashBookModel) onDeletePressed;
+  final Function(CashBookModel) onEditPressed;
+  final Function(CashBookModel) onArchivePressed;
+
   final List<CashBookModel> models;
-  final Function(CashBookModel) onPressed;
+  final Function(CashBookModel) onItemPressed;
 
   @override
   State<OperationListWidget> createState() => _OperationListWidgetState();
@@ -85,29 +94,25 @@ class _OperationListWidgetState extends State<OperationListWidget> {
               .compareTo(DateUtility.removeTimeFromDate(
                   DateTime.parse(element2.date))),
       floatingHeader: true,
-      groupSeparatorBuilder: (CashBookModel element) => SizedBox(
-        height: 35,
-        child: Align(
-          alignment: Alignment.center,
-          child: Container(
-            width: 120,
-            decoration: BoxDecoration(
-              color: const Color(0xFF3345A6),
-              border: Border.all(
-                color: const Color(0xFF3345A6),
+      groupSeparatorBuilder: (CashBookModel element) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+            height: 35,
+            child: Align(
+              alignment: Alignment.center,
+              child: RawMaterialButton(
+                onPressed: () {},
+                padding: const EdgeInsets.all(8),
+                fillColor: const Color(0xFF3345A6),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
+                child: Text(
+                  DateUtility.getAlphabeticDate(DateTime.parse(element.date)),
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                DateUtility.getAlphabeticDate(DateTime.parse(element.date)),
-                style: const TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
+            )),
       ),
       itemBuilder: (_, CashBookModel element) {
         return Card(
@@ -125,48 +130,56 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                 motion: const ScrollMotion(),
 
                 // A pane can dismiss the Slidable.
-                dismissible: DismissiblePane(onDismissed: () {}),
+                dismissible: DismissiblePane(onDismissed: () {
+                  print('on dismiss ');
+                }),
 
                 // All actions are defined in the children parameter.
-                children: const [
+                children: [
                   // A SlidableAction can have an icon and/or a label.
                   SlidableAction(
-                    onPressed: null,
+                    onPressed: (_) {
+                      widget.onDeletePressed(element);
+                    },
                     backgroundColor: Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
                     label: 'Delete',
                   ),
                   SlidableAction(
-                    onPressed: null,
+                    onPressed: (_) {
+                      widget.onEditPressed(element);
+                    },
                     backgroundColor: Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
                     icon: Icons.share,
-                    label: 'Share',
+                    label: 'Edit',
                   ),
                 ],
               ),
 
               // The end action pane is the one at the right or the bottom side.
-              endActionPane: const ActionPane(
+              endActionPane: ActionPane(
                 motion: ScrollMotion(),
                 children: [
                   SlidableAction(
                     // An action can be bigger than the others.
                     flex: 2,
-                    onPressed: null,
+                    onPressed: (_) {
+                      widget.onArchivePressed(element);
+                    },
                     backgroundColor: Color(0xFF7BC043),
                     foregroundColor: Colors.white,
                     icon: Icons.archive,
                     label: 'Archive',
                   ),
-                  SlidableAction(
+                  /* SlidableAction(
                     onPressed: null,
                     backgroundColor: Color(0xFF0392CF),
                     foregroundColor: Colors.white,
                     icon: Icons.save,
                     label: 'Save',
-                  ),
+                  ),*/
                 ],
               ),
 
@@ -175,7 +188,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
               child: InkWell(
                   child: OperationTile(model: element),
                   onTap: () {
-                    widget.onPressed(element);
+                    widget.onItemPressed(element);
                   }),
             ));
       },
@@ -220,7 +233,7 @@ class OperationTile extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Container(
                       constraints:
-                          const BoxConstraints(maxWidth: 100, minWidth: 1),
+                          const BoxConstraints(maxWidth: 200, minWidth: 1),
                       alignment: Alignment.centerLeft,
                       child: AppTextWithDot(
                         text:
@@ -264,8 +277,8 @@ class OperationTile extends StatelessWidget {
               Container(
                 constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
                 child: AppTextWithDot(
-                  text:
-                      '${DateUtility.getTimeRepresentation(DateTime.parse(model.date))}',
+                  text: DateUtility.getTimeRepresentation(
+                      DateTime.parse(model.date)),
                   style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
