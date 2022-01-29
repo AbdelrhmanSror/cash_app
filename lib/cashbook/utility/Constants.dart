@@ -4,8 +4,10 @@ extension TypeExtension on TypeFilter {
   String get value {
     if (this == TypeFilter.CASH_IN) {
       return CASH_IN;
-    } else {
+    } else if (this == TypeFilter.CASH_OUT) {
       return CASH_OUT;
+    } else {
+      return 'ALL';
     }
   }
 }
@@ -14,8 +16,10 @@ extension TypeExtensionString on String {
   TypeFilter get typeFilter {
     if (this == TypeFilter.CASH_IN.value) {
       return TypeFilter.CASH_IN;
-    } else {
+    } else if (this == TypeFilter.CASH_OUT.value) {
       return TypeFilter.CASH_OUT;
+    } else {
+      return TypeFilter.ALL;
     }
   }
 }
@@ -42,6 +46,7 @@ enum DateFilter {
   THIS_YEAR,
   LAST_30_DAYS,
   LAST_MONTH,
+  ALL,
   CUSTOM
 }
 
@@ -97,8 +102,10 @@ extension DateTypeExtension on DateFilter {
     }
     if (this == DateFilter.LAST_MONTH) {
       return LAST_MONTH;
-    } else {
+    } else if (this == DateFilter.CUSTOM) {
       return CUSTOM;
+    } else {
+      return 'ALL';
     }
   }
 }
@@ -119,8 +126,10 @@ extension TypeDateExtensionString on String {
     }
     if (this == LAST_MONTH) {
       return DateFilter.LAST_MONTH;
-    } else {
+    } else if (this == CUSTOM) {
       return DateFilter.CUSTOM;
+    } else {
+      return DateFilter.ALL;
     }
   }
 }
@@ -135,11 +144,11 @@ const String CASH_HIGH_TO_LOW = 'Cash high To low';
 const String LATEST = 'Latest';
 const String OLDER = 'Older';
 
-const String THIS_WEEK = 'THIS_WEEK';
-const String LAST_7_DAYS = 'LAST_7_DAYS';
-const String THIS_YEAR = 'THIS_YEAR';
-const String LAST_30_DAYS = 'LAST_30_DAYS';
-const String LAST_MONTH = 'LAST_MONTH';
+const String THIS_WEEK = 'THIS WEEK';
+const String LAST_7_DAYS = 'LAST 7 DAYS';
+const String THIS_YEAR = 'THIS YEAR';
+const String LAST_30_DAYS = 'LAST 30 DAYS';
+const String LAST_MONTH = 'LAST MONTH';
 const String CUSTOM = 'CUSTOM';
 
 const String SORT = 'Sort type';

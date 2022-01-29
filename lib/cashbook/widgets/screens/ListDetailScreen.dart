@@ -81,7 +81,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   Widget buildEditButton() {
     return RoundedTextButton(
         hide: widget.hideEditButton,
-        text: AppTextWithDot(
+        text: const AppTextWithDot(
           text: 'EDIT',
           style: TextStyle(
             fontSize: 16,
@@ -179,8 +179,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       widgets: [
         AppTextWithDot(
           text: widget.model.date.getFormattedDateTime(),
-          style: TextStyle(
-              color: const Color(0xFF281361),
+          style: const TextStyle(
+              color: Color(0xFF281361),
               fontSize: 20,
               fontWeight: FontWeight.bold),
         ),
@@ -191,7 +191,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         ),
         const Divider(height: 3, color: Colors.white),
         AppTextWithDot(
-          text: '${widget.model.cash} EGP',
+          text: '${widget.model.cash.abs()} EGP',
           style: TextStyle(
               color: widget.model.type == CASH_OUT
                   ? Colors.red
@@ -230,7 +230,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         AppTextWithDot(
           maxLines: 8,
           text: widget.model.description,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13),
         )
       ],

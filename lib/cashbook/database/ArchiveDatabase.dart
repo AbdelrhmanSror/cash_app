@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'AppDatabase.dart';

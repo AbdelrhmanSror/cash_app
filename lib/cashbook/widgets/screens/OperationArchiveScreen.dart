@@ -2,7 +2,7 @@ import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Extensions.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationListWidget.dart';

@@ -54,6 +54,10 @@ class DateUtility {
     return Date(firstDateInWeek, lastDateInWeek);
   }
 
+  static String getTimeRepresentation(DateTime dateTime) {
+    return DateFormat('jm').format(dateTime);
+  }
+
   static String getDateRepresentation(DateTime dateTime) {
     DateTime now = DateTime.now();
     DateTime justNow = now.subtract(const Duration(minutes: 1));

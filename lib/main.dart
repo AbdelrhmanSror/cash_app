@@ -56,7 +56,6 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    //retrieve all the data in the database to initialize our app
     return Scaffold(
       body: PageView(
         children: _widgetOptions(),

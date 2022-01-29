@@ -1,6 +1,6 @@
 //callback for database
 
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 
 abstract class CashBookDatabaseListener<CashBookModel> {
   void onDatabaseStarted(CashBookModelListDetails models);

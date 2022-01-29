@@ -1,6 +1,6 @@
 /*
 
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/CompositeWidget.dart';
 import 'package:debts_app/creditbook/suppliers/database/supplier.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Cash.dart';
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Date.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -237,11 +237,8 @@ class CashBookDatabase extends AppDatabase {
     }
   }
 
-  Future<CashBookModelListDetails> retrieveAll(
-      {Date? date,
-      TypeFilter? type,
-      CashRange? cashRange,
-      SortFilter? sortFilter}) async {
+  Future<CashBookModelListDetails> retrieveAll(Date date, TypeFilter type,
+      CashRange cashRange, SortFilter sortFilter) async {
     final db = await init();
     final argumentList = [];
     String whereClause = 'Where';
@@ -249,12 +246,12 @@ class CashBookDatabase extends AppDatabase {
     double totalCashOut = 0;
     String startDate = '';
     String endDate = '';
-    if (date != null) {
-      whereClause += ' date(date) BETWEEN ? And ? ';
-      argumentList.add(date.firstDate);
-      argumentList.add(date.lastDate);
-    }
-    if (type != null) {
+    whereClause += ' date(date) BETWEEN ? And ? ';
+    print('min max date is ${date.firstDate}   ${date.lastDate} ');
+
+    argumentList.add(date.firstDate);
+    argumentList.add(date.lastDate);
+    if (type != TypeFilter.ALL) {
       if (whereClause.length == 5) {
         whereClause += ' "type" =?';
       } else {
@@ -262,17 +259,10 @@ class CashBookDatabase extends AppDatabase {
       }
       argumentList.add(type.value);
     }
-    if (cashRange != null) {
-      if (whereClause.length == 5) {
-        whereClause += ' cash>=? And cash <=?';
-      } else {
-        whereClause += ' And cash>=? And cash <=?';
-      }
-      argumentList.add(cashRange.first);
-      argumentList.add(cashRange.last);
-    }
+    whereClause += ' And cash>=? And cash <=?';
+    argumentList.add(cashRange.first);
+    argumentList.add(cashRange.last);
 
-    if (whereClause.length == 5) whereClause = '';
     // Query the table for  The last model in list.
     final List<Map<String, dynamic>> maps = await db.rawQuery(
         'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',

@@ -1,92 +1,93 @@
-import 'package:debts_app/cashbook/utility/Constants.dart';
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/Utility.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class chartX extends StatelessWidget {
-  chartX({Key? key, required this.modelListDetails}) : super(key: key);
-  CashBookModelListDetails modelListDetails;
+class HeadLineChart extends StatelessWidget {
+  const HeadLineChart(
+      {Key? key, required this.modelListDetails, required this.label})
+      : super(key: key);
+  final CashBookModelListDetails modelListDetails;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Wrap(
-          children: [
-            RichText(
-                text: TextSpan(children: [
-              const TextSpan(
-                text: 'EGP  ',
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Wrap(
+            children: [
+              RichText(
+                  text: TextSpan(children: [
+                const TextSpan(
+                  text: 'EGP  ',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                    text: (Utility.formatCashNumber(
+                        modelListDetails.getBalance().abs())),
+                    style: const TextStyle(
+                        fontSize: 30,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold))
+              ])),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${modelListDetails.getPercentage().toStringAsFixed(1)}%',
                 style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
+                    fontSize: 16,
+                    color: modelListDetails.getPercentage() >= 0
+                        ? const Color(0xFF08A696)
+                        : const Color(0xFFF88D93),
                     fontWeight: FontWeight.bold),
               ),
-              TextSpan(
-                  text: '${(modelListDetails.getBalance()).abs()}',
+              const SizedBox(width: 4),
+              RawMaterialButton(
+                onPressed: () {},
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                child: Text(
+                  label,
                   style: const TextStyle(
-                      fontSize: 30,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold))
-            ])),
-          ],
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '${modelListDetails.getPercentage().toStringAsFixed(1)}%',
-              style: TextStyle(
-                  fontSize: 16,
-                  color: modelListDetails.getPercentage() >= 0
-                      ? Color(0xFF08A696)
-                      : Color(0xFFF88D93),
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 8),
-            ChoiceChip(
-              selected: true,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: Color(0xFF3345A6), width: 1),
-                borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
+                ),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: Color(0xFF3345A6), width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                fillColor: const Color(0xFF3345A6),
               ),
-              backgroundColor: Colors.white10,
-              label: const Text(
-                'Week',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
-              ),
-              selectedColor: const Color(0xFF3345A6),
-              onSelected: (bool value) {},
-            )
-          ],
-        ),
-        Expanded(
-            flex: 1, child: _LineChart(modelListDetails: modelListDetails)),
-      ],
+            ],
+          ),
+          Expanded(
+              flex: 1, child: SpLineChart(modelListDetails: modelListDetails)),
+        ],
+      ),
     );
   }
 }
 
-class _LineChart extends StatelessWidget {
-  _LineChart({required this.modelListDetails});
+class SpLineChart extends StatelessWidget {
+  const SpLineChart({Key? key, required this.modelListDetails})
+      : super(key: key);
 
-  CashBookModelListDetails modelListDetails;
+  final CashBookModelListDetails modelListDetails;
 
   List<FlSpot> getSpots(CashBookModelListDetails models) {
     final List<FlSpot> spots = [];
     for (int i = 0; i < models.models.length; i++) {
-      spots.add(FlSpot(
-          (i).toDouble(),
-          models.models[i].type == TypeFilter.CASH_IN.value
-              ? models.models[i].cash
-              : -models.models[i].cash));
+      spots.add(FlSpot((i).toDouble(), models.models[i].getBalance()));
     }
     return spots;
   }
@@ -110,9 +111,10 @@ class _LineChart extends StatelessWidget {
                     const textStyle = TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.normal,
-                      fontSize: 12,
+                      fontSize: 10,
                     );
-                    return LineTooltipItem('EGP ${touchedSpot.y}', textStyle);
+                    return LineTooltipItem(
+                        'balance:EGP ${touchedSpot.y}', textStyle);
                   }).toList();
                 })),
         gridData: gridData,
@@ -121,8 +123,8 @@ class _LineChart extends StatelessWidget {
         lineBarsData: lineBarsData1,
         minX: 0,
         maxX: modelListDetails.models.length.toDouble(),
-        maxY: modelListDetails.getMaxCashIn(),
-        minY: -(modelListDetails.getMaxCashOut()),
+        maxY: modelListDetails.totalCashIn,
+        minY: modelListDetails.totalCashOut,
       );
 
   FlTitlesData get titlesData1 => FlTitlesData(

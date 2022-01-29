@@ -37,7 +37,8 @@ class CashBookModel {
   }
 
   double getBalance() {
-    return totalCashIn - totalCashOut;
+    print('total cash in $totalCashIn    $totalCashOut');
+    return totalCashIn + totalCashOut;
   }
 
   // Implement toString to make it easier to see information about

@@ -1,4 +1,5 @@
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/Utility.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +13,9 @@ class InOutCashDetails extends StatelessWidget {
     final double totalCashIn = models.totalCashIn;
     final double totalCashOut = models.totalCashOut;
 
-    return Flex(
+    return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      direction: Axis.horizontal,
       children: [
         const Icon(
           Icons.arrow_upward_outlined,
@@ -32,9 +32,11 @@ class InOutCashDetails extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   final dialog = AlertDialog(
-                      content: SizedBox(
-                    height: 50,
+                      content: Container(
+                    constraints:
+                        const BoxConstraints(minWidth: 1, maxWidth: 150),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextWithDot(
@@ -42,13 +44,21 @@ class InOutCashDetails extends StatelessWidget {
                           style: TextStyle(color: Colors.blueGrey.shade200),
                         ),
                         const Divider(height: 3, color: Colors.white),
-                        AppTextWithDot(
-                          text: 'EGP ${totalCashIn}',
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25),
-                        ),
+                        RichText(
+                            text: TextSpan(children: [
+                          const TextSpan(
+                              text: 'EGP',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10)),
+                          TextSpan(
+                              text: ' ${Utility.formatCashNumber(totalCashIn)}',
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25))
+                        ]))
                       ],
                     ),
                   ));
@@ -65,28 +75,36 @@ class InOutCashDetails extends StatelessWidget {
                     text: 'Cash in',
                     style: TextStyle(
                         color: Colors.blueGrey.shade200,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.normal),
                   ),
                 ),
-                AppTextWithDot(
-                  text: 'EGP $totalCashIn',
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold),
-                ),
+                RichText(
+                    text: TextSpan(children: [
+                  const TextSpan(
+                      text: 'EGP',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 9)),
+                  TextSpan(
+                      text: ' ${Utility.formatCashNumber(totalCashIn)}',
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16))
+                ]))
               ],
             ),
           ),
         ),
         const SizedBox(
-          width: 10,
+          width: 20,
         ),
         const Icon(
           Icons.arrow_downward_outlined,
           size: 25,
-          color: const Color(0xFFF88D93),
+          color: Color(0xFFF88D93),
         ),
         const SizedBox(
           width: 10,
@@ -98,9 +116,11 @@ class InOutCashDetails extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   final dialog = AlertDialog(
-                      content: SizedBox(
-                    height: 50,
+                      content: Container(
+                    constraints:
+                        const BoxConstraints(minWidth: 1, maxWidth: 150),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextWithDot(
@@ -108,13 +128,22 @@ class InOutCashDetails extends StatelessWidget {
                           style: TextStyle(color: Colors.blueGrey.shade200),
                         ),
                         const Divider(height: 3, color: Colors.white),
-                        AppTextWithDot(
-                          text: 'EGP ${totalCashOut}',
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25),
-                        ),
+                        RichText(
+                            text: TextSpan(children: [
+                          const TextSpan(
+                              text: 'EGP',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10)),
+                          TextSpan(
+                              text:
+                                  ' ${Utility.formatCashNumber(totalCashOut.abs())}',
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25))
+                        ]))
                       ],
                     ),
                   ));
@@ -131,18 +160,25 @@ class InOutCashDetails extends StatelessWidget {
                     text: 'Cash out',
                     style: TextStyle(
                         color: Colors.blueGrey.shade200,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.normal),
                   ),
                 ),
-                AppTextWithDot(
-                  text: 'EGP $totalCashOut',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                RichText(
+                    text: TextSpan(children: [
+                  const TextSpan(
+                      text: 'EGP',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 9)),
+                  TextSpan(
+                      text: ' ${Utility.formatCashNumber(totalCashOut.abs())}',
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16))
+                ]))
               ],
             ),
           ),

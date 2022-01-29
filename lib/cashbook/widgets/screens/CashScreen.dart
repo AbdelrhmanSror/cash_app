@@ -212,7 +212,9 @@ class _CashScreenState extends State<CashScreen> {
             await databaseRepository.insertCashBook(CashBookModel(
                 date: '${DateTime.now() /*.subtract(Duration(days: 3))*/}',
                 description: descriptionText,
-                cash: (double.parse(numberText)),
+                cash: (widget.type == CASH_IN
+                    ? double.parse(numberText)
+                    : -double.parse(numberText)),
                 type: widget.type));
             FocusScope.of(context).unfocus();
             context.navigateBackWithDelay(200, '');
@@ -223,7 +225,9 @@ class _CashScreenState extends State<CashScreen> {
                 totalCashOut: widget.modelToEdit!.totalCashOut,
                 date: widget.modelToEdit!.date,
                 description: descriptionText,
-                cash: (double.parse(numberText)),
+                cash: (widget.type == CASH_IN
+                    ? double.parse(numberText)
+                    : -double.parse(numberText)),
                 type: widget.type,
                 id: widget.modelToEdit!.id));
             FocusScope.of(context).unfocus();

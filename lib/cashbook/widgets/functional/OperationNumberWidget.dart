@@ -16,7 +16,10 @@ class OperationNumberWidget extends StatelessWidget {
       widgets: [
         AppTextWithDot(
           text: 'Operations',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF3345A6)),
         ),
         const VerticalDivider(width: 2),
         AppTextWithDot(

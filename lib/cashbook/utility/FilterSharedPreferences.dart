@@ -5,48 +5,30 @@ import 'dataClasses/Cash.dart';
 import 'dataClasses/Date.dart';
 
 class FilterSharedPreferences {
-  static void retrievedFilterPreferences(
-      Function(Date? date, TypeFilter? type, CashRange? cashRange,
-              SortFilter? sortFilter)
-          onReady) async {
-    final prefs = await SharedPreferences.getInstance();
-    final type = getTypesFromPreferences(prefs);
-    final sort = getSortFromPreferences(prefs);
-    final date = _getDateFromPreferences(prefs);
-    final cash = _getCashRangeFromPreferences(prefs);
-
-    onReady(date, type, cash, sort);
-  }
-
   static Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(DATE, dateFilter.value);
+    await prefs.setString(DATE, dateFilter.value);
   }
 
-  static Future<DateFilter?> getDateTypeFromPreferences() async {
+  static Future<DateFilter> getDateTypeFromPreferences(
+      {DateFilter defaultValue = DateFilter.ALL}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final dateFilter = prefs.getString(DATE);
-    if (dateFilter == null) {
-      return null;
-    } else {
-      return dateFilter.dateFilter;
-    }
+    if (dateFilter == null) return defaultValue;
+    return dateFilter.dateFilter;
   }
 
   static Future<void> setTypesInPreferences(TypeFilter typeFilter) async {
     final prefs = await SharedPreferences.getInstance();
-    final previousType = getTypesFromPreferences(prefs);
-    //if the type exist in the prefs then delete it
-    if (typeFilter == TypeFilter.ALL || previousType == typeFilter) {
-      prefs.remove(TYPE);
-    } else {
-      prefs.setString(TYPE, typeFilter.value);
-    }
+    prefs.setString(TYPE, typeFilter.value);
   }
 
-  static TypeFilter? getTypesFromPreferences(SharedPreferences prefs) {
+  static Future<TypeFilter> getTypesFromPreferences(
+      {TypeFilter defaultValue = TypeFilter.ALL}) async {
+    final prefs = await SharedPreferences.getInstance();
     final type = prefs.getString(TYPE);
-    return type?.typeFilter;
+    if (type == null) return defaultValue;
+    return type.typeFilter;
   }
 
   static Future<void> setSortInPreferences(SortFilter sortFilter) async {
@@ -62,20 +44,21 @@ class FilterSharedPreferences {
     }
   }
 
-  static SortFilter? getSortFromPreferences(SharedPreferences prefs) {
-    //by default data is sorted in descending order.
+  static Future<SortFilter> getSortFromPreferences(
+      {SortFilter defaultValue = SortFilter.LATEST}) async {
+    final prefs = await SharedPreferences.getInstance();
     final sort = prefs.getString(SORT);
-    if (sort == LATEST) {
-      return SortFilter.LATEST;
-    } else if (sort == OLDER) {
+    if (sort == OLDER) {
       return SortFilter.OLDER;
-    } else if (sort == CASH_HIGH_TO_LOW) {
-      return SortFilter.CASH_HIGH_TO_LOW;
-    } else if (sort == CASH_LOW_TO_HIGH) {
-      return SortFilter.CASH_LOW_TO_HIGH;
-    } else {
-      return null;
     }
+    if (sort == CASH_HIGH_TO_LOW) {
+      return SortFilter.CASH_HIGH_TO_LOW;
+    }
+    if (sort == CASH_LOW_TO_HIGH) {
+      return SortFilter.CASH_LOW_TO_HIGH;
+    }
+    //by default data is sorted in descending order.
+    return defaultValue;
   }
 
   static Future<void> setDateInPreferences(Date date) async {
@@ -84,13 +67,12 @@ class FilterSharedPreferences {
     prefs.setString(DATE_END_RANGE, date.lastDate);
   }
 
-  static Date? _getDateFromPreferences(SharedPreferences prefs) {
-    final startDate = prefs.getString(DATE_START_RANGE);
-    final endDate = prefs.getString(DATE_END_RANGE);
-    final date = (startDate == null || endDate == null)
-        ? null
-        : Date(startDate, endDate);
-    return date;
+  static Future<Date> getDateFromPreferences(Date defaultValue) async {
+    final prefs = await SharedPreferences.getInstance();
+    final startDate =
+        prefs.getString(DATE_START_RANGE) ?? defaultValue.firstDate;
+    final endDate = prefs.getString(DATE_END_RANGE) ?? defaultValue.lastDate;
+    return Date(startDate, endDate);
   }
 
   static Future<void> setCashRangeInPreferences(
@@ -100,13 +82,12 @@ class FilterSharedPreferences {
     prefs.setDouble(CASH_END_RANGE, cashRange.last);
   }
 
-  static CashRange? _getCashRangeFromPreferences(SharedPreferences prefs) {
-    final startCash = prefs.getDouble(CASH_START_RANGE);
-    final endCash = prefs.getDouble(CASH_END_RANGE);
-    final cash = (startCash == null || endCash == null)
-        ? null
-        : CashRange(startCash, endCash);
-    return cash;
+  static Future<CashRange> getCashRangeFromPreferences(
+      CashRange defaultValue) async {
+    final prefs = await SharedPreferences.getInstance();
+    final startCash = prefs.getDouble(CASH_START_RANGE) ?? defaultValue.first;
+    final endCash = prefs.getDouble(CASH_END_RANGE) ?? defaultValue.last;
+    return CashRange(startCash, endCash);
   }
 
   static Future<void> flipArrowState(FilterArrowState filterArrowState) async {

@@ -5,9 +5,10 @@ import 'package:debts_app/cashbook/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/cashbook/database/models/ArchiveModel.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
+import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/FilterSharedPreferences.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Cash.dart';
-import 'package:debts_app/cashbook/utility/dataClasses/CashbookModeldetails.dart';
+import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -76,45 +77,31 @@ class DataBaseRepository {
 
   Future<void> insertCashBook(CashBookModel modelToInsert) async {
     await _cashBookDatabase.insert(modelToInsert);
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveCashBooks() async {
-    FilterSharedPreferences.retrievedFilterPreferences(
-        (date, type, cashRange, sortFilter) {
-      _retrieveCashBooks((cashBookModelListDetails) {
-        _alertOnCashBookStart(cashBookModelListDetails);
-      });
-    });
+    _alertOnCashBookStart(await _retrieveCashBooks());
   }
 
-  void _retrieveCashBooks(Function(CashBookModelListDetails) onReady) async {
-    FilterSharedPreferences.retrievedFilterPreferences(
-        (date, type, cashRange, sortFilter) async {
-      CashBookModelListDetails cashBookModelListDetails =
-          await _cashBookDatabase.retrieveAll(
-              date: date,
-              type: type,
-              cashRange: cashRange,
-              sortFilter: sortFilter);
-      onReady(cashBookModelListDetails);
-    });
+  Future<CashBookModelListDetails> _retrieveCashBooks() async {
+    final date = await getDateFromPreferences();
+    final type = await getTypesFromPreferences();
+    final cashRange = await getCashRangeFromPreferences();
+    final sortFilter = await getSortFromPreferences();
+    CashBookModelListDetails cashBookModelListDetails =
+        await _cashBookDatabase.retrieveAll(date, type, cashRange, sortFilter);
+    return cashBookModelListDetails;
   }
 
   Future<void> updateCashBook(CashBookModel modelToUpdate) async {
     await _cashBookDatabase.update(modelToUpdate);
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   Future<void> deleteCashBook(CashBookModel modelToDelete) async {
     await _cashBookDatabase.delete(modelToDelete);
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveArchivedCashBooks(int parentId) async {
@@ -137,22 +124,16 @@ class DataBaseRepository {
     int parentId = await _parentArchiveDatabase.createParentId(orderedModels);
     await _archiveDatabase.insert(orderedModels.models, parentId);
     await _cashBookDatabase.deleteAll(orderedModels.models);
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   void retrieveFilteredCashBooks() async {
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   Future<void> clearFilter() async {
     await FilterSharedPreferences.clearFilter();
-    _retrieveCashBooks((cashBookModelListDetails) {
-      _alertOnCashBookChanged(cashBookModelListDetails);
-    });
+    _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
   Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
@@ -168,11 +149,49 @@ class DataBaseRepository {
     FilterSharedPreferences.setCashRangeInPreferences(prefs, cashRange);
   }
 
-  Future<void> setDateRangeInPreferences(Date date) async {
-    FilterSharedPreferences.setDateInPreferences(date);
+  Future<void> setDateRangeInPreferences(Date? date) async {
+    if (date == null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(DATE_START_RANGE);
+      await prefs.remove(DATE_END_RANGE);
+    } else {
+      FilterSharedPreferences.setDateInPreferences(date);
+    }
   }
 
   Future<void> setSortInPreferences(SortFilter sortFilter) async {
     FilterSharedPreferences.setSortInPreferences(sortFilter);
+  }
+
+  Future<DateFilter> getDateTypeFromPreferences() async {
+    return FilterSharedPreferences.getDateTypeFromPreferences();
+  }
+
+  Future<TypeFilter> getTypesFromPreferences() async {
+    return FilterSharedPreferences.getTypesFromPreferences();
+  }
+
+  Future<SortFilter> getSortFromPreferences() async {
+    return FilterSharedPreferences.getSortFromPreferences();
+  }
+
+  Future<Date> getDateFromPreferences() async {
+    final date = await getMinMaxDate();
+    return FilterSharedPreferences.getDateFromPreferences(Date(
+        DateUtility.removeTimeFromDate(DateTime.parse(date.firstDate)),
+        DateUtility.removeTimeFromDate(DateTime.parse(date.lastDate))));
+  }
+
+  Future<CashRange> getCashRangeFromPreferences() async {
+    return FilterSharedPreferences.getCashRangeFromPreferences(
+        await getMinMaxCash());
+  }
+
+  Future<void> flipArrowState(FilterArrowState filterArrowState) async {
+    await FilterSharedPreferences.flipArrowState(filterArrowState);
+  }
+
+  Future<bool> getArrowState(FilterArrowState filterArrowState) async {
+    return FilterSharedPreferences.getArrowState(filterArrowState);
   }
 }

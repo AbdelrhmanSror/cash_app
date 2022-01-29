@@ -4,8 +4,6 @@
 // the data is the same
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 
-import '../Constants.dart';
-
 class CashBookModelListDetails {
   final List<CashBookModel> models;
   final double totalCashIn;
@@ -22,30 +20,12 @@ class CashBookModelListDetails {
       this.endDate = ''});
 
   double getBalance() {
-    return totalCashIn - totalCashOut;
-  }
-
-  double getMaxCashIn() {
-    var maxCashIn = 0.0;
-    for (var model in models) {
-      if (model.type == CASH_IN && model.cash > maxCashIn) {
-        maxCashIn = model.cash;
-      }
-    }
-    return maxCashIn;
-  }
-
-  double getMaxCashOut() {
-    var maxCashOut = 0.0;
-    for (var model in models) {
-      if (model.type == CASH_OUT && model.cash > maxCashOut) {
-        maxCashOut = model.cash;
-      }
-    }
-    return maxCashOut;
+    return totalCashIn + totalCashOut;
   }
 
   double getPercentage() {
-    return ((totalCashIn - totalCashOut) / totalCashOut) * 100;
+    var percentage = ((totalCashIn - totalCashOut.abs()) / totalCashOut.abs());
+    if (percentage >= 1) percentage = 1;
+    return percentage * 100;
   }
 }

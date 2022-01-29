@@ -1,24 +1,16 @@
-import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import 'Constants.dart';
-import 'dataClasses/Cash.dart';
-
 class Utility {
-  //get the type of current sorting mechanism of the app ,
-  //if it was latest then the we can get the total cash in out from first position in the list because it accumulates all the data before
-  //other wise we get it from the last position of the list;
-  static CashRange getTotalCashInOut(List<CashBookModel> models) {
-    var temptype = SortFilter.LATEST;
-    if (temptype == SortFilter.LATEST) {
-      return CashRange(models[0].totalCashIn, models[0].totalCashOut);
-    } else {
-      return CashRange(models[models.length - 1].totalCashIn,
-          models[models.length - 1].totalCashOut);
+  static String formatCashNumber(double number) {
+    var formatter = NumberFormat('##,###,000');
+    if (number < 100) {
+      formatter = NumberFormat('#,###,00');
     }
+    return formatter.format(number);
   }
 
   static Route createAnimationRoute(
@@ -41,17 +33,6 @@ class Utility {
         );
       },
     );
-  }
-
-  static CashRange getMinAndMaxCash(List<CashBookModel> models) {
-    if (models.isEmpty) return CashRange(0, 0);
-    var min = models[0].cash;
-    var max = models[0].cash;
-    for (var elements in models) {
-      if (elements.cash < min) min = elements.cash;
-      if (elements.cash > max) max = elements.cash;
-    }
-    return CashRange(min, max);
   }
 
   static void showKeyboard(FocusNode focusNode, {int duration = 500}) {
