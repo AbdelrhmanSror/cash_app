@@ -39,44 +39,37 @@ class _CashListScreenState extends State<CashListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
+    return RefreshIndicator(
+        onRefresh: () async {
+          databaseRepository.retrieveCashBooksForFirstTime();
+        },
+        child: Scaffold(
+            backgroundColor: Theme.of(context).canvasColor,
+            appBar: MyCustomAppBar(
+              title: const Text(
+                'DEBTS',
+                style: TextStyle(
+                    color: Color(0xFF3345A6),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24),
+              ),
             ),
-          )
-        : RefreshIndicator(
-            onRefresh: () async {
-              databaseRepository.retrieveCashBooks();
-            },
-            child: Scaffold(
-                backgroundColor: Theme.of(context).canvasColor,
-                appBar: MyCustomAppBar(
-                  title: const Text(
-                    'DEBTS',
-                    style: TextStyle(
-                        color: Color(0xFF3345A6),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24),
-                  ),
-                ),
-                body: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
-                  child: Column(
+            body: Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          buildTypeFilter(),
-                          buildOperationsArchiveWidget()
-                        ],
-                      ),
-                      Expanded(child: buildOperationListWidget(context)),
-                      buildCashInOutButton(context)
+                      buildTypeFilter(),
+                      buildOperationsArchiveWidget()
                     ],
                   ),
-                )));
+                  Expanded(child: buildOperationListWidget(context)),
+                  buildCashInOutButton(context)
+                ],
+              ),
+            )));
   }
 
   Container buildCashInOutButton(BuildContext context) {
@@ -193,24 +186,26 @@ class _CashListScreenState extends State<CashListScreen>
   @override
   void initState() {
     super.initState();
+    // databaseRepository.insertCashBook(CashBookModel(date: (DateTime.now()).add(const Duration(days: 1)).toString(), cash: 5000, type: TypeFilter.CASH_IN.value));
+
     //register this widget as listener to the any updates happen in the database
     databaseRepository.registerCashBookDatabaseListener(this);
     //retrieve all the data in the database to initialize our app
-    databaseRepository.retrieveCashBooks();
+    databaseRepository.retrieveCashBooksForFirstTime();
   }
 
   @override
   void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
-
-    updateTypeFilter(await databaseRepository.getTypesFromPreferences());
+    final cashType = await databaseRepository.getTypesFromPreferences();
     sortType = await databaseRepository.getSortFromPreferences();
+    updateTypeFilter(cashType);
     setState(() {
       //to dismiss loading bar
       if (_isLoading) {
         dismissLoadingBar();
       }
-      models = insertedModels;
+      models = insertedModels.applySort(sortType).applyType(cashType);
     });
     // });
   }
@@ -218,12 +213,13 @@ class _CashListScreenState extends State<CashListScreen>
   @override
   void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
-    updateTypeFilter(await databaseRepository.getTypesFromPreferences());
+    final cashType = await databaseRepository.getTypesFromPreferences();
     sortType = await databaseRepository.getSortFromPreferences();
+    updateTypeFilter(cashType);
     setState(() {
       _isLoading = false;
       //initial setup for models
-      this.models = models;
+      this.models = models.applySort(sortType).applyType(cashType);
     });
   }
 

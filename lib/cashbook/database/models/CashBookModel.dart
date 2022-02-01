@@ -12,6 +12,7 @@ class CashBookModel {
   double totalCashOut;
   final String description;
   final String type;
+  int groupId;
 
   CashBookModel(
       {this.id = -1,
@@ -20,7 +21,8 @@ class CashBookModel {
       this.totalCashOut = 0,
       this.description = '',
       required this.cash,
-      required this.type});
+      required this.type,
+      this.groupId = 0});
 
   // Convert a model into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -44,7 +46,7 @@ class CashBookModel {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'AppModel{id: $id, date: $date, cash: $cash  cashout:$totalCashOut  cashin $totalCashIn  type $type}';
+    return 'AppModel{id: $id, groupId:$groupId ,date: $date, cash: $cash  cashout:$totalCashOut  cashin $totalCashIn  type $type}\n';
   }
 }
 

@@ -1,6 +1,6 @@
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
-import 'package:debts_app/cashbook/utility/Extensions.dart';
+import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/CompositeWidget.dart';
@@ -96,8 +96,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         paddingRight: 16,
         onPressed: () async {
           CashBookModel? result /*EmptyCashBookModel()*/;
-          ScreenNavigation.navigateToEditScreen(context, widget.model);
-
+          //waiting until user finishes what he is doing on the edit screen
+          await ScreenNavigation.navigateToEditScreen(context, widget.model);
           //get updated model
           result = await databaseRepository.getById(widget.model.id);
           setState(() {
@@ -162,7 +162,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     return CompositeWidget(
       widgets: [
         AppTextWithDot(
-          text: widget.model.date.getFormattedDateTime(),
+          text: DateUtility.getDateRepresentation(
+                  DateTime.parse(widget.model.date)) +
+              DateUtility.getTimeRepresentation(
+                  DateTime.parse(widget.model.date)),
           style: const TextStyle(
               color: Color(0xFF281361),
               fontSize: 20,
@@ -177,7 +180,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         AppTextWithDot(
           text: '${widget.model.cash.abs()} EGP',
           style: TextStyle(
-              color: widget.model.type == CASH_OUT
+              color: widget.model.type == TypeFilter.CASH_OUT.value
                   ? Colors.red
                   : Colors.greenAccent,
               fontWeight: FontWeight.bold,

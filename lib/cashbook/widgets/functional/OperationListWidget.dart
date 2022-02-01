@@ -83,16 +83,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
   Widget buildStickyList() {
     // A rectangular area of a [Material] that responds to touch.
-    return StickyGroupedListView<CashBookModel, String>(
+    return StickyGroupedListView<CashBookModel, int>(
       elements: widget.models,
-      groupBy: (CashBookModel element) =>
-          DateUtility.removeTimeFromDate(DateTime.parse(element.date)),
-      groupComparator: (String value1, String value2) =>
-          value2.compareTo(value1),
-      itemComparator: (CashBookModel element1, CashBookModel element2) =>
-          DateUtility.removeTimeFromDate(DateTime.parse(element1.date))
-              .compareTo(DateUtility.removeTimeFromDate(
-                  DateTime.parse(element2.date))),
+      groupBy: (CashBookModel element) => element.groupId,
       floatingHeader: true,
       groupSeparatorBuilder: (CashBookModel element) => Padding(
         padding: const EdgeInsets.all(8.0),
@@ -107,7 +100,8 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),
                 child: Text(
-                  DateUtility.getAlphabeticDate(DateTime.parse(element.date)),
+                  DateUtility.getDateRepresentation(
+                      DateTime.parse(element.date)),
                   style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
@@ -122,7 +116,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             elevation: 4.0,
             child: Slidable(
               // Specify a key if the Slidable is dismissible.
-              key: const ValueKey(0),
+              key: ValueKey(element.id),
 
               // The start action pane is the one at the left or the top side.
               startActionPane: ActionPane(
@@ -132,6 +126,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                 // A pane can dismiss the Slidable.
                 dismissible: DismissiblePane(onDismissed: () {
                   print('on dismiss ');
+                  widget.onDeletePressed(element);
                 }),
 
                 // All actions are defined in the children parameter.
@@ -141,7 +136,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                     onPressed: (_) {
                       widget.onDeletePressed(element);
                     },
-                    backgroundColor: Color(0xFFFE4A49),
+                    backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
                     label: 'Delete',
@@ -150,7 +145,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                     onPressed: (_) {
                       widget.onEditPressed(element);
                     },
-                    backgroundColor: Color(0xFF21B7CA),
+                    backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
                     icon: Icons.share,
                     label: 'Edit',
@@ -160,7 +155,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
               // The end action pane is the one at the right or the bottom side.
               endActionPane: ActionPane(
-                motion: ScrollMotion(),
+                motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
                     // An action can be bigger than the others.
@@ -168,7 +163,7 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                     onPressed: (_) {
                       widget.onArchivePressed(element);
                     },
-                    backgroundColor: Color(0xFF7BC043),
+                    backgroundColor: const Color(0xFF7BC043),
                     foregroundColor: Colors.white,
                     icon: Icons.archive,
                     label: 'Archive',
@@ -213,10 +208,12 @@ class OperationTile extends StatelessWidget {
       children: [
         Row(children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.only(left: 8),
             child: Icon(
-              (model.type == CASH_IN ? Icons.add : Icons.remove),
-              color: model.type == CASH_OUT
+              (model.type == TypeFilter.CASH_IN.value
+                  ? Icons.add
+                  : Icons.remove),
+              color: model.type == TypeFilter.CASH_OUT.value
                   ? const Color(0xFFF64E57)
                   : const Color(0xFF08A696),
               size: 16,
@@ -271,19 +268,16 @@ class OperationTile extends StatelessWidget {
           ),
         ]),
         Padding(
-          padding: const EdgeInsets.only(right: 16.0, top: 8),
+          padding: const EdgeInsets.only(right: 8.0, top: 8),
           child: Column(
             children: [
-              Container(
-                constraints: const BoxConstraints(minWidth: 1, maxWidth: 180),
-                child: AppTextWithDot(
-                  text: DateUtility.getTimeRepresentation(
-                      DateTime.parse(model.date)),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Colors.black),
-                ),
+              AppTextWithDot(
+                text: DateUtility.getTimeRepresentation(
+                    DateTime.parse(model.date)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: Colors.black),
               ),
               Row(
                 children: [
@@ -295,10 +289,10 @@ class OperationTile extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                   Icon(
-                    model.type == CASH_OUT
+                    model.type == TypeFilter.CASH_OUT.value
                         ? Icons.arrow_drop_down
                         : Icons.arrow_drop_up,
-                    color: model.type == CASH_OUT
+                    color: model.type == TypeFilter.CASH_OUT.value
                         ? const Color(0xFFF88D93)
                         : const Color(0xFF60C8C8),
                   )

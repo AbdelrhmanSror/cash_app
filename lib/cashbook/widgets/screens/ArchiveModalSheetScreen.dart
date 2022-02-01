@@ -1,4 +1,4 @@
-import 'package:debts_app/cashbook/utility/Extensions.dart';
+import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/InOutCashDetails.dart';
@@ -69,7 +69,10 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold),
                           ),
                           AppTextWithDot(
-                            text: models.startDate.getFormattedDate(),
+                            text: DateUtility.getDateRepresentation(
+                                    DateTime.parse(models.startDate)) +
+                                DateUtility.getTimeRepresentation(
+                                    DateTime.parse(models.startDate)),
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -92,7 +95,10 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold),
                           ),
                           AppTextWithDot(
-                            text: models.endDate.getFormattedDate(),
+                            text: DateUtility.getDateRepresentation(
+                                    DateTime.parse(models.endDate)) +
+                                DateUtility.getTimeRepresentation(
+                                    DateTime.parse(models.endDate)),
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -164,7 +170,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                       paddingLeft: 16,
                       paddingRight: 16,
                       onPressed: () {
-                        databaseRepository.archiveCashBooks(models);
+                        databaseRepository.archiveCashBooks(models.models);
                         Utility.createModalSheet(
                                 context, const ClosedBookAlertScreen())
                             .then((value) {

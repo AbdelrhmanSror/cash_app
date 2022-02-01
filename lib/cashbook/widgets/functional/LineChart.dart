@@ -4,11 +4,34 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class HeadLineChart extends StatelessWidget {
-  const HeadLineChart(
-      {Key? key, required this.modelListDetails, required this.label})
+  const HeadLineChart({Key? key, required this.modelListDetails})
       : super(key: key);
   final CashBookModelListDetails modelListDetails;
-  final String label;
+
+  Image _getIcon() {
+    if (modelListDetails.getPercentage() > 0) {
+      return Image.asset(
+        'assets/images/icon-increase-52.png',
+        width: 25,
+        height: 20,
+        color: Color(0xFF08A696),
+      );
+    } else if (modelListDetails.getPercentage() < 0) {
+      return Image.asset(
+        'assets/images/icon-decrease-50.png',
+        width: 25,
+        height: 20,
+        color: Color(0xFFF88D93),
+      );
+    } else {
+      return Image.asset(
+        'assets/images/stable.png',
+        width: 25,
+        height: 20,
+        color: Colors.grey,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,39 +59,27 @@ class HeadLineChart extends StatelessWidget {
             ])),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '${modelListDetails.getPercentage().toStringAsFixed(1)}%',
-              style: TextStyle(
-                  fontSize: 16,
-                  color: modelListDetails.getPercentage() >= 0
-                      ? const Color(0xFF08A696)
-                      : const Color(0xFFF88D93),
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 4),
-            RawMaterialButton(
-              elevation: 0,
-              onPressed: () {},
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-              child: Text(
-                label,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500),
-              ),
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: Color(0xFF3345A6), width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              fillColor: const Color(0xFF3345A6),
-            ),
-          ],
+        const SizedBox(width: 8),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${modelListDetails.getPercentage().toStringAsFixed(1)}%  ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: modelListDetails.getPercentage() >= 0
+                          ? const Color(0xFF08A696)
+                          : const Color(0xFFF88D93),
+                      fontWeight: FontWeight.bold)),
+              _getIcon()
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         Expanded(
             flex: 1, child: SpLineChart(modelListDetails: modelListDetails)),
       ],
@@ -87,7 +98,7 @@ class SpLineChart extends StatelessWidget {
     return LineChart(
       sampleData1,
       swapAnimationDuration: const Duration(milliseconds: 250),
-      swapAnimationCurve: Curves.linear, // Optional
+      swapAnimationCurve: Curves.bounceInOut, // Optional
     );
   }
 

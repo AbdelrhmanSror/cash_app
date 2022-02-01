@@ -3,9 +3,9 @@ enum TypeFilter { CASH_IN, CASH_OUT, ALL }
 extension TypeExtension on TypeFilter {
   String get value {
     if (this == TypeFilter.CASH_IN) {
-      return CASH_IN;
+      return _CASH_IN;
     } else if (this == TypeFilter.CASH_OUT) {
-      return CASH_OUT;
+      return _CASH_OUT;
     } else {
       return 'ALL';
     }
@@ -29,13 +29,13 @@ enum SortFilter { CASH_LOW_TO_HIGH, CASH_HIGH_TO_LOW, LATEST, OLDER }
 extension SortExtension on SortFilter {
   String get value {
     if (this == SortFilter.LATEST) {
-      return LATEST;
+      return _LATEST;
     } else if (this == SortFilter.OLDER) {
-      return OLDER;
+      return _OLDER;
     } else if (this == SortFilter.CASH_LOW_TO_HIGH) {
-      return CASH_LOW_TO_HIGH;
+      return _CASH_LOW_TO_HIGH;
     } else {
-      return CASH_HIGH_TO_LOW;
+      return _CASH_HIGH_TO_LOW;
     }
   }
 }
@@ -89,21 +89,21 @@ extension FilterArrowStateExtension on FilterArrowState {
 extension DateTypeExtension on DateFilter {
   String get value {
     if (this == DateFilter.THIS_WEEK) {
-      return THIS_WEEK;
+      return _THIS_WEEK;
     }
     if (this == DateFilter.LAST_7_DAYS) {
-      return LAST_7_DAYS;
+      return _LAST_7_DAYS;
     }
     if (this == DateFilter.THIS_YEAR) {
-      return THIS_YEAR;
+      return _THIS_YEAR;
     }
     if (this == DateFilter.LAST_30_DAYS) {
-      return LAST_30_DAYS;
+      return _LAST_30_DAYS;
     }
     if (this == DateFilter.LAST_MONTH) {
-      return LAST_MONTH;
+      return _LAST_MONTH;
     } else if (this == DateFilter.CUSTOM) {
-      return CUSTOM;
+      return _CUSTOM;
     } else {
       return 'ALL';
     }
@@ -112,21 +112,21 @@ extension DateTypeExtension on DateFilter {
 
 extension TypeDateExtensionString on String {
   DateFilter get dateFilter {
-    if (this == THIS_WEEK) {
+    if (this == _THIS_WEEK) {
       return DateFilter.THIS_WEEK;
     }
-    if (this == LAST_7_DAYS) {
+    if (this == _LAST_7_DAYS) {
       return DateFilter.LAST_7_DAYS;
     }
-    if (this == THIS_YEAR) {
+    if (this == _THIS_YEAR) {
       return DateFilter.THIS_YEAR;
     }
-    if (this == LAST_30_DAYS) {
+    if (this == _LAST_30_DAYS) {
       return DateFilter.LAST_30_DAYS;
     }
-    if (this == LAST_MONTH) {
+    if (this == _LAST_MONTH) {
       return DateFilter.LAST_MONTH;
-    } else if (this == CUSTOM) {
+    } else if (this == _CUSTOM) {
       return DateFilter.CUSTOM;
     } else {
       return DateFilter.ALL;
@@ -136,20 +136,20 @@ extension TypeDateExtensionString on String {
 
 enum OperationType { UPDATE, INSERT, DELETE }
 
-const String CASH_IN = 'Cash In';
-const String CASH_OUT = 'Cash Out';
+const String _CASH_IN = 'Cash In';
+const String _CASH_OUT = 'Cash Out';
 
-const String CASH_LOW_TO_HIGH = 'Cash low To High';
-const String CASH_HIGH_TO_LOW = 'Cash high To low';
-const String LATEST = 'Latest';
-const String OLDER = 'Older';
+const String _CASH_LOW_TO_HIGH = 'Cash low To High';
+const String _CASH_HIGH_TO_LOW = 'Cash high To low';
+const String _LATEST = 'Latest';
+const String _OLDER = 'Older';
 
-const String THIS_WEEK = 'THIS WEEK';
-const String LAST_7_DAYS = 'LAST 7 DAYS';
-const String THIS_YEAR = 'THIS YEAR';
-const String LAST_30_DAYS = 'LAST 30 DAYS';
-const String LAST_MONTH = 'LAST MONTH';
-const String CUSTOM = 'CUSTOM';
+const String _THIS_WEEK = 'THIS WEEK';
+const String _LAST_7_DAYS = 'LAST 7 DAYS';
+const String _THIS_YEAR = 'THIS YEAR';
+const String _LAST_30_DAYS = 'LAST 30 DAYS';
+const String _LAST_MONTH = 'LAST MONTH';
+const String _CUSTOM = 'CUSTOM';
 
 const String SORT = 'Sort type';
 const String TYPE = 'operation Type';

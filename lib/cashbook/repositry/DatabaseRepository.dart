@@ -80,17 +80,24 @@ class DataBaseRepository {
     _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
-  void retrieveCashBooks() async {
-    _alertOnCashBookStart(await _retrieveCashBooks());
+  void retrieveCashBooksForFirstTime({
+    Date? defaultDate,
+    CashRange? defaultCashRange,
+  }) async {
+    _alertOnCashBookStart(await _retrieveCashBooks(
+      defaultCashRange: defaultCashRange,
+      defaultDate: defaultDate,
+    ));
   }
 
-  Future<CashBookModelListDetails> _retrieveCashBooks() async {
-    final date = await getDateFromPreferences();
-    final type = await getTypesFromPreferences();
-    final cashRange = await getCashRangeFromPreferences();
-    final sortFilter = await getSortFromPreferences();
+  Future<CashBookModelListDetails> _retrieveCashBooks({
+    Date? defaultDate,
+    CashRange? defaultCashRange,
+  }) async {
+    final date = defaultDate ?? await getDateFromPreferences();
+    final cashRange = defaultCashRange ?? await getCashRangeFromPreferences();
     CashBookModelListDetails cashBookModelListDetails =
-        await _cashBookDatabase.retrieveAll(date, type, cashRange, sortFilter);
+        await _cashBookDatabase.retrieveAll(date, cashRange);
     return cashBookModelListDetails;
   }
 
@@ -127,8 +134,14 @@ class DataBaseRepository {
     _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
-  void retrieveFilteredCashBooks() async {
-    _alertOnCashBookChanged(await _retrieveCashBooks());
+  void retrieveFilteredCashBooks({
+    Date? defaultDate,
+    CashRange? defaultCashRange,
+  }) async {
+    _alertOnCashBookChanged(await _retrieveCashBooks(
+      defaultCashRange: defaultCashRange,
+      defaultDate: defaultDate,
+    ));
   }
 
   Future<void> clearFilter() async {

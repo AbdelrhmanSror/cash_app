@@ -99,11 +99,21 @@ class _CashBookScreenState extends State<CashBookScreen>
           )
         : RefreshIndicator(
             onRefresh: () async {
-              databaseRepository.retrieveCashBooks();
+              databaseRepository.retrieveCashBooksForFirstTime();
             },
             child: Scaffold(
                 backgroundColor: const Color(0x00ffffff),
-                appBar: MyCustomAppBar(
+                appBar: /* AppBar(backgroundColor: Theme.of(context).canvasColor,
+                  centerTitle: true,elevation: 0,
+                  title: const Text(
+                    'DEBTS',
+                    style: TextStyle(
+                        color: Color(0xFF3345A6),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24),
+                  ),
+                )*/
+                    MyCustomAppBar(
                   title: const Text(
                     'DEBTS',
                     style: TextStyle(
@@ -123,7 +133,6 @@ class _CashBookScreenState extends State<CashBookScreen>
                         child: buildCard(
                           HeadLineChart(
                             modelListDetails: models,
-                            label: sortType.value,
                           ),
                         ),
                       ),
@@ -163,20 +172,21 @@ class _CashBookScreenState extends State<CashBookScreen>
     //register this widget as listener to the any updates happen in the database
     databaseRepository.registerCashBookDatabaseListener(this);
     //retrieve all the data in the database to initialize our app
-    databaseRepository.retrieveCashBooks();
+    databaseRepository.retrieveCashBooksForFirstTime();
   }
 
   @override
   void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
-
-    sortType = await databaseRepository.getSortFromPreferences();
     setState(() {
       //to dismiss loading bar
       if (_isLoading) {
         dismissLoadingBar();
       }
-      models = insertedModels;
+
+      //applying default sortFilter as Older
+      models =
+          insertedModels.applySort(SortFilter.OLDER).applyType(TypeFilter.ALL);
     });
     // });
   }
@@ -184,11 +194,13 @@ class _CashBookScreenState extends State<CashBookScreen>
   @override
   void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
-    sortType = await databaseRepository.getSortFromPreferences();
     setState(() {
       _isLoading = false;
       //initial setup for models
-      this.models = models;
+
+      //applying default sortFilter as Older
+      this.models =
+          models.applySort(SortFilter.OLDER).applyType(TypeFilter.ALL);
     });
   }
 

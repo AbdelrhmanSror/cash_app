@@ -1,6 +1,6 @@
 import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/ArchiveModel.dart';
-import 'package:debts_app/cashbook/utility/Extensions.dart';
+import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/circularButton.dart';
 import 'package:debts_app/main.dart';
@@ -108,7 +108,8 @@ class OperationTile extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: AppTextWithDot(
-                      text: 'From ${model.startDate.getFormattedDate()}',
+                      text:
+                          'From ${DateUtility.getDateRepresentation(DateTime.parse(model.startDate))}',
                       style: TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 14,
@@ -116,7 +117,8 @@ class OperationTile extends StatelessWidget {
                     ),
                   ),
                   AppTextWithDot(
-                    text: 'To ${model.endDate.getFormattedDate()}',
+                    text:
+                        'To ${DateUtility.getDateRepresentation(DateTime.parse(model.endDate))}',
                     style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 14,

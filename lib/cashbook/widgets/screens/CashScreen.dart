@@ -10,8 +10,7 @@ import 'package:flutter/material.dart';
 import '../../../main.dart';
 
 class CashInScreen extends CashScreen {
-  const CashInScreen(
-      {CashBookModel? modelToEdit, required operationType, Key? key})
+   CashInScreen({CashBookModel? modelToEdit, required operationType, Key? key})
       : super(
             operationType: operationType,
             key: key,
@@ -20,12 +19,11 @@ class CashInScreen extends CashScreen {
             cashFieldHintTextColor: Colors.greenAccent,
             validationButtonTextColor: Colors.green,
             validationButtonBackgroundColor: const Color(0xF5C0F8B2),
-            type: CASH_IN);
+            type: TypeFilter.CASH_IN.value);
 }
 
 class CashOutScreen extends CashScreen {
-  const CashOutScreen(
-      {CashBookModel? modelToEdit, required operationType, Key? key})
+  CashOutScreen({CashBookModel? modelToEdit, required operationType, Key? key})
       : super(
             key: key,
             operationType: operationType,
@@ -34,7 +32,7 @@ class CashOutScreen extends CashScreen {
             cashFieldHintTextColor: Colors.red,
             validationButtonTextColor: Colors.red,
             validationButtonBackgroundColor: const Color(0xCCFDF1F3),
-            type: CASH_OUT);
+            type: TypeFilter.CASH_OUT.value);
 }
 
 abstract class CashScreen extends StatefulWidget {
@@ -212,7 +210,7 @@ class _CashScreenState extends State<CashScreen> {
             await databaseRepository.insertCashBook(CashBookModel(
                 date: '${DateTime.now() /*.subtract(Duration(days: 3))*/}',
                 description: descriptionText,
-                cash: (widget.type == CASH_IN
+                cash: (widget.type == TypeFilter.CASH_IN.value
                     ? double.parse(numberText)
                     : -double.parse(numberText)),
                 type: widget.type));
@@ -225,7 +223,7 @@ class _CashScreenState extends State<CashScreen> {
                 totalCashOut: widget.modelToEdit!.totalCashOut,
                 date: widget.modelToEdit!.date,
                 description: descriptionText,
-                cash: (widget.type == CASH_IN
+                cash: (widget.type == TypeFilter.CASH_IN.value
                     ? double.parse(numberText)
                     : -double.parse(numberText)),
                 type: widget.type,

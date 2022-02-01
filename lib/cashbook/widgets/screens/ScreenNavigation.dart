@@ -20,9 +20,10 @@ class ScreenNavigation {
         Curves.ease));
   }
 
-  static void navigateToEditScreen(BuildContext context, CashBookModel model) {
-    if (model.type == CASH_IN) {
-      Navigator.of(context).push(Utility.createAnimationRoute(
+  static Future<void> navigateToEditScreen(
+      BuildContext context, CashBookModel model) async {
+    if (model.type == TypeFilter.CASH_IN.value) {
+      await Navigator.of(context).push(Utility.createAnimationRoute(
           CashInScreen(
             operationType: OperationType.UPDATE,
             modelToEdit: model,
@@ -31,8 +32,8 @@ class ScreenNavigation {
           Offset.zero,
           Curves.ease));
     }
-    if (model.type == CASH_OUT) {
-      Navigator.of(context).push(Utility.createAnimationRoute(
+    if (model.type == TypeFilter.CASH_OUT.value) {
+      await Navigator.of(context).push(Utility.createAnimationRoute(
           CashOutScreen(
             operationType: OperationType.UPDATE,
             modelToEdit: model,

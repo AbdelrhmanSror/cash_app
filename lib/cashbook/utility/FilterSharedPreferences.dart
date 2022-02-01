@@ -33,14 +33,14 @@ class FilterSharedPreferences {
 
   static Future<void> setSortInPreferences(SortFilter sortFilter) async {
     final prefs = await SharedPreferences.getInstance();
-    if (sortFilter.value == LATEST) {
-      prefs.setString(SORT, LATEST);
-    } else if (sortFilter.value == OLDER) {
-      prefs.setString(SORT, OLDER);
-    } else if (sortFilter.value == CASH_HIGH_TO_LOW) {
-      prefs.setString(SORT, CASH_HIGH_TO_LOW);
-    } else if (sortFilter.value == CASH_LOW_TO_HIGH) {
-      prefs.setString(SORT, CASH_LOW_TO_HIGH);
+    if (sortFilter.value == SortFilter.LATEST.value) {
+      prefs.setString(SORT, SortFilter.LATEST.value);
+    } else if (sortFilter.value == SortFilter.OLDER.value) {
+      prefs.setString(SORT, SortFilter.OLDER.value);
+    } else if (sortFilter.value == SortFilter.CASH_HIGH_TO_LOW.value) {
+      prefs.setString(SORT, SortFilter.CASH_HIGH_TO_LOW.value);
+    } else if (sortFilter.value == SortFilter.CASH_LOW_TO_HIGH.value) {
+      prefs.setString(SORT, SortFilter.CASH_LOW_TO_HIGH.value);
     }
   }
 
@@ -48,13 +48,13 @@ class FilterSharedPreferences {
       {SortFilter defaultValue = SortFilter.LATEST}) async {
     final prefs = await SharedPreferences.getInstance();
     final sort = prefs.getString(SORT);
-    if (sort == OLDER) {
+    if (sort == SortFilter.OLDER.value) {
       return SortFilter.OLDER;
     }
-    if (sort == CASH_HIGH_TO_LOW) {
+    if (sort == SortFilter.CASH_HIGH_TO_LOW.value) {
       return SortFilter.CASH_HIGH_TO_LOW;
     }
-    if (sort == CASH_LOW_TO_HIGH) {
+    if (sort == SortFilter.CASH_LOW_TO_HIGH.value) {
       return SortFilter.CASH_LOW_TO_HIGH;
     }
     //by default data is sorted in descending order.

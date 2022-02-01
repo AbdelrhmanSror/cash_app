@@ -68,7 +68,7 @@ class _FilterState extends State<FilterScreen>
   void initState() {
     super.initState();
     databaseRepository.registerCashBookDatabaseListener(this);
-    databaseRepository.retrieveCashBooks();
+    databaseRepository.retrieveCashBooksForFirstTime();
     //   print('models are ${ databaseRepository.getAllCashBooks()}\n');
   }
 
@@ -788,7 +788,8 @@ class _FilterState extends State<FilterScreen>
   @override
   void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
-    await updateFilterUi(models);
+    final cashType = await databaseRepository.getTypesFromPreferences();
+    await updateFilterUi(models.applyType(cashType));
     await initArrowState();
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
@@ -800,7 +801,8 @@ class _FilterState extends State<FilterScreen>
   @override
   void onDatabaseChanged(CashBookModelListDetails models) async {
     if (!mounted) return;
-    await updateFilterUi(models);
+    final cashType = await databaseRepository.getTypesFromPreferences();
+    await updateFilterUi(models.applyType(cashType));
     //to dismiss the loading bar
     setState(() {
       dismissLoadingBar();
@@ -853,7 +855,6 @@ class _FilterState extends State<FilterScreen>
   }
 */
   void updateCashFilter(CashRange cashRange) {
-    print('cashRange ${cashRange.first}   ${cashRange.last}');
     _startPrice = cashRange.first;
     _endPrice = cashRange.last;
   }

@@ -1,6 +1,6 @@
 import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
-import 'package:debts_app/cashbook/utility/Extensions.dart';
+import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/InOutCashDetails.dart';
@@ -74,7 +74,11 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           subTitle1: Padding(
             padding: const EdgeInsets.only(top: 2.0),
             child: AppTextWithDot(
-              text: models.startDate.getFormattedDateTime2(),
+              text: DateUtility.getDateRepresentation2(
+                      DateTime.parse(models.startDate)) +
+                  ' at ' +
+                  DateUtility.getTimeRepresentation(
+                      DateTime.parse(models.startDate)),
               style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 12),
             ),
           ),
@@ -86,7 +90,11 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           subTitle2: Padding(
             padding: const EdgeInsets.only(top: 2.0),
             child: AppTextWithDot(
-              text: models.endDate.getFormattedDateTime2(),
+              text: DateUtility.getDateRepresentation2(
+                      DateTime.parse(models.endDate)) +
+                  ' at ' +
+                  DateUtility.getTimeRepresentation(
+                      DateTime.parse(models.endDate)),
               style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 12),
             ),
           ),

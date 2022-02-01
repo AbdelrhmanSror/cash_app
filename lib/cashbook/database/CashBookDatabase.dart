@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Cash.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Date.dart';
@@ -237,8 +236,10 @@ class CashBookDatabase extends AppDatabase {
     }
   }
 
-  Future<CashBookModelListDetails> retrieveAll(Date date, TypeFilter type,
-      CashRange cashRange, SortFilter sortFilter) async {
+  Future<CashBookModelListDetails> retrieveAll(
+      Date date,
+      /*TypeFilter type,*/
+      CashRange cashRange) async {
     final db = await init();
     final argumentList = [];
     String whereClause = 'Where';
@@ -247,23 +248,12 @@ class CashBookDatabase extends AppDatabase {
     String startDate = '';
     String endDate = '';
     whereClause += ' date(date) BETWEEN ? And ? ';
-    print('min max date is ${date.firstDate}   ${date.lastDate} ');
-
     argumentList.add(date.firstDate);
     argumentList.add(date.lastDate);
-    if (type != TypeFilter.ALL) {
-      if (whereClause.length == 5) {
-        whereClause += ' "type" =?';
-      } else {
-        whereClause += ' And "type" =?';
-      }
-      argumentList.add(type.value);
-    }
     whereClause += ' And cash>=? And cash <=?';
     argumentList.add(cashRange.first);
     argumentList.add(cashRange.last);
 
-    // Query the table for  The last model in list.
     final List<Map<String, dynamic>> maps = await db.rawQuery(
         'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',
         argumentList);
@@ -283,33 +273,7 @@ class CashBookDatabase extends AppDatabase {
       startDate = modelsAfterModel[0].date;
       endDate = modelsAfterModel[modelsAfterModel.length - 1].date;
     }
-
-    if (sortFilter == SortFilter.OLDER) {
-      return CashBookModelListDetails(modelsAfterModel,
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    }
-
-    if (sortFilter == SortFilter.CASH_HIGH_TO_LOW) {
-      return CashBookModelListDetails(
-          modelsAfterModel..sort((a, b) => -1 * a.cash.compareTo(b.cash)),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    }
-    if (sortFilter == SortFilter.CASH_LOW_TO_HIGH) {
-      return CashBookModelListDetails(
-          modelsAfterModel..sort((a, b) => a.cash.compareTo(b.cash)),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    }
-    //by default we return operation in descending order.
-    return CashBookModelListDetails(modelsAfterModel.reversed.toList(),
+    return CashBookModelListDetails(modelsAfterModel,
         totalCashIn: totalCashIn,
         totalCashOut: totalCashOut,
         startDate: startDate,
