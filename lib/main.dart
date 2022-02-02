@@ -67,7 +67,7 @@ class _MainStatefulWidgetState extends State<MainStatefulWidget> {
         },
         scrollDirection: Axis.horizontal,
       ),
-      bottomNavigationBar: MyBottomNavigation(
+      bottomNavigationBar: MyAppBottomNavigation(
         selectedIndex: _selectedIndex,
         onItemTapped: (index) {
           _onItemTapped(index);

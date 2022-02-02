@@ -1,10 +1,10 @@
-enum TypeFilter { CASH_IN, CASH_OUT, ALL }
+enum TypeFilter { cashIn, cashOut, all }
 
 extension TypeExtension on TypeFilter {
   String get value {
-    if (this == TypeFilter.CASH_IN) {
+    if (this == TypeFilter.cashIn) {
       return _CASH_IN;
-    } else if (this == TypeFilter.CASH_OUT) {
+    } else if (this == TypeFilter.cashOut) {
       return _CASH_OUT;
     } else {
       return 'ALL';
@@ -14,25 +14,25 @@ extension TypeExtension on TypeFilter {
 
 extension TypeExtensionString on String {
   TypeFilter get typeFilter {
-    if (this == TypeFilter.CASH_IN.value) {
-      return TypeFilter.CASH_IN;
-    } else if (this == TypeFilter.CASH_OUT.value) {
-      return TypeFilter.CASH_OUT;
+    if (this == TypeFilter.cashIn.value) {
+      return TypeFilter.cashIn;
+    } else if (this == TypeFilter.cashOut.value) {
+      return TypeFilter.cashOut;
     } else {
-      return TypeFilter.ALL;
+      return TypeFilter.all;
     }
   }
 }
 
-enum SortFilter { CASH_LOW_TO_HIGH, CASH_HIGH_TO_LOW, LATEST, OLDER }
+enum SortFilter { cashLowToHigh, cashHighToLow, latest, older }
 
 extension SortExtension on SortFilter {
   String get value {
-    if (this == SortFilter.LATEST) {
+    if (this == SortFilter.latest) {
       return _LATEST;
-    } else if (this == SortFilter.OLDER) {
+    } else if (this == SortFilter.older) {
       return _OLDER;
-    } else if (this == SortFilter.CASH_LOW_TO_HIGH) {
+    } else if (this == SortFilter.cashLowToHigh) {
       return _CASH_LOW_TO_HIGH;
     } else {
       return _CASH_HIGH_TO_LOW;
@@ -41,20 +41,20 @@ extension SortExtension on SortFilter {
 }
 
 enum DateFilter {
-  THIS_WEEK,
-  LAST_7_DAYS,
-  THIS_YEAR,
-  LAST_30_DAYS,
-  LAST_MONTH,
-  ALL,
-  CUSTOM
+  thisWeek,
+  last7Days,
+  thisYear,
+  last30Days,
+  lastMonth,
+  all,
+  custom
 }
 
-enum ArrowState { EXPANDED, UNEXPANDED }
+enum ArrowState { expanded, unExpanded }
 
 extension ArrowStateExtension on ArrowState {
   bool get value {
-    if (this == ArrowState.EXPANDED) {
+    if (this == ArrowState.expanded) {
       return true;
     } else {
       return false;
@@ -64,45 +64,45 @@ extension ArrowStateExtension on ArrowState {
 
 enum FilterArrowState {
 //variable represents the state of filter options arrow
-  DATE_ARROW,
-  CASH_ARROW,
-  SORT_ARROW,
-  TYPE_ARROW
+  dateArrow,
+  cashArrow,
+  sortArrow,
+  typeArrow
 }
 
 extension FilterArrowStateExtension on FilterArrowState {
   String get value {
-    if (this == FilterArrowState.DATE_ARROW) {
-      return DATE_ARROW;
+    if (this == FilterArrowState.dateArrow) {
+      return _DATE_ARROW;
     }
-    if (this == FilterArrowState.CASH_ARROW) {
-      return CASH_ARROW;
+    if (this == FilterArrowState.cashArrow) {
+      return _CASH_ARROW;
     }
-    if (this == FilterArrowState.SORT_ARROW) {
-      return SORT_ARROW;
+    if (this == FilterArrowState.sortArrow) {
+      return _SORT_ARROW;
     } else {
-      return TYPE_ARROW;
+      return _TYPE_ARROW;
     }
   }
 }
 
 extension DateTypeExtension on DateFilter {
   String get value {
-    if (this == DateFilter.THIS_WEEK) {
+    if (this == DateFilter.thisWeek) {
       return _THIS_WEEK;
     }
-    if (this == DateFilter.LAST_7_DAYS) {
+    if (this == DateFilter.last7Days) {
       return _LAST_7_DAYS;
     }
-    if (this == DateFilter.THIS_YEAR) {
+    if (this == DateFilter.thisYear) {
       return _THIS_YEAR;
     }
-    if (this == DateFilter.LAST_30_DAYS) {
+    if (this == DateFilter.last30Days) {
       return _LAST_30_DAYS;
     }
-    if (this == DateFilter.LAST_MONTH) {
+    if (this == DateFilter.lastMonth) {
       return _LAST_MONTH;
-    } else if (this == DateFilter.CUSTOM) {
+    } else if (this == DateFilter.custom) {
       return _CUSTOM;
     } else {
       return 'ALL';
@@ -113,28 +113,28 @@ extension DateTypeExtension on DateFilter {
 extension TypeDateExtensionString on String {
   DateFilter get dateFilter {
     if (this == _THIS_WEEK) {
-      return DateFilter.THIS_WEEK;
+      return DateFilter.thisWeek;
     }
     if (this == _LAST_7_DAYS) {
-      return DateFilter.LAST_7_DAYS;
+      return DateFilter.last7Days;
     }
     if (this == _THIS_YEAR) {
-      return DateFilter.THIS_YEAR;
+      return DateFilter.thisYear;
     }
     if (this == _LAST_30_DAYS) {
-      return DateFilter.LAST_30_DAYS;
+      return DateFilter.last30Days;
     }
     if (this == _LAST_MONTH) {
-      return DateFilter.LAST_MONTH;
+      return DateFilter.lastMonth;
     } else if (this == _CUSTOM) {
-      return DateFilter.CUSTOM;
+      return DateFilter.custom;
     } else {
-      return DateFilter.ALL;
+      return DateFilter.all;
     }
   }
 }
 
-enum OperationType { UPDATE, INSERT, DELETE }
+enum OperationType { update, insert, delete }
 
 const String _CASH_IN = 'Cash In';
 const String _CASH_OUT = 'Cash Out';
@@ -161,7 +161,9 @@ const String DATE_START_RANGE = 'start date range';
 const String DATE_END_RANGE = 'end date range';
 
 //variable represents the state of filter options arrow
-const String DATE_ARROW = "date arrow ";
-const String CASH_ARROW = 'cash arrow ';
-const String SORT_ARROW = 'sort arrow ';
-const String TYPE_ARROW = 'type arrow ';
+const String _DATE_ARROW = "date arrow ";
+const String _CASH_ARROW = 'cash arrow ';
+const String _SORT_ARROW = 'sort arrow ';
+const String _TYPE_ARROW = 'type arrow ';
+
+const String FILTER_STATE = "filter state ";

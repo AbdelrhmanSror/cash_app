@@ -210,10 +210,10 @@ class OperationTile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: Icon(
-              (model.type == TypeFilter.CASH_IN.value
+              (model.type == TypeFilter.cashIn.value
                   ? Icons.add
                   : Icons.remove),
-              color: model.type == TypeFilter.CASH_OUT.value
+              color: model.type == TypeFilter.cashOut.value
                   ? const Color(0xFFF64E57)
                   : const Color(0xFF08A696),
               size: 16,
@@ -289,10 +289,10 @@ class OperationTile extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                   Icon(
-                    model.type == TypeFilter.CASH_OUT.value
+                    model.type == TypeFilter.cashOut.value
                         ? Icons.arrow_drop_down
                         : Icons.arrow_drop_up,
-                    color: model.type == TypeFilter.CASH_OUT.value
+                    color: model.type == TypeFilter.cashOut.value
                         ? const Color(0xFFF88D93)
                         : const Color(0xFF60C8C8),
                   )

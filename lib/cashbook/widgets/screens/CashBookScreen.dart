@@ -87,7 +87,7 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashBookModelListDetails models = CashBookModelListDetails([]);
   bool _isLoading = true;
 
-  SortFilter sortType = SortFilter.LATEST;
+  SortFilter sortType = SortFilter.latest;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +186,7 @@ class _CashBookScreenState extends State<CashBookScreen>
 
       //applying default sortFilter as Older
       models =
-          insertedModels.applySort(SortFilter.OLDER).applyType(TypeFilter.ALL);
+          insertedModels.applySort(SortFilter.older).applyType(TypeFilter.all);
     });
     // });
   }
@@ -200,7 +200,7 @@ class _CashBookScreenState extends State<CashBookScreen>
 
       //applying default sortFilter as Older
       this.models =
-          models.applySort(SortFilter.OLDER).applyType(TypeFilter.ALL);
+          models.applySort(SortFilter.older).applyType(TypeFilter.all);
     });
   }
 

@@ -37,7 +37,7 @@ class CashBookModelListDetails {
 
   CashBookModelListDetails applyType(TypeFilter typeFilter) {
     //by default it retrieves all types from database.
-    if (typeFilter == TypeFilter.ALL) return this;
+    if (typeFilter == TypeFilter.all) return this;
     return CashBookModelListDetails(
         models.where((element) => element.type == typeFilter.value).toList(),
         totalCashIn: totalCashIn,
@@ -48,20 +48,20 @@ class CashBookModelListDetails {
 
   CashBookModelListDetails applySort(SortFilter sortFilter) {
     final CashBookModelListDetails cashBookModelDetails;
-    if (sortFilter == SortFilter.OLDER) {
+    if (sortFilter == SortFilter.older) {
       cashBookModelDetails = CashBookModelListDetails(models.toList(),
           totalCashIn: totalCashIn,
           totalCashOut: totalCashOut,
           startDate: startDate,
           endDate: endDate);
-    } else if (sortFilter == SortFilter.CASH_HIGH_TO_LOW) {
+    } else if (sortFilter == SortFilter.cashHighToLow) {
       cashBookModelDetails = CashBookModelListDetails(
           models..sort((a, b) => -1 * a.cash.compareTo(b.cash)),
           totalCashIn: totalCashIn,
           totalCashOut: totalCashOut,
           startDate: startDate,
           endDate: endDate);
-    } else if (sortFilter == SortFilter.CASH_LOW_TO_HIGH) {
+    } else if (sortFilter == SortFilter.cashLowToHigh) {
       cashBookModelDetails = CashBookModelListDetails(
           models..sort((a, b) => a.cash.compareTo(b.cash)),
           totalCashIn: totalCashIn,

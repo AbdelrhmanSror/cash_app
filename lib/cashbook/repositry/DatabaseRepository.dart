@@ -149,6 +149,10 @@ class DataBaseRepository {
     _alertOnCashBookChanged(await _retrieveCashBooks());
   }
 
+  Future<bool> isFilterCleared() async {
+    return (await FilterSharedPreferences.getFilterState());
+  }
+
   Future<void> setDateTypeInPreferences(DateFilter dateFilter) async {
     FilterSharedPreferences.setDateTypeInPreferences(dateFilter);
   }
@@ -205,6 +209,7 @@ class DataBaseRepository {
   }
 
   Future<bool> getArrowState(FilterArrowState filterArrowState) async {
-    return FilterSharedPreferences.getArrowState(filterArrowState);
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return FilterSharedPreferences.getArrowState(preferences, filterArrowState);
   }
 }

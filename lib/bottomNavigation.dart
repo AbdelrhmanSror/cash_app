@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class MyBottomNavigation extends StatefulWidget {
+class MyAppBottomNavigation extends StatefulWidget {
   final Function(int) onItemTapped;
   final int selectedIndex;
 
-  const MyBottomNavigation(
+  const MyAppBottomNavigation(
       {required this.selectedIndex, required this.onItemTapped, Key? key})
       : super(key: key);
 
   @override
-  State<MyBottomNavigation> createState() => _MyBottomNavigationState();
+  State<MyAppBottomNavigation> createState() => _MyAppBottomNavigationState();
 }
 
-class _MyBottomNavigationState extends State<MyBottomNavigation> {
+class _MyAppBottomNavigationState extends State<MyAppBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(

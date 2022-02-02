@@ -50,7 +50,7 @@ abstract class AppDatabase {
 
   void updateTotalCashInOut(
       CashBookModel currentModel, CashBookModel previousModel) {
-    if (currentModel.type == CASH_IN) {
+    if (currentModel.type == TypeFilter.cashIn.value) {
       currentModel.totalCashIn = previousModel.totalCashIn + currentModel.cash;
       currentModel.totalCashOut = previousModel.totalCashOut;
     } else {

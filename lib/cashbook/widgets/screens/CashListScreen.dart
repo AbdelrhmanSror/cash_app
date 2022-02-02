@@ -2,17 +2,14 @@ import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
-import 'package:debts_app/cashbook/widgets/functional/ArchiveButtonWidget.dart';
-import 'package:debts_app/cashbook/widgets/functional/CashInButtonWidget.dart';
-import 'package:debts_app/cashbook/widgets/functional/CashOutButtonWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/InOutCashDetails.dart';
 import 'package:debts_app/cashbook/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationNumberWidget.dart';
-import 'package:debts_app/cashbook/widgets/functional/OperationsArchiveWidget.dart';
 import 'package:debts_app/cashbook/widgets/screens/CashBookScreen.dart';
 import 'package:debts_app/cashbook/widgets/screens/ScreenNavigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../../main.dart';
 
@@ -32,9 +29,9 @@ class _CashListScreenState extends State<CashListScreen>
 
   final List<bool> _typeOptionSelections = [true, false, false];
   int previousTypeSelectedOptionIndex = 0;
-  SortFilter sortType = SortFilter.LATEST;
+  SortFilter sortType = SortFilter.latest;
 
-  DateFilter dateType = DateFilter.ALL;
+  DateFilter dateType = DateFilter.all;
   int previousDateSelectedOptionIndex = 0;
 
   @override
@@ -54,38 +51,91 @@ class _CashListScreenState extends State<CashListScreen>
                     fontSize: 24),
               ),
             ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endDocked,
+            floatingActionButton: SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              icon: Icons.add,
+              activeIcon: Icons.close,
+              spacing: 3,
+              childPadding: const EdgeInsets.all(4),
+              spaceBetweenChildren: 5,
+              buttonSize: Size(50.0, 50),
+              childrenButtonSize: Size(50.0, 50.0),
+              visible: true,
+              direction: SpeedDialDirection.up,
+              switchLabelPosition: false,
+
+              /// If true user is forced to close dial manually
+              closeManually: false,
+
+              /// If false, backgroundOverlay will not be rendered.
+              renderOverlay: true,
+              useRotationAnimation: true,
+              tooltip: 'Open Speed Dial',
+              heroTag: 'hero-tag',
+              elevation: 8.0,
+              animationSpeed: 200,
+              shape: const StadiumBorder(),
+              children: [
+                SpeedDialChild(
+                    child: const Icon(Icons.attach_money),
+                    backgroundColor: const Color(0xF5C0F8B2),
+                    foregroundColor: Colors.green,
+                    label: 'Cash In',
+                    onTap: () => ScreenNavigation.navigateToCashInScreen(
+                        context, OperationType.insert)),
+                SpeedDialChild(
+                    child: const Icon(Icons.money_off),
+                    backgroundColor: Color(0xCCFDF1F3),
+                    foregroundColor: Colors.red,
+                    label: 'Cash out',
+                    onTap: () => ScreenNavigation.navigateToCashOutScreen(
+                        context, OperationType.insert)),
+                SpeedDialChild(
+                  visible: models.models.isNotEmpty,
+                  child: const Icon(Icons.archive_outlined),
+                  backgroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
+                  label: 'Archive',
+                  onTap: () =>
+                      ScreenNavigation.navigateToArchiveModalSheetScreen(
+                          context, models),
+                ),
+              ],
+            ),
+            bottomNavigationBar: BottomAppBar(
+              shape: const CircularNotchedRectangle(),
+              notchMargin: 8.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    tooltip: "Search",
+                    onPressed: () => {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.archive_outlined),
+                    tooltip: " Operations Archive",
+                    onPressed: () {
+                      ScreenNavigation.navigateToParentArchiveScreen(context);
+                    },
+                  )
+                ],
+              ),
+            ),
             body: Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildTypeFilter(),
-                      buildOperationsArchiveWidget()
-                    ],
-                  ),
+                  buildTypeFilter(),
                   Expanded(child: buildOperationListWidget(context)),
-                  buildCashInOutButton(context)
+                  //buildCashInOutButton(context)
                 ],
               ),
             )));
-  }
-
-  Container buildCashInOutButton(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(
-          minWidth: double.infinity, maxWidth: double.infinity),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Expanded(child: buildCashInButton(context)),
-          const VerticalDivider(),
-          Expanded(child: buildCashOutButton(context))
-        ],
-      ),
-    );
   }
 
   Widget buildTypeFilter() {
@@ -98,7 +148,7 @@ class _CashListScreenState extends State<CashListScreen>
             'All',
             (value) async {
               showLoadingBar();
-              await databaseRepository.setTypeInPreferences(TypeFilter.ALL);
+              await databaseRepository.setTypeInPreferences(TypeFilter.all);
               databaseRepository.retrieveFilteredCashBooks();
             },
           ),
@@ -110,7 +160,7 @@ class _CashListScreenState extends State<CashListScreen>
             'Income',
             (value) async {
               showLoadingBar();
-              await databaseRepository.setTypeInPreferences(TypeFilter.CASH_IN);
+              await databaseRepository.setTypeInPreferences(TypeFilter.cashIn);
               databaseRepository.retrieveFilteredCashBooks();
             },
           ),
@@ -120,24 +170,12 @@ class _CashListScreenState extends State<CashListScreen>
           'Outcome',
           (value) async {
             showLoadingBar();
-            await databaseRepository.setTypeInPreferences(TypeFilter.CASH_OUT);
+            await databaseRepository.setTypeInPreferences(TypeFilter.cashOut);
             databaseRepository.retrieveFilteredCashBooks();
           },
         ),
       ],
     );
-  }
-
-  CashOutButton buildCashOutButton(BuildContext context) {
-    return CashOutButton(onCashOutPressed: () {
-      ScreenNavigation.navigateToCashOutScreen(context, OperationType.INSERT);
-    });
-  }
-
-  CashInButton buildCashInButton(BuildContext context) {
-    return CashInButton(onCashInPressed: () {
-      ScreenNavigation.navigateToCashInScreen(context, OperationType.INSERT);
-    });
   }
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
@@ -157,20 +195,9 @@ class _CashListScreenState extends State<CashListScreen>
         });
   }
 
-  ArchiveButtonWidget buildArchiveButtonWidget() => ArchiveButtonWidget(
-      onPressed: () {
-        ScreenNavigation.navigateToArchiveModalSheetScreen(context, models);
-      },
-      hide: (models.models.isEmpty));
-
   OperationNumberWidget buildOperationNumberWidget() {
     return OperationNumberWidget(countNumber: models.models.length);
   }
-
-  OperationsArchiveWidget buildOperationsArchiveWidget() =>
-      OperationsArchiveWidget(onPressed: () {
-        ScreenNavigation.navigateToParentArchiveScreen(context);
-      });
 
   NetBalanceWidget buildNetBalanceWidget() {
     return NetBalanceWidget(
@@ -181,7 +208,6 @@ class _CashListScreenState extends State<CashListScreen>
 
   Widget buildInOutCashDetails() => InOutCashDetails(models: models);
 
-  // Utility.createModalSheet(context, CashInFilterScreen());
 
   @override
   void initState() {
@@ -250,12 +276,12 @@ class _CashListScreenState extends State<CashListScreen>
 
   void updateTypeFilter(TypeFilter type) {
     _typeOptionSelections[previousTypeSelectedOptionIndex] = false;
-    if (type == TypeFilter.CASH_IN) {
+    if (type == TypeFilter.cashIn) {
       _typeOptionSelections[1] = true;
       previousTypeSelectedOptionIndex = 1;
       return;
     }
-    if (type == TypeFilter.CASH_OUT) {
+    if (type == TypeFilter.cashOut) {
       _typeOptionSelections[2] = true;
       previousTypeSelectedOptionIndex = 2;
       return;

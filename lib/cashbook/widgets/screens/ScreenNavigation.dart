@@ -22,20 +22,20 @@ class ScreenNavigation {
 
   static Future<void> navigateToEditScreen(
       BuildContext context, CashBookModel model) async {
-    if (model.type == TypeFilter.CASH_IN.value) {
+    if (model.type == TypeFilter.cashIn.value) {
       await Navigator.of(context).push(Utility.createAnimationRoute(
           CashInScreen(
-            operationType: OperationType.UPDATE,
+            operationType: OperationType.update,
             modelToEdit: model,
           ),
           const Offset(1.0, 0.0),
           Offset.zero,
           Curves.ease));
     }
-    if (model.type == TypeFilter.CASH_OUT.value) {
+    if (model.type == TypeFilter.cashOut.value) {
       await Navigator.of(context).push(Utility.createAnimationRoute(
           CashOutScreen(
-            operationType: OperationType.UPDATE,
+            operationType: OperationType.update,
             modelToEdit: model,
           ),
           const Offset(1.0, 0.0),

@@ -180,7 +180,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         AppTextWithDot(
           text: '${widget.model.cash.abs()} EGP',
           style: TextStyle(
-              color: widget.model.type == TypeFilter.CASH_OUT.value
+              color: widget.model.type == TypeFilter.cashOut.value
                   ? Colors.red
                   : Colors.greenAccent,
               fontWeight: FontWeight.bold,

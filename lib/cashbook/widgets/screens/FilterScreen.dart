@@ -215,7 +215,7 @@ class _FilterState extends State<FilterScreen>
             onPressed: () {
               setState(() {
                 FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.DATE_ARROW);
+                    FilterArrowState.dateArrow);
                 _dateExpanded = !_dateExpanded;
               });
             },
@@ -239,7 +239,7 @@ class _FilterState extends State<FilterScreen>
             onPressed: () {
               setState(() {
                 FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.TYPE_ARROW);
+                    FilterArrowState.typeArrow);
 
                 _typeExpanded = !_typeExpanded;
               });
@@ -264,7 +264,7 @@ class _FilterState extends State<FilterScreen>
             onPressed: () {
               setState(() {
                 FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.CASH_ARROW);
+                    FilterArrowState.cashArrow);
 
                 _cashExpanded = !_cashExpanded;
               });
@@ -289,7 +289,7 @@ class _FilterState extends State<FilterScreen>
             onPressed: () {
               setState(() {
                 FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.SORT_ARROW);
+                    FilterArrowState.sortArrow);
                 _sortExpanded = !_sortExpanded;
               });
             },
@@ -540,7 +540,7 @@ class _FilterState extends State<FilterScreen>
           () async {
             showLoadingBar();
             await databaseRepository
-                .setSortInPreferences(SortFilter.CASH_LOW_TO_HIGH);
+                .setSortInPreferences(SortFilter.cashLowToHigh);
             databaseRepository.retrieveFilteredCashBooks(
                 /*sortFilter: SortFilter.CASH_LOW_TO_HIGH*/);
           },
@@ -551,7 +551,7 @@ class _FilterState extends State<FilterScreen>
           () async {
             showLoadingBar();
             await databaseRepository
-                .setSortInPreferences(SortFilter.CASH_HIGH_TO_LOW);
+                .setSortInPreferences(SortFilter.cashHighToLow);
 
             databaseRepository.retrieveFilteredCashBooks(
                 /* sortFilter: SortFilter.CASH_HIGH_TO_LOW*/);
@@ -562,7 +562,7 @@ class _FilterState extends State<FilterScreen>
           'Latest',
           () async {
             showLoadingBar();
-            await databaseRepository.setSortInPreferences(SortFilter.LATEST);
+            await databaseRepository.setSortInPreferences(SortFilter.latest);
 
             databaseRepository.retrieveFilteredCashBooks(
                 /* sortFilter: SortFilter.LATEST*/);
@@ -573,7 +573,7 @@ class _FilterState extends State<FilterScreen>
           'Older',
           () async {
             showLoadingBar();
-            await databaseRepository.setSortInPreferences(SortFilter.OLDER);
+            await databaseRepository.setSortInPreferences(SortFilter.older);
             databaseRepository.retrieveFilteredCashBooks(
                 /* sortFilter: SortFilter.OLDER*/);
           },
@@ -613,7 +613,7 @@ class _FilterState extends State<FilterScreen>
   void onAllDateSelected() async {
     showLoadingBar();
     await databaseRepository.setDateRangeInPreferences(null);
-    databaseRepository.setDateTypeInPreferences(DateFilter.ALL);
+    databaseRepository.setDateTypeInPreferences(DateFilter.all);
     databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
 
@@ -628,7 +628,7 @@ class _FilterState extends State<FilterScreen>
             child: buildDatePicker((startDate, endDate) async {
               showLoadingBar();
               await databaseRepository
-                  .setDateTypeInPreferences(DateFilter.CUSTOM);
+                  .setDateTypeInPreferences(DateFilter.custom);
               databaseRepository.setDateRangeInPreferences(
                   Date(startDate.toString(), endDate.toString()));
               databaseRepository.retrieveFilteredCashBooks();
@@ -642,7 +642,7 @@ class _FilterState extends State<FilterScreen>
     showLoadingBar();
     await databaseRepository.setDateRangeInPreferences(
         DateUtility.getFirstAndLastDateInLastMonth());
-    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_MONTH);
+    databaseRepository.setDateTypeInPreferences(DateFilter.lastMonth);
 
     databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
@@ -651,7 +651,7 @@ class _FilterState extends State<FilterScreen>
     showLoadingBar();
     await databaseRepository.setDateRangeInPreferences(
         DateUtility.getFirstAndLastDateInLast30Days());
-    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_30_DAYS);
+    databaseRepository.setDateTypeInPreferences(DateFilter.last30Days);
 
     databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
@@ -660,7 +660,7 @@ class _FilterState extends State<FilterScreen>
     showLoadingBar();
     await databaseRepository.setDateRangeInPreferences(
         DateUtility.getFirstAndLastDateInCurrentYear());
-    databaseRepository.setDateTypeInPreferences(DateFilter.THIS_YEAR);
+    databaseRepository.setDateTypeInPreferences(DateFilter.thisYear);
 
     databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
@@ -670,7 +670,7 @@ class _FilterState extends State<FilterScreen>
 
     await databaseRepository.setDateRangeInPreferences(
         DateUtility.getFirstAndLastDateInLast7Days());
-    databaseRepository.setDateTypeInPreferences(DateFilter.LAST_7_DAYS);
+    databaseRepository.setDateTypeInPreferences(DateFilter.last7Days);
 
     databaseRepository.retrieveFilteredCashBooks(/*date: date*/);
   }
@@ -679,7 +679,7 @@ class _FilterState extends State<FilterScreen>
     showLoadingBar();
     await databaseRepository.setDateRangeInPreferences(
         DateUtility.getFirstAndLastDateInCurrentWeek());
-    databaseRepository.setDateTypeInPreferences(DateFilter.THIS_WEEK);
+    databaseRepository.setDateTypeInPreferences(DateFilter.thisWeek);
     //fetch date by data in this week
     databaseRepository.retrieveFilteredCashBooks(
         /*date: date, sortFilter: SortFilter.LATEST*/);
@@ -817,13 +817,13 @@ class _FilterState extends State<FilterScreen>
     final sortFilter = await databaseRepository.getSortFromPreferences();
     _minCash = startEndCash.first;
     _maxCash = startEndCash.last;
-    /*//if all is null then all is either cleared or not yet filtered
-    if (clearedOrNotFiltered(date, type, cashRange, sortFilter, dateType)) {
+    //if all is null then all is either cleared or not yet filtered
+    if (await databaseRepository.isFilterCleared()) {
       isCleared = true;
       await initArrowState();
     } else {
       isCleared = false;
-    }*/
+    }
     updateCount(models);
     updateDateFilter(date, dateType);
     updateCashFilter(cashRange);
@@ -835,25 +835,16 @@ class _FilterState extends State<FilterScreen>
   }
 
   Future<void> initArrowState() async {
-    _dateExpanded = await FilterSharedPreferences.getArrowState(
-        FilterArrowState.DATE_ARROW);
-    _typeExpanded = await FilterSharedPreferences.getArrowState(
-        FilterArrowState.TYPE_ARROW);
-    _sortExpanded = await FilterSharedPreferences.getArrowState(
-        FilterArrowState.SORT_ARROW);
-    _cashExpanded = await FilterSharedPreferences.getArrowState(
-        FilterArrowState.CASH_ARROW);
+    _dateExpanded =
+        await databaseRepository.getArrowState(FilterArrowState.dateArrow);
+    _typeExpanded =
+        await databaseRepository.getArrowState(FilterArrowState.typeArrow);
+    _sortExpanded =
+        await databaseRepository.getArrowState(FilterArrowState.sortArrow);
+    _cashExpanded =
+        await databaseRepository.getArrowState(FilterArrowState.cashArrow);
   }
 
-  /*bool clearedOrNotFiltered(Date date, TypeFilter type, CashRange cashRange,
-      SortFilter sortFilter, DateFilter dateType) {
-    return (date == null &&
-        type == null &&
-        cashRange == null &&
-        sortFilter == null &&
-        dateType == null);
-  }
-*/
   void updateCashFilter(CashRange cashRange) {
     _startPrice = cashRange.first;
     _endPrice = cashRange.last;
@@ -861,48 +852,49 @@ class _FilterState extends State<FilterScreen>
 
   void updateSortFilter(SortFilter sortFilter) {
     _sortOptionSelections[previousSortSelectedOptionIndex] = false;
-    if (sortFilter == SortFilter.CASH_LOW_TO_HIGH) {
+    if (sortFilter == SortFilter.cashLowToHigh) {
       _sortOptionSelections[0] = true;
       previousSortSelectedOptionIndex = 0;
     }
-    if (sortFilter == SortFilter.CASH_HIGH_TO_LOW) {
+    if (sortFilter == SortFilter.cashHighToLow) {
       _sortOptionSelections[1] = true;
       previousSortSelectedOptionIndex = 1;
     }
-    if (sortFilter == SortFilter.LATEST) {
+    if (sortFilter == SortFilter.latest) {
       _sortOptionSelections[2] = true;
       previousSortSelectedOptionIndex = 2;
     }
-    if (sortFilter == SortFilter.OLDER) {
+    if (sortFilter == SortFilter.older) {
       _sortOptionSelections[3] = true;
       previousSortSelectedOptionIndex = 3;
     }
   }
 
   void updateDateFilter(Date date, DateFilter? dateType) {
-    _fromDate = DateUtility.getAlphabeticDate(DateTime.parse(date.firstDate));
-    _toDate = DateUtility.getAlphabeticDate(DateTime.parse(date.lastDate));
+    _fromDate =
+        DateUtility.getDateRepresentation(DateTime.parse(date.firstDate));
+    _toDate = DateUtility.getDateRepresentation(DateTime.parse(date.lastDate));
     _dateOptionSelections[previousDateSelectedOptionIndex] = false;
     // if (dateType != null) this.dateType = dateType;
-    if (dateType == DateFilter.THIS_WEEK) {
+    if (dateType == DateFilter.thisWeek) {
       _dateOptionSelections[0] = true;
       previousDateSelectedOptionIndex = 0;
-    } else if (dateType == DateFilter.LAST_7_DAYS) {
+    } else if (dateType == DateFilter.last7Days) {
       _dateOptionSelections[1] = true;
       previousDateSelectedOptionIndex = 1;
-    } else if (dateType == DateFilter.LAST_30_DAYS) {
+    } else if (dateType == DateFilter.last30Days) {
       _dateOptionSelections[2] = true;
       previousDateSelectedOptionIndex = 2;
-    } else if (dateType == DateFilter.LAST_MONTH) {
+    } else if (dateType == DateFilter.lastMonth) {
       _dateOptionSelections[3] = true;
       previousDateSelectedOptionIndex = 3;
-    } else if (dateType == DateFilter.THIS_YEAR) {
+    } else if (dateType == DateFilter.thisYear) {
       _dateOptionSelections[4] = true;
       previousDateSelectedOptionIndex = 4;
-    } else if (dateType == DateFilter.CUSTOM) {
+    } else if (dateType == DateFilter.custom) {
       _dateOptionSelections[6] = true;
       previousDateSelectedOptionIndex = 6;
-    } else if (dateType == DateFilter.ALL) {
+    } else if (dateType == DateFilter.all) {
       _dateOptionSelections[5] = true;
       previousDateSelectedOptionIndex = 5;
     }

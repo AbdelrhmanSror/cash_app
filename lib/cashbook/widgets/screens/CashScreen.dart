@@ -19,7 +19,7 @@ class CashInScreen extends CashScreen {
             cashFieldHintTextColor: Colors.greenAccent,
             validationButtonTextColor: Colors.green,
             validationButtonBackgroundColor: const Color(0xF5C0F8B2),
-            type: TypeFilter.CASH_IN.value);
+            type: TypeFilter.cashIn.value);
 }
 
 class CashOutScreen extends CashScreen {
@@ -32,7 +32,7 @@ class CashOutScreen extends CashScreen {
             cashFieldHintTextColor: Colors.red,
             validationButtonTextColor: Colors.red,
             validationButtonBackgroundColor: const Color(0xCCFDF1F3),
-            type: TypeFilter.CASH_OUT.value);
+            type: TypeFilter.cashOut.value);
 }
 
 abstract class CashScreen extends StatefulWidget {
@@ -74,7 +74,7 @@ class _CashScreenState extends State<CashScreen> {
 
   TextFormField cashNumberField() {
     var numberTextField = TextFormField(
-      initialValue: widget.operationType == OperationType.UPDATE
+      initialValue: widget.operationType == OperationType.update
           ? widget.modelToEdit?.cash.toString()
           : null,
       focusNode: _numberFieldFocusNode,
@@ -108,7 +108,7 @@ class _CashScreenState extends State<CashScreen> {
     var detailsTextField = Opacity(
         opacity: opacity,
         child: TextFormField(
-            initialValue: widget.operationType == OperationType.UPDATE
+            initialValue: widget.operationType == OperationType.update
                 ? widget.modelToEdit?.description
                 : null,
             enabled: opacity >= 1.0,
@@ -137,7 +137,7 @@ class _CashScreenState extends State<CashScreen> {
     Utility.showKeyboard(_numberFieldFocusNode);
     //if the operation type is update so we show the description textFormField
     //initially setup the value with the value in model in case user did no changes.
-    if (widget.operationType == OperationType.UPDATE) {
+    if (widget.operationType == OperationType.update) {
       setState(() {
         numberText = widget.modelToEdit!.cash.toString();
         descriptionText = widget.modelToEdit!.description.toString();
@@ -206,24 +206,24 @@ class _CashScreenState extends State<CashScreen> {
       paddingRight: 16,
       onPressed: () async {
         if (numberText.isNotEmpty) {
-          if (widget.operationType == OperationType.INSERT) {
+          if (widget.operationType == OperationType.insert) {
             await databaseRepository.insertCashBook(CashBookModel(
                 date: '${DateTime.now() /*.subtract(Duration(days: 3))*/}',
                 description: descriptionText,
-                cash: (widget.type == TypeFilter.CASH_IN.value
+                cash: (widget.type == TypeFilter.cashIn.value
                     ? double.parse(numberText)
                     : -double.parse(numberText)),
                 type: widget.type));
             FocusScope.of(context).unfocus();
             context.navigateBackWithDelay(200, '');
           }
-          if (widget.operationType == OperationType.UPDATE) {
+          if (widget.operationType == OperationType.update) {
             await databaseRepository.updateCashBook(CashBookModel(
                 totalCashIn: widget.modelToEdit!.totalCashIn,
                 totalCashOut: widget.modelToEdit!.totalCashOut,
                 date: widget.modelToEdit!.date,
                 description: descriptionText,
-                cash: (widget.type == TypeFilter.CASH_IN.value
+                cash: (widget.type == TypeFilter.cashIn.value
                     ? double.parse(numberText)
                     : -double.parse(numberText)),
                 type: widget.type,
