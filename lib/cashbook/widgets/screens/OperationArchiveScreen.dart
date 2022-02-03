@@ -1,5 +1,6 @@
 import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
+import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
@@ -147,6 +148,9 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        itemComparator: (e1, e2) =>
+            models.applyItemSortComparator(SortFilter.latest, e1, e2),
+        groupBy: (element) => element.groupId,
         onEditPressed: (_) {},
         onDeletePressed: (_) {},
         onArchivePressed: (_) {},

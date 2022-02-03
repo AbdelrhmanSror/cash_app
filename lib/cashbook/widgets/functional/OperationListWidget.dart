@@ -10,14 +10,20 @@ import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 class OperationListWidget extends StatefulWidget {
   const OperationListWidget(
-      {required this.models,
+      {required this.groupBy,
+      required this.itemComparator,
+      required this.models,
       required this.onItemPressed,
       required this.onDeletePressed,
       required this.onEditPressed,
       required this.onArchivePressed,
       Key? key})
       : super(key: key);
+  final int Function(CashBookModel element) groupBy;
+  final int Function(CashBookModel element1, CashBookModel element2)
+      itemComparator;
 
+  //final int Function(int id1, int id2) groupComparator;
   final Function(CashBookModel) onDeletePressed;
   final Function(CashBookModel) onEditPressed;
   final Function(CashBookModel) onArchivePressed;
@@ -84,8 +90,10 @@ class _OperationListWidgetState extends State<OperationListWidget> {
   Widget buildStickyList() {
     // A rectangular area of a [Material] that responds to touch.
     return StickyGroupedListView<CashBookModel, int>(
+      //creating new reference to list
       elements: widget.models,
-      groupBy: (CashBookModel element) => element.groupId,
+      itemComparator: (x, y) => widget.itemComparator(x, y),
+      groupBy: (CashBookModel element) => widget.groupBy(element),
       floatingHeader: true,
       groupSeparatorBuilder: (CashBookModel element) => Padding(
         padding: const EdgeInsets.all(8.0),

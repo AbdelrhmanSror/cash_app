@@ -179,14 +179,8 @@ class _CashBookScreenState extends State<CashBookScreen>
   void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
     setState(() {
-      //to dismiss loading bar
-      if (_isLoading) {
-        dismissLoadingBar();
-      }
-
+      models = insertedModels.applyType(TypeFilter.all);
       //applying default sortFilter as Older
-      models =
-          insertedModels.applySort(SortFilter.older).applyType(TypeFilter.all);
     });
     // });
   }
@@ -197,10 +191,8 @@ class _CashBookScreenState extends State<CashBookScreen>
     setState(() {
       _isLoading = false;
       //initial setup for models
-
       //applying default sortFilter as Older
-      this.models =
-          models.applySort(SortFilter.older).applyType(TypeFilter.all);
+      this.models = models.applyType(TypeFilter.all);
     });
   }
 
@@ -223,23 +215,5 @@ class _CashBookScreenState extends State<CashBookScreen>
     );
   }
 
-  void dismissLoadingBar() {
-    _isLoading = false;
-    Navigator.of(context).pop();
-  }
 
-  void showLoadingBar() {
-    _isLoading = true;
-    showDialog(
-      barrierDismissible: false,
-      builder: (ctx) {
-        return const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
-        );
-      },
-      context: context,
-    );
-  }
 }

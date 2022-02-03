@@ -14,7 +14,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../main.dart';
 
 class CashListScreen extends StatefulWidget {
-  const CashListScreen({Key? key}) : super(key: key);
+  CashListScreen({Key? key}) : super(key: key);
+  CashBookModelListDetails modelListDetails = CashBookModelListDetails([]);
 
   @override
   State<CashListScreen> createState() {
@@ -24,8 +25,7 @@ class CashListScreen extends StatefulWidget {
 
 class _CashListScreenState extends State<CashListScreen>
     implements CashBookDatabaseListener<CashBookModel> {
-  CashBookModelListDetails models = CashBookModelListDetails([]);
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   final List<bool> _typeOptionSelections = [true, false, false];
   int previousTypeSelectedOptionIndex = 0;
@@ -38,7 +38,7 @@ class _CashListScreenState extends State<CashListScreen>
   Widget build(BuildContext context) {
     return RefreshIndicator(
         onRefresh: () async {
-          databaseRepository.retrieveCashBooksForFirstTime();
+          databaseRepository.retrieveFilteredCashBooks();
         },
         child: Scaffold(
             backgroundColor: Theme.of(context).canvasColor,
@@ -60,8 +60,8 @@ class _CashListScreenState extends State<CashListScreen>
               spacing: 3,
               childPadding: const EdgeInsets.all(4),
               spaceBetweenChildren: 5,
-              buttonSize: Size(50.0, 50),
-              childrenButtonSize: Size(50.0, 50.0),
+              buttonSize: const Size(50.0, 50),
+              childrenButtonSize: const Size(50.0, 50.0),
               visible: true,
               direction: SpeedDialDirection.up,
               switchLabelPosition: false,
@@ -93,14 +93,14 @@ class _CashListScreenState extends State<CashListScreen>
                     onTap: () => ScreenNavigation.navigateToCashOutScreen(
                         context, OperationType.insert)),
                 SpeedDialChild(
-                  visible: models.models.isNotEmpty,
+                  visible: widget.modelListDetails.models.isNotEmpty,
                   child: const Icon(Icons.archive_outlined),
                   backgroundColor: Colors.indigo,
                   foregroundColor: Colors.white,
                   label: 'Archive',
                   onTap: () =>
                       ScreenNavigation.navigateToArchiveModalSheetScreen(
-                          context, models),
+                          context, widget.modelListDetails),
                 ),
               ],
             ),
@@ -180,6 +180,9 @@ class _CashListScreenState extends State<CashListScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        itemComparator: (e1, e2) =>
+            widget.modelListDetails.applyItemSortComparator(sortType, e1, e2),
+        groupBy: (element) => element.groupId,
         onDeletePressed: (element) {
           databaseRepository.deleteCashBook(element);
         },
@@ -189,65 +192,57 @@ class _CashListScreenState extends State<CashListScreen>
         onArchivePressed: (element) {
           databaseRepository.archiveCashBooks([element]);
         },
-        models: models.models,
+        models: widget.modelListDetails.models,
         onItemPressed: (model) {
           ScreenNavigation.navigateToListDetailScreen(context, model);
         });
   }
 
   OperationNumberWidget buildOperationNumberWidget() {
-    return OperationNumberWidget(countNumber: models.models.length);
+    return OperationNumberWidget(
+        countNumber: widget.modelListDetails.models.length);
   }
 
   NetBalanceWidget buildNetBalanceWidget() {
     return NetBalanceWidget(
-      netBalance:
-          models.models.isEmpty ? 0 : models.totalCashIn - models.totalCashOut,
+      netBalance: widget.modelListDetails.models.isEmpty
+          ? 0
+          : widget.modelListDetails.getBalance(),
     );
   }
 
-  Widget buildInOutCashDetails() => InOutCashDetails(models: models);
-
+  Widget buildInOutCashDetails() =>
+      InOutCashDetails(models: widget.modelListDetails);
 
   @override
   void initState() {
     super.initState();
-    // databaseRepository.insertCashBook(CashBookModel(date: (DateTime.now()).add(const Duration(days: 1)).toString(), cash: 5000, type: TypeFilter.CASH_IN.value));
+    //databaseRepository.insertCashBook(CashBookModel(date: (DateTime.now()).add(const Duration(days: 1)).toString(), cash: -2000, type: TypeFilter.cashOut.value));
 
     //register this widget as listener to the any updates happen in the database
     databaseRepository.registerCashBookDatabaseListener(this);
     //retrieve all the data in the database to initialize our app
-    databaseRepository.retrieveCashBooksForFirstTime();
+    databaseRepository.retrieveFilteredCashBooks();
   }
 
   @override
   void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
-    final cashType = await databaseRepository.getTypesFromPreferences();
     sortType = await databaseRepository.getSortFromPreferences();
+    final cashType = await databaseRepository.getTypesFromPreferences();
     updateTypeFilter(cashType);
     setState(() {
       //to dismiss loading bar
-      if (_isLoading) {
-        dismissLoadingBar();
-      }
-      models = insertedModels.applySort(sortType).applyType(cashType);
+      dismissLoadingBar();
+      widget.modelListDetails =
+          insertedModels.applyType(cashType).applySort(sortType);
+      //when grouping item in list
     });
     // });
   }
 
   @override
-  void onDatabaseStarted(CashBookModelListDetails models) async {
-    if (!mounted) return;
-    final cashType = await databaseRepository.getTypesFromPreferences();
-    sortType = await databaseRepository.getSortFromPreferences();
-    updateTypeFilter(cashType);
-    setState(() {
-      _isLoading = false;
-      //initial setup for models
-      this.models = models.applySort(sortType).applyType(cashType);
-    });
-  }
+  void onDatabaseStarted(CashBookModelListDetails models) {}
 
   Widget buildChoiceChip(
       bool selected, String text, Function(bool) onSelected) {
@@ -291,8 +286,10 @@ class _CashListScreenState extends State<CashListScreen>
   }
 
   void dismissLoadingBar() {
-    _isLoading = false;
-    Navigator.of(context).pop();
+    if (_isLoading) {
+      _isLoading = false;
+      Navigator.of(context).pop();
+    }
   }
 
   void showLoadingBar() {

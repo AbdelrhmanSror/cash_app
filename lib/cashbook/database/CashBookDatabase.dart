@@ -255,7 +255,7 @@ class CashBookDatabase extends AppDatabase {
     argumentList.add(cashRange.last);
 
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM "$_tableName" $whereClause ORDER BY "id" ASC ',
+        'SELECT * FROM "$_tableName" $whereClause ORDER BY date(date) ASC ',
         argumentList);
     List<CashBookModel> modelsAfterModel = maps.toCashBookModels();
     //we propagate data based on the new fetched operations

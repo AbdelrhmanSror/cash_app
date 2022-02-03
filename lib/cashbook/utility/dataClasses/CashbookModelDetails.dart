@@ -17,22 +17,8 @@ class CashBookModelListDetails {
       {this.totalCashIn = 0,
       this.totalCashOut = 0,
       this.startDate = '',
-      this.endDate = ''});
-
-  //setting group id if we want to group items
-  void _setGroupId(CashBookModelListDetails cashBookModelListDetails) {
-    for (int i = 1; i < cashBookModelListDetails.models.length; i++) {
-      if (DateUtility.removeTimeFromDate(
-              DateTime.parse(cashBookModelListDetails.models[i].date)) ==
-          DateUtility.removeTimeFromDate(
-              DateTime.parse(cashBookModelListDetails.models[i - 1].date))) {
-        cashBookModelListDetails.models[i].groupId =
-            cashBookModelListDetails.models[i - 1].groupId;
-      } else {
-        cashBookModelListDetails.models[i].groupId =
-            cashBookModelListDetails.models[i - 1].groupId + 1;
-      }
-    }
+      this.endDate = ''}) {
+    print("");
   }
 
   CashBookModelListDetails applyType(TypeFilter typeFilter) {
@@ -46,38 +32,39 @@ class CashBookModelListDetails {
         endDate: endDate);
   }
 
+  //setting group id in case we want to group items based on certain sortFilter
   CashBookModelListDetails applySort(SortFilter sortFilter) {
-    final CashBookModelListDetails cashBookModelDetails;
-    if (sortFilter == SortFilter.older) {
-      cashBookModelDetails = CashBookModelListDetails(models.toList(),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    } else if (sortFilter == SortFilter.cashHighToLow) {
-      cashBookModelDetails = CashBookModelListDetails(
-          models..sort((a, b) => -1 * a.cash.compareTo(b.cash)),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    } else if (sortFilter == SortFilter.cashLowToHigh) {
-      cashBookModelDetails = CashBookModelListDetails(
-          models..sort((a, b) => a.cash.compareTo(b.cash)),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
-    } else {
-      cashBookModelDetails = CashBookModelListDetails(models.reversed.toList(),
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          startDate: startDate,
-          endDate: endDate);
+    final newSortedModels = models.toList();
+    newSortedModels
+        .sort((e1, e2) => applyItemSortComparator(sortFilter, e1, e2));
+    for (int i = 1; i < newSortedModels.length; i++) {
+      if (DateUtility.removeTimeFromDate(
+              DateTime.parse(newSortedModels[i].date)) ==
+          DateUtility.removeTimeFromDate(
+              DateTime.parse(newSortedModels[i - 1].date))) {
+        newSortedModels[i].groupId = newSortedModels[i - 1].groupId;
+      } else {
+        newSortedModels[i].groupId = newSortedModels[i - 1].groupId + 1;
+      }
     }
-    //setting group id for list in case of grouping element
-    _setGroupId(cashBookModelDetails);
-    return cashBookModelDetails;
+    return CashBookModelListDetails(newSortedModels,
+        totalCashIn: totalCashIn,
+        totalCashOut: totalCashOut,
+        startDate: startDate,
+        endDate: endDate);
+  }
+
+  int applyItemSortComparator(
+      SortFilter sortFilter, CashBookModel e1, CashBookModel e2) {
+    if (sortFilter == SortFilter.older) {
+      return e1.id.compareTo(e2.id);
+    } else if (sortFilter == SortFilter.cashHighToLow) {
+      return -1 * e1.cash.compareTo(e2.cash);
+    } else if (sortFilter == SortFilter.cashLowToHigh) {
+      return e1.cash.compareTo(e2.cash);
+    } else {
+      return -1 * e1.id.compareTo(e2.id);
+    }
   }
 
   double getBalance() {

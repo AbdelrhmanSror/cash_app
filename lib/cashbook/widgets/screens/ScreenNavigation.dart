@@ -14,10 +14,7 @@ import 'OperationArchiveScreen.dart';
 class ScreenNavigation {
   static void navigateToCashListScreen(BuildContext context) {
     Navigator.of(context).push(Utility.createAnimationRoute(
-        const CashListScreen(),
-        const Offset(1.0, 0.0),
-        Offset.zero,
-        Curves.ease));
+        CashListScreen(), const Offset(1.0, 0.0), Offset.zero, Curves.ease));
   }
 
   static Future<void> navigateToEditScreen(

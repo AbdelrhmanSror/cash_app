@@ -802,7 +802,9 @@ class _FilterState extends State<FilterScreen>
   void onDatabaseChanged(CashBookModelListDetails models) async {
     if (!mounted) return;
     final cashType = await databaseRepository.getTypesFromPreferences();
-    await updateFilterUi(models.applyType(cashType));
+    await updateFilterUi(models
+        .applySort(await databaseRepository.getSortFromPreferences())
+        .applyType(cashType));
     //to dismiss the loading bar
     setState(() {
       dismissLoadingBar();
