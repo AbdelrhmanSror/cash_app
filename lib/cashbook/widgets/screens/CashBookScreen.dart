@@ -144,7 +144,11 @@ class _CashBookScreenState extends State<CashBookScreen>
                           children: [
                             buildOperationNumberWidget(),
                             IconButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  sortType = await databaseRepository
+                                      .getSortFromPreferences();
+                                  final cashType = await databaseRepository
+                                      .getTypesFromPreferences();
                                   ScreenNavigation.navigateToCashListScreen(
                                       context);
                                 },

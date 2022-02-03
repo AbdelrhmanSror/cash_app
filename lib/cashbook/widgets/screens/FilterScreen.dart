@@ -803,7 +803,6 @@ class _FilterState extends State<FilterScreen>
     if (!mounted) return;
     final cashType = await databaseRepository.getTypesFromPreferences();
     await updateFilterUi(models
-        .applySort(await databaseRepository.getSortFromPreferences())
         .applyType(cashType));
     //to dismiss the loading bar
     setState(() {
