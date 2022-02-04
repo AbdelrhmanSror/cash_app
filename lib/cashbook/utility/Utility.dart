@@ -35,7 +35,7 @@ class Utility {
     );
   }
 
-  static void showKeyboard(FocusNode focusNode, {int duration = 500}) {
+  static void showKeyboard(FocusNode focusNode, {int duration = 50}) {
     SchedulerBinding.instance?.addPostFrameCallback((Duration _) {
       Future.delayed(Duration(milliseconds: duration), () {
         focusNode.requestFocus();

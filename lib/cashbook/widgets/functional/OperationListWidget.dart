@@ -17,6 +17,7 @@ class OperationListWidget extends StatefulWidget {
       required this.onDeletePressed,
       required this.onEditPressed,
       required this.onArchivePressed,
+      required this.slideable,
       Key? key})
       : super(key: key);
   final int Function(CashBookModel element) groupBy;
@@ -30,6 +31,7 @@ class OperationListWidget extends StatefulWidget {
 
   final List<CashBookModel> models;
   final Function(CashBookModel) onItemPressed;
+  final bool slideable;
 
   @override
   State<OperationListWidget> createState() => _OperationListWidgetState();
@@ -123,6 +125,8 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             ),
             elevation: 4.0,
             child: Slidable(
+              enabled: widget.slideable,
+
               // Specify a key if the Slidable is dismissible.
               key: ValueKey(element.id),
 
@@ -133,7 +137,6 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
                 // A pane can dismiss the Slidable.
                 dismissible: DismissiblePane(onDismissed: () {
-                  print('on dismiss ');
                   widget.onDeletePressed(element);
                 }),
 

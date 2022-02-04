@@ -35,8 +35,7 @@ class CashBookModelListDetails {
   //setting group id in case we want to group items based on certain sortFilter
   CashBookModelListDetails applySort(SortFilter sortFilter) {
     final newSortedModels = models.toList();
-    newSortedModels
-        .sort((e1, e2) => applyItemSortComparator(sortFilter, e1, e2));
+    newSortedModels.sort((e1, e2) => itemSortComparator(sortFilter, e1, e2));
     for (int i = 1; i < newSortedModels.length; i++) {
       if (DateUtility.removeTimeFromDate(
               DateTime.parse(newSortedModels[i].date)) ==
@@ -54,7 +53,7 @@ class CashBookModelListDetails {
         endDate: endDate);
   }
 
-  int applyItemSortComparator(
+  int itemSortComparator(
       SortFilter sortFilter, CashBookModel e1, CashBookModel e2) {
     if (sortFilter == SortFilter.older) {
       return e1.id.compareTo(e2.id);

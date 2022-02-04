@@ -10,6 +10,7 @@ import 'package:debts_app/cashbook/widgets/functional/OperationListWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationNumberWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/RectangleTitleArea.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../main.dart';
@@ -77,7 +78,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
             child: AppTextWithDot(
               text: DateUtility.getDateRepresentation2(
                       DateTime.parse(models.startDate)) +
-                  ' at ' +
+                  ' At ' +
                   DateUtility.getTimeRepresentation(
                       DateTime.parse(models.startDate)),
               style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 12),
@@ -93,7 +94,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
             child: AppTextWithDot(
               text: DateUtility.getDateRepresentation2(
                       DateTime.parse(models.endDate)) +
-                  ' at ' +
+                  ' At ' +
                   DateUtility.getTimeRepresentation(
                       DateTime.parse(models.endDate)),
               style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 12),
@@ -105,7 +106,9 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
           child: Column(
             children: [
               Column(children: [
-                buildInOutCashDetails(),
+                Container(
+                    alignment: Alignment.center,
+                    child: buildInOutCashDetails()),
                 const Divider(
                   thickness: 0.2,
                   color: Colors.blueGrey,
@@ -117,28 +120,17 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                   child: buildNetBalanceWidget(),
                 ),
               ]),
+              Container(
+                alignment: Alignment.bottomLeft,
+                child: buildOperationNumberWidget(),
+                padding: const EdgeInsets.only(
+                    left: 16.0, right: 16.0, top: 20, bottom: 2),
+              ),
               Expanded(
-                flex: 2,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 20, bottom: 2),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            buildOperationNumberWidget(),
-                          ]),
-                    ),
-                    Expanded(child: buildOperationListWidget(context)),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(
-                          left: 8, right: 8, top: 8, bottom: 32),
-                    ),
-                  ],
-                ),
-              )
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: buildOperationListWidget(context),
+              ))
             ],
           ),
         )
@@ -148,8 +140,9 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        slideable: false,
         itemComparator: (e1, e2) =>
-            models.applyItemSortComparator(SortFilter.latest, e1, e2),
+            models.itemSortComparator(SortFilter.latest, e1, e2),
         groupBy: (element) => element.groupId,
         onEditPressed: (_) {},
         onDeletePressed: (_) {},

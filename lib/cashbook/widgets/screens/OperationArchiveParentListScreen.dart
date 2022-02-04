@@ -43,7 +43,9 @@ class _OperationArchiveParentListScreenWidgetState
         title: const Text(
           'OPERATIONS ARCHIVE',
           style: TextStyle(
-              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 20),
+              color: Color(0xFF3345A6),
+              fontWeight: FontWeight.bold,
+              fontSize: 20),
         ),
       ),
       body: _buildSuggestions(),
@@ -97,7 +99,7 @@ class OperationTile extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8),
               child: CircularButton(
                 icon: Icons.book,
-                iconColor: Colors.blue,
+                iconColor: Color(0xFF3345A6),
                 backgroundColor: Colors.blue.shade50,
               ),
             ),

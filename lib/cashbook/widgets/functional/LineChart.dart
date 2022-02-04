@@ -106,7 +106,7 @@ class SpLineChart extends StatelessWidget {
         lineTouchData: LineTouchData(
             handleBuiltInTouches: true,
             touchTooltipData: LineTouchTooltipData(
-                tooltipBgColor: const Color(0xFF3345A6),
+                tooltipBgColor: Colors.white,
                 getTooltipItems: (touchedSpots) {
                   return touchedSpots.map((LineBarSpot touchedSpot) {
                     const textStyle = TextStyle(

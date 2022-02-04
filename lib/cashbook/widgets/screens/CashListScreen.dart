@@ -62,6 +62,8 @@ class _CashListScreenState extends State<CashListScreen>
                 floatingActionButton: SpeedDial(
                   animatedIcon: AnimatedIcons.menu_close,
                   icon: Icons.add,
+                  backgroundColor: const Color(0xFF3345A6),
+                  activeBackgroundColor: Colors.red,
                   activeIcon: Icons.close,
                   spacing: 3,
                   childPadding: const EdgeInsets.all(4),
@@ -93,7 +95,7 @@ class _CashListScreenState extends State<CashListScreen>
                             context, OperationType.insert)),
                     SpeedDialChild(
                         child: const Icon(Icons.money_off),
-                        backgroundColor: Color(0xCCFDF1F3),
+                        backgroundColor: const Color(0xCCFDF1F3),
                         foregroundColor: Colors.red,
                         label: 'Cash out',
                         onTap: () => ScreenNavigation.navigateToCashOutScreen(
@@ -155,7 +157,7 @@ class _CashListScreenState extends State<CashListScreen>
             _typeOptionSelections[0],
             'All',
             (value) async {
-              showLoadingBar();
+              // showLoadingBar();
               await databaseRepository.setTypeInPreferences(TypeFilter.all);
               databaseRepository.retrieveFilteredCashBooks();
             },
@@ -167,7 +169,7 @@ class _CashListScreenState extends State<CashListScreen>
             _typeOptionSelections[1],
             'Income',
             (value) async {
-              showLoadingBar();
+              // showLoadingBar();
               await databaseRepository.setTypeInPreferences(TypeFilter.cashIn);
               databaseRepository.retrieveFilteredCashBooks();
             },
@@ -177,7 +179,7 @@ class _CashListScreenState extends State<CashListScreen>
           _typeOptionSelections[2],
           'Outcome',
           (value) async {
-            showLoadingBar();
+            //  showLoadingBar();
             await databaseRepository.setTypeInPreferences(TypeFilter.cashOut);
             databaseRepository.retrieveFilteredCashBooks();
           },
@@ -188,8 +190,9 @@ class _CashListScreenState extends State<CashListScreen>
 
   OperationListWidget buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
+        slideable: true,
         itemComparator: (e1, e2) =>
-            widget.modelListDetails.applyItemSortComparator(sortType, e1, e2),
+            widget.modelListDetails.itemSortComparator(sortType, e1, e2),
         groupBy: (element) => element.groupId,
         onDeletePressed: (element) {
           databaseRepository.deleteCashBook(element);

@@ -240,7 +240,6 @@ class _FilterState extends State<FilterScreen>
               setState(() {
                 FilterSharedPreferences.flipArrowState(
                     FilterArrowState.typeArrow);
-
                 _typeExpanded = !_typeExpanded;
               });
             },
@@ -286,11 +285,12 @@ class _FilterState extends State<FilterScreen>
               fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
         ),
         IconButton(
-            onPressed: () {
+            onPressed: () async {
+              FilterSharedPreferences.flipArrowState(
+                  FilterArrowState.sortArrow);
               setState(() {
-                FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.sortArrow);
                 _sortExpanded = !_sortExpanded;
+                print('sortExpanded $_sortExpanded');
               });
             },
             icon: Icon(_sortExpanded
@@ -530,55 +530,58 @@ class _FilterState extends State<FilterScreen>
   }
 
   Widget buildSortingSelection() {
-    return Wrap(
-      alignment: WrapAlignment.start,
-      spacing: 8,
-      children: [
-        buildChoiceChip(
-          _sortOptionSelections[0],
-          'Cash:Low to high',
-          () async {
-            showLoadingBar();
-            await databaseRepository
-                .setSortInPreferences(SortFilter.cashLowToHigh);
-            databaseRepository.retrieveFilteredCashBooks(
-                /*sortFilter: SortFilter.CASH_LOW_TO_HIGH*/);
-          },
-        ),
-        buildChoiceChip(
-          _sortOptionSelections[1],
-          'Cash:High to low',
-          () async {
-            showLoadingBar();
-            await databaseRepository
-                .setSortInPreferences(SortFilter.cashHighToLow);
+    return ExpandableWidget(
+      expand: _sortExpanded,
+      child: Wrap(
+        alignment: WrapAlignment.start,
+        spacing: 8,
+        children: [
+          buildChoiceChip(
+            _sortOptionSelections[0],
+            'Cash:Low to high',
+            () async {
+              showLoadingBar();
+              await databaseRepository
+                  .setSortInPreferences(SortFilter.cashLowToHigh);
+              databaseRepository.retrieveFilteredCashBooks(
+                  /*sortFilter: SortFilter.CASH_LOW_TO_HIGH*/);
+            },
+          ),
+          buildChoiceChip(
+            _sortOptionSelections[1],
+            'Cash:High to low',
+            () async {
+              showLoadingBar();
+              await databaseRepository
+                  .setSortInPreferences(SortFilter.cashHighToLow);
 
-            databaseRepository.retrieveFilteredCashBooks(
-                /* sortFilter: SortFilter.CASH_HIGH_TO_LOW*/);
-          },
-        ),
-        buildChoiceChip(
-          _sortOptionSelections[2],
-          'Latest',
-          () async {
-            showLoadingBar();
-            await databaseRepository.setSortInPreferences(SortFilter.latest);
+              databaseRepository.retrieveFilteredCashBooks(
+                  /* sortFilter: SortFilter.CASH_HIGH_TO_LOW*/);
+            },
+          ),
+          buildChoiceChip(
+            _sortOptionSelections[2],
+            'Latest',
+            () async {
+              showLoadingBar();
+              await databaseRepository.setSortInPreferences(SortFilter.latest);
 
-            databaseRepository.retrieveFilteredCashBooks(
-                /* sortFilter: SortFilter.LATEST*/);
-          },
-        ),
-        buildChoiceChip(
-          _sortOptionSelections[3],
-          'Older',
-          () async {
-            showLoadingBar();
-            await databaseRepository.setSortInPreferences(SortFilter.older);
-            databaseRepository.retrieveFilteredCashBooks(
-                /* sortFilter: SortFilter.OLDER*/);
-          },
-        )
-      ],
+              databaseRepository.retrieveFilteredCashBooks(
+                  /* sortFilter: SortFilter.LATEST*/);
+            },
+          ),
+          buildChoiceChip(
+            _sortOptionSelections[3],
+            'Older',
+            () async {
+              showLoadingBar();
+              await databaseRepository.setSortInPreferences(SortFilter.older);
+              databaseRepository.retrieveFilteredCashBooks(
+                  /* sortFilter: SortFilter.OLDER*/);
+            },
+          )
+        ],
+      ),
     );
   }
 
@@ -802,8 +805,7 @@ class _FilterState extends State<FilterScreen>
   void onDatabaseChanged(CashBookModelListDetails models) async {
     if (!mounted) return;
     final cashType = await databaseRepository.getTypesFromPreferences();
-    await updateFilterUi(models
-        .applyType(cashType));
+    await updateFilterUi(models.applyType(cashType));
     //to dismiss the loading bar
     setState(() {
       dismissLoadingBar();
