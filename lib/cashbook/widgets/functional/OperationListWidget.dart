@@ -13,10 +13,10 @@ class OperationListWidget extends StatefulWidget {
       {required this.groupBy,
       required this.itemComparator,
       required this.models,
-      required this.onItemPressed,
-      required this.onDeletePressed,
-      required this.onEditPressed,
-      required this.onArchivePressed,
+      this.onItemPressed,
+      this.onDeletePressed,
+      this.onEditPressed,
+      this.onArchivePressed,
       required this.slideable,
       Key? key})
       : super(key: key);
@@ -25,12 +25,12 @@ class OperationListWidget extends StatefulWidget {
       itemComparator;
 
   //final int Function(int id1, int id2) groupComparator;
-  final Function(CashBookModel) onDeletePressed;
-  final Function(CashBookModel) onEditPressed;
-  final Function(CashBookModel) onArchivePressed;
+  final Function(CashBookModel)? onDeletePressed;
+  final Function(CashBookModel)? onEditPressed;
+  final Function(CashBookModel)? onArchivePressed;
 
   final List<CashBookModel> models;
-  final Function(CashBookModel) onItemPressed;
+  final Function(CashBookModel)? onItemPressed;
   final bool slideable;
 
   @override
@@ -137,7 +137,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
 
                 // A pane can dismiss the Slidable.
                 dismissible: DismissiblePane(onDismissed: () {
-                  widget.onDeletePressed(element);
+                  try {
+                    widget.onDeletePressed!(element);
+                  } on NullThrownError catch (_, e) {}
                 }),
 
                 // All actions are defined in the children parameter.
@@ -145,7 +147,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                   // A SlidableAction can have an icon and/or a label.
                   SlidableAction(
                     onPressed: (_) {
-                      widget.onDeletePressed(element);
+                      try {
+                        widget.onDeletePressed!(element);
+                      } on NullThrownError catch (_, e) {}
                     },
                     backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
@@ -154,7 +158,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                   ),
                   SlidableAction(
                     onPressed: (_) {
-                      widget.onEditPressed(element);
+                      try {
+                        widget.onEditPressed!(element);
+                      } on NullThrownError catch (_, e) {}
                     },
                     backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
@@ -172,20 +178,15 @@ class _OperationListWidgetState extends State<OperationListWidget> {
                     // An action can be bigger than the others.
                     flex: 2,
                     onPressed: (_) {
-                      widget.onArchivePressed(element);
+                      try {
+                        widget.onArchivePressed!(element);
+                      } on NullThrownError catch (_, e) {}
                     },
                     backgroundColor: const Color(0xFF7BC043),
                     foregroundColor: Colors.white,
                     icon: Icons.archive,
                     label: 'Archive',
                   ),
-                  /* SlidableAction(
-                    onPressed: null,
-                    backgroundColor: Color(0xFF0392CF),
-                    foregroundColor: Colors.white,
-                    icon: Icons.save,
-                    label: 'Save',
-                  ),*/
                 ],
               ),
 
@@ -194,7 +195,9 @@ class _OperationListWidgetState extends State<OperationListWidget> {
               child: InkWell(
                   child: OperationTile(model: element),
                   onTap: () {
-                    widget.onItemPressed(element);
+                    try {
+                      widget.onItemPressed!(element);
+                    } on NullThrownError catch (_, e) {}
                   }),
             ));
       },

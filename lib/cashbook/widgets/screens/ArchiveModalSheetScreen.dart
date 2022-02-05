@@ -48,7 +48,10 @@ class ArchiveModalSheetScreen extends StatelessWidget {
               indent: 20,
               endIndent: 20,
             ),
-            buildNetBalanceWidget(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: buildNetBalanceWidget(),
+            ),
             //              padding: const EdgeInsets.only(left: 16, right: 16, top: 24),
             Container(
               padding: const EdgeInsets.only(left: 16, right: 16, top: 30),
@@ -71,9 +74,10 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                           AppTextWithDot(
                             text: DateUtility.getDateRepresentation(
                                     DateTime.parse(models.startDate)) +
+                                " at " +
                                 DateUtility.getTimeRepresentation(
                                     DateTime.parse(models.startDate)),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal),
@@ -97,9 +101,10 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                           AppTextWithDot(
                             text: DateUtility.getDateRepresentation(
                                     DateTime.parse(models.endDate)) +
+                                " at " +
                                 DateUtility.getTimeRepresentation(
                                     DateTime.parse(models.endDate)),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal),
@@ -122,7 +127,7 @@ class ArchiveModalSheetScreen extends StatelessWidget {
                           ),
                           AppTextWithDot(
                             text: '${models.models.length}',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal),

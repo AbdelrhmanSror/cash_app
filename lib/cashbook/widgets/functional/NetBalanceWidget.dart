@@ -1,3 +1,4 @@
+import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class NetBalanceWidget extends StatelessWidget {
               fontWeight: FontWeight.normal),
         ),
         AppTextWithDot(
-          text: ' ${(netBalance).abs()} EGP',
+          text: ' ${Utility.formatCashNumber((netBalance).abs())} EGP',
           style: TextStyle(
               color: netBalance < 0 ? Colors.red : Colors.greenAccent,
               fontSize: 13,

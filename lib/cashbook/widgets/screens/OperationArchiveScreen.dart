@@ -116,7 +116,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
                   endIndent: 20,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.only(top: 8),
                   child: buildNetBalanceWidget(),
                 ),
               ]),
@@ -128,7 +128,7 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
               ),
               Expanded(
                   child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
                 child: buildOperationListWidget(context),
               ))
             ],
@@ -144,9 +144,6 @@ class _OperationArchiveScreenState extends State<OperationArchiveScreen>
         itemComparator: (e1, e2) =>
             models.itemSortComparator(SortFilter.latest, e1, e2),
         groupBy: (element) => element.groupId,
-        onEditPressed: (_) {},
-        onDeletePressed: (_) {},
-        onArchivePressed: (_) {},
         models: models.models,
         onItemPressed: (model) {
           Navigator.of(context).push(Utility.createAnimationRoute(

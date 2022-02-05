@@ -1,6 +1,7 @@
 import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/ArchiveModel.dart';
 import 'package:debts_app/cashbook/utility/DateUtility.dart';
+import 'package:debts_app/cashbook/utility/Utility.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/circularButton.dart';
 import 'package:debts_app/main.dart';
@@ -99,7 +100,7 @@ class OperationTile extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8),
               child: CircularButton(
                 icon: Icons.book,
-                iconColor: Color(0xFF3345A6),
+                iconColor: const Color(0xFF3345A6),
                 backgroundColor: Colors.blue.shade50,
               ),
             ),
@@ -132,7 +133,7 @@ class OperationTile extends StatelessWidget {
             width: 100,
             alignment: Alignment.centerRight,
             child: AppTextWithDot(
-              text: '${model.balance} EGP',
+              text: '${Utility.formatCashNumber(model.balance.abs())} EGP',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

@@ -7,8 +7,12 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class Utility {
   static String formatCashNumber(double number) {
     var formatter = NumberFormat('##,###,000');
-    if (number < 100) {
-      formatter = NumberFormat('#,###,00');
+    if (number.abs() < 100) {
+      if (number.abs() < 10) {
+        formatter = NumberFormat('#,###,0');
+      } else {
+        formatter = NumberFormat('#,###,00');
+      }
     }
     return formatter.format(number);
   }
