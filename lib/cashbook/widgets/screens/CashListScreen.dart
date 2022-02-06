@@ -2,10 +2,8 @@ import 'package:debts_app/cashbook/database/AppDatabaseCallback.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
-import 'package:debts_app/cashbook/widgets/functional/InOutCashDetails.dart';
-import 'package:debts_app/cashbook/widgets/functional/NetBalanceWidget.dart';
 import 'package:debts_app/cashbook/widgets/functional/OperationListWidget.dart';
-import 'package:debts_app/cashbook/widgets/functional/OperationNumberWidget.dart';
+import 'package:debts_app/cashbook/widgets/functional/SearchBarWidget.dart';
 import 'package:debts_app/cashbook/widgets/screens/CashBookScreen.dart';
 import 'package:debts_app/cashbook/widgets/screens/ScreenNavigation.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +12,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../main.dart';
 
 class CashListScreen extends StatefulWidget {
-  CashListScreen({Key? key}) : super(key: key);
-  CashBookModelListDetails modelListDetails = CashBookModelListDetails([]);
+  const CashListScreen({Key? key}) : super(key: key);
 
   @override
   State<CashListScreen> createState() {
@@ -25,135 +22,157 @@ class CashListScreen extends StatefulWidget {
 
 class _CashListScreenState extends State<CashListScreen>
     implements CashBookDatabaseListener<CashBookModel> {
+  CashBookModelListDetails _modelListDetails = CashBookModelListDetails([]);
   bool _isLoading = true;
 
   final List<bool> _typeOptionSelections = [true, false, false];
-  int previousTypeSelectedOptionIndex = 0;
-  SortFilter sortType = SortFilter.latest;
-
-  DateFilter dateType = DateFilter.all;
-  int previousDateSelectedOptionIndex = 0;
+  int _previousTypeSelectedOptionIndex = 0;
+  SortFilter _sortType = SortFilter.latest;
+  TextEditingController textController = TextEditingController();
+  double? filterCash;
 
   @override
   Widget build(BuildContext context) {
     return _isLoading
         ? const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
+            child: CircularProgressIndicator(),
           )
         : RefreshIndicator(
-            onRefresh: () async {
-              databaseRepository.retrieveFilteredCashBooks();
-            },
+            color: const Color(0xFF3345A6),
+            displacement: 100,
+            onRefresh: _handleRefresh,
             child: Scaffold(
-                backgroundColor: Theme.of(context).canvasColor,
-                appBar: MyCustomAppBar(
-                  title: const Text(
-                    'DEBTS',
-                    style: TextStyle(
-                        color: Color(0xFF3345A6),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24),
-                  ),
-                ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endDocked,
-                floatingActionButton: SpeedDial(
-                  animatedIcon: AnimatedIcons.menu_close,
-                  icon: Icons.add,
-                  backgroundColor: const Color(0xFF3345A6),
-                  activeBackgroundColor: Colors.red,
-                  activeIcon: Icons.close,
-                  spacing: 3,
-                  childPadding: const EdgeInsets.all(4),
-                  spaceBetweenChildren: 5,
-                  buttonSize: const Size(50.0, 50),
-                  childrenButtonSize: const Size(50.0, 50.0),
-                  visible: true,
-                  direction: SpeedDialDirection.up,
-                  switchLabelPosition: false,
-
-                  /// If true user is forced to close dial manually
-                  closeManually: false,
-
-                  /// If false, backgroundOverlay will not be rendered.
-                  renderOverlay: true,
-                  useRotationAnimation: true,
-                  tooltip: 'Open Speed Dial',
-                  heroTag: 'hero-tag',
-                  elevation: 8.0,
-                  animationSpeed: 200,
-                  shape: const StadiumBorder(),
-                  children: [
-                    SpeedDialChild(
-                        child: const Icon(Icons.attach_money),
-                        backgroundColor: const Color(0xF5C0F8B2),
-                        foregroundColor: Colors.green,
-                        label: 'Cash In',
-                        onTap: () => ScreenNavigation.navigateToCashInScreen(
-                            context, OperationType.insert)),
-                    SpeedDialChild(
-                        child: const Icon(Icons.money_off),
-                        backgroundColor: const Color(0xCCFDF1F3),
-                        foregroundColor: Colors.red,
-                        label: 'Cash out',
-                        onTap: () => ScreenNavigation.navigateToCashOutScreen(
-                            context, OperationType.insert)),
-                    SpeedDialChild(
-                      visible: widget.modelListDetails.models.isNotEmpty,
-                      child: const Icon(Icons.archive_outlined),
-                      backgroundColor: Colors.indigo,
-                      foregroundColor: Colors.white,
-                      label: 'Archive',
-                      onTap: () =>
-                          ScreenNavigation.navigateToArchiveModalSheetScreen(
-                              context, widget.modelListDetails),
+              body: Scaffold(
+                  backgroundColor: Theme.of(context).canvasColor,
+                  appBar: MyCustomAppBar(
+                    title: const Text(
+                      'DEBTS',
+                      style: TextStyle(
+                          color: Color(0xFF3345A6),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24),
                     ),
-                  ],
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  shape: const CircularNotchedRectangle(),
-                  notchMargin: 8.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.endDocked,
+                  floatingActionButton: SpeedDial(
+                    animatedIcon: AnimatedIcons.menu_close,
+                    icon: Icons.add,
+                    backgroundColor: const Color(0xFF3345A6),
+                    activeBackgroundColor: Colors.red,
+                    activeIcon: Icons.close,
+                    spacing: 3,
+                    childPadding: const EdgeInsets.all(4),
+                    spaceBetweenChildren: 5,
+                    buttonSize: const Size(50.0, 50),
+                    childrenButtonSize: const Size(50.0, 50.0),
+                    visible: true,
+                    direction: SpeedDialDirection.up,
+                    switchLabelPosition: false,
+
+                    /// If true user is forced to close dial manually
+                    closeManually: false,
+
+                    /// If false, backgroundOverlay will not be rendered.
+                    renderOverlay: true,
+                    useRotationAnimation: true,
+                    tooltip: 'Open Speed Dial',
+                    heroTag: 'hero-tag',
+                    elevation: 8.0,
+                    animationSpeed: 200,
+                    shape: const StadiumBorder(),
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        tooltip: "Search",
-                        onPressed: () => {},
+                      SpeedDialChild(
+                          child: const Icon(Icons.attach_money),
+                          backgroundColor: const Color(0xF5C0F8B2),
+                          foregroundColor: Colors.green,
+                          label: 'Cash In',
+                          onTap: () => ScreenNavigation.navigateToCashInScreen(
+                              context, OperationType.insert)),
+                      SpeedDialChild(
+                          child: const Icon(Icons.money_off),
+                          backgroundColor: const Color(0xCCFDF1F3),
+                          foregroundColor: Colors.red,
+                          label: 'Cash out',
+                          onTap: () => ScreenNavigation.navigateToCashOutScreen(
+                              context, OperationType.insert)),
+                      SpeedDialChild(
+                        visible: _modelListDetails.models.isNotEmpty,
+                        child: const Icon(Icons.archive_outlined),
+                        backgroundColor: Colors.indigo,
+                        foregroundColor: Colors.white,
+                        label: 'Archive',
+                        onTap: () =>
+                            ScreenNavigation.navigateToArchiveModalSheetScreen(
+                                context, _modelListDetails),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.archive_outlined),
-                        tooltip: " Operations Archive",
-                        onPressed: () {
-                          ScreenNavigation.navigateToParentArchiveScreen(
-                              context);
-                        },
-                      )
                     ],
                   ),
-                ),
-                body: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
-                  child: Column(
-                    children: [
-                      buildTypeFilter(),
-                      Expanded(child: buildOperationListWidget(context)),
-                      //buildCashInOutButton(context)
-                    ],
+                  bottomNavigationBar: BottomAppBar(
+                    shape: const CircularNotchedRectangle(),
+                    notchMargin: 8.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        buildSearchBar(context),
+                        IconButton(
+                          icon: const Icon(Icons.archive_outlined),
+                          tooltip: " Operations Archive",
+                          onPressed: () {
+                            ScreenNavigation.navigateToParentArchiveScreen(
+                                context);
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                )));
+                  body: Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildTypeFilter(),
+                          ],
+                        ),
+                        Expanded(child: _buildOperationListWidget(context)),
+                        //buildCashInOutButton(context)
+                      ],
+                    ),
+                  )),
+            ));
   }
 
-  Widget buildTypeFilter() {
+  SearchBar buildSearchBar(BuildContext context) {
+    return SearchBar(
+      closeSearchOnSuffixTap: false,
+      autoFocus: true,
+      width: MediaQuery.of(context).size.width - 110,
+      textInputType: TextInputType.number,
+      textController: textController,
+      onSuffixTap: () {
+        setState(() {
+          textController.clear();
+        });
+      },
+    );
+  }
+
+  Future<void> _handleRefresh() async {
+    //delaying the refresh indicator for 1 sec.
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
+    databaseRepository.retrieveFilteredCashBooks();
+  }
+
+  Widget _buildTypeFilter() {
     return Row(
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 4),
-          child: buildChoiceChip(
+          child: _buildChoiceChip(
             _typeOptionSelections[0],
             'All',
             (value) async {
@@ -165,7 +184,7 @@ class _CashListScreenState extends State<CashListScreen>
         ),
         Padding(
           padding: const EdgeInsets.only(right: 4.0),
-          child: buildChoiceChip(
+          child: _buildChoiceChip(
             _typeOptionSelections[1],
             'Income',
             (value) async {
@@ -175,7 +194,7 @@ class _CashListScreenState extends State<CashListScreen>
             },
           ),
         ),
-        buildChoiceChip(
+        _buildChoiceChip(
           _typeOptionSelections[2],
           'Outcome',
           (value) async {
@@ -188,11 +207,11 @@ class _CashListScreenState extends State<CashListScreen>
     );
   }
 
-  OperationListWidget buildOperationListWidget(BuildContext context) {
+  OperationListWidget _buildOperationListWidget(BuildContext context) {
     return OperationListWidget(
         slideable: true,
         itemComparator: (e1, e2) =>
-            widget.modelListDetails.itemSortComparator(sortType, e1, e2),
+            _modelListDetails.itemSortComparator(_sortType, e1, e2),
         groupBy: (element) => element.groupId,
         onDeletePressed: (element) {
           databaseRepository.deleteCashBook(element);
@@ -203,27 +222,11 @@ class _CashListScreenState extends State<CashListScreen>
         onArchivePressed: (element) {
           databaseRepository.archiveCashBooks([element]);
         },
-        models: widget.modelListDetails.models,
+        models: _modelListDetails.models,
         onItemPressed: (model) {
           ScreenNavigation.navigateToListDetailScreen(context, model);
         });
   }
-
-  OperationNumberWidget buildOperationNumberWidget() {
-    return OperationNumberWidget(
-        countNumber: widget.modelListDetails.models.length);
-  }
-
-  NetBalanceWidget buildNetBalanceWidget() {
-    return NetBalanceWidget(
-      netBalance: widget.modelListDetails.models.isEmpty
-          ? 0
-          : widget.modelListDetails.getBalance(),
-    );
-  }
-
-  Widget buildInOutCashDetails() =>
-      InOutCashDetails(models: widget.modelListDetails);
 
   @override
   void initState() {
@@ -234,19 +237,25 @@ class _CashListScreenState extends State<CashListScreen>
     databaseRepository.registerCashBookDatabaseListener(this);
     //retrieve all the data in the database to initialize our app
     databaseRepository.retrieveCashBooksForFirstTime();
+    textController.addListener(() {
+      filterCash = double.tryParse(textController.text);
+      databaseRepository.retrieveFilteredCashBooks();
+    });
   }
 
   @override
   void onDatabaseChanged(CashBookModelListDetails insertedModels) async {
     if (!mounted) return;
-    sortType = await databaseRepository.getSortFromPreferences();
+    _sortType = await databaseRepository.getSortFromPreferences();
     final cashType = await databaseRepository.getTypesFromPreferences();
-    updateTypeFilter(cashType);
+    _updateTypeFilter(cashType);
     setState(() {
       //to dismiss loading bar
-      dismissLoadingBar();
-      widget.modelListDetails =
-          insertedModels.applyType(cashType).applySort(sortType);
+      _isLoading = false;
+      _modelListDetails = insertedModels
+          .applyType(cashType)
+          .applySort(_sortType)
+          .applyCash(filterCash);
       //when grouping item in list
     });
     // });
@@ -255,15 +264,14 @@ class _CashListScreenState extends State<CashListScreen>
   @override
   void onDatabaseStarted(CashBookModelListDetails models) async {
     if (!mounted) return;
-    sortType = await databaseRepository.getSortFromPreferences();
+    _sortType = await databaseRepository.getSortFromPreferences();
     final cashType = await databaseRepository.getTypesFromPreferences();
-    updateTypeFilter(cashType);
+    _updateTypeFilter(cashType);
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         //to dismiss loading bar
         _isLoading = false;
-        widget.modelListDetails =
-            models.applyType(cashType).applySort(sortType);
+        _modelListDetails = models.applyType(cashType).applySort(_sortType);
         //when grouping item in list
       });
     });
@@ -271,7 +279,7 @@ class _CashListScreenState extends State<CashListScreen>
     // });
   }
 
-  Widget buildChoiceChip(
+  Widget _buildChoiceChip(
       bool selected, String text, Function(bool) onSelected) {
     return ChoiceChip(
       selected: selected,
@@ -296,41 +304,19 @@ class _CashListScreenState extends State<CashListScreen>
     );
   }
 
-  void updateTypeFilter(TypeFilter type) {
-    _typeOptionSelections[previousTypeSelectedOptionIndex] = false;
+  void _updateTypeFilter(TypeFilter type) {
+    _typeOptionSelections[_previousTypeSelectedOptionIndex] = false;
     if (type == TypeFilter.cashIn) {
       _typeOptionSelections[1] = true;
-      previousTypeSelectedOptionIndex = 1;
+      _previousTypeSelectedOptionIndex = 1;
       return;
     }
     if (type == TypeFilter.cashOut) {
       _typeOptionSelections[2] = true;
-      previousTypeSelectedOptionIndex = 2;
+      _previousTypeSelectedOptionIndex = 2;
       return;
     }
     _typeOptionSelections[0] = true;
-    previousTypeSelectedOptionIndex = 0;
-  }
-
-  void dismissLoadingBar() {
-    if (_isLoading) {
-      _isLoading = false;
-      Navigator.of(context).pop();
-    }
-  }
-
-  void showLoadingBar() {
-    _isLoading = true;
-    showDialog(
-      barrierDismissible: false,
-      builder: (ctx) {
-        return const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 3,
-          ),
-        );
-      },
-      context: context,
-    );
+    _previousTypeSelectedOptionIndex = 0;
   }
 }

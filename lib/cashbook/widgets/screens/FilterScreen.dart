@@ -188,9 +188,9 @@ class _FilterState extends State<FilterScreen>
             buildDateTitle(),
             buildDateSelection(),
             buildDivider(),
-            buildCashTitle(),
+          /*  buildCashTitle(),
             buildCashSlider(),
-            buildDivider(),
+            buildDivider(),*/
             Padding(
               padding: const EdgeInsets.only(bottom: 4.0),
               child: buildSortTitle(),
@@ -290,7 +290,6 @@ class _FilterState extends State<FilterScreen>
                   FilterArrowState.sortArrow);
               setState(() {
                 _sortExpanded = !_sortExpanded;
-                print('sortExpanded $_sortExpanded');
               });
             },
             icon: Icon(_sortExpanded
@@ -409,7 +408,7 @@ class _FilterState extends State<FilterScreen>
                           content: TextField(
                             focusNode: focusNode,
                             onSubmitted: (number) async {
-                              Navigator.of(context).pop();
+                              /*   Navigator.of(context).pop();
                               final value = double.parse(number);
                               if (cashInRange(number) && value <= _endPrice) {
                                 showLoadingBar();
@@ -419,7 +418,7 @@ class _FilterState extends State<FilterScreen>
                                         CashRange(value, _endPrice));
 
                                 databaseRepository.retrieveFilteredCashBooks();
-                              }
+                              }*/
                             },
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.done,
@@ -454,7 +453,7 @@ class _FilterState extends State<FilterScreen>
                               content: TextField(
                                 focusNode: focusNode,
                                 onSubmitted: (number) async {
-                                  Navigator.of(context).pop();
+                                  /*  Navigator.of(context).pop();
 
                                   final value = double.parse(number);
                                   //only if the number is bigger than the least number
@@ -467,7 +466,7 @@ class _FilterState extends State<FilterScreen>
                                             CashRange(_startPrice, value));
                                     databaseRepository
                                         .retrieveFilteredCashBooks();
-                                  }
+                                  }*/
                                 },
                                 keyboardType: TextInputType.number,
                                 textInputAction: TextInputAction.done,

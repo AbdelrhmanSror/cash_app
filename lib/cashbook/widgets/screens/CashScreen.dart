@@ -67,12 +67,10 @@ abstract class CashScreen extends StatefulWidget {
 
 class _CashScreenState extends State<CashScreen> {
   final _numberFieldFocusNode = FocusNode();
-
   double opacity = 0.0;
   String numberText = '';
   String descriptionText = '';
-
-  TextFormField cashNumberField() {
+  TextFormField _cashNumberField() {
     var numberTextField = TextFormField(
       initialValue: widget.operationType == OperationType.update
           ? widget.modelToEdit?.cash.toString()
@@ -171,7 +169,7 @@ class _CashScreenState extends State<CashScreen> {
           children: [
             Column(
               children: [
-                buildCashFieldWidget(),
+                _buildCashFieldWidget(),
                 buildCashDetailsFieldWidget(),
               ],
             ),
@@ -180,7 +178,7 @@ class _CashScreenState extends State<CashScreen> {
               child: Container(
                 constraints: const BoxConstraints(
                     minWidth: double.infinity, maxWidth: double.infinity),
-                child: buildValidateButton(context),
+                child: _buildValidateButton(context),
               ),
             )
           ],
@@ -189,7 +187,7 @@ class _CashScreenState extends State<CashScreen> {
     );
   }
 
-  RoundedTextButton buildValidateButton(BuildContext context) {
+  RoundedTextButton _buildValidateButton(BuildContext context) {
     return RoundedTextButton(
       text: AppTextWithDot(
         text: 'VALIDATE',
@@ -240,18 +238,18 @@ class _CashScreenState extends State<CashScreen> {
     );
   }
 
-  CompositeWidget buildCashFieldWidget() {
+  CompositeWidget _buildCashFieldWidget() {
     return CompositeWidget(
         width: double.infinity,
         widgets: [
           AppTextWithDot(
             text: widget.type,
-            style: TextStyle(
+            style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
                 fontWeight: FontWeight.normal),
           ),
-          cashNumberField()
+          _cashNumberField()
         ],
         vertical: true);
   }

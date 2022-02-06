@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 
 class ClosedBookAlertScreen extends StatefulWidget {
   const ClosedBookAlertScreen({Key? key}) : super(key: key);
-
   @override
   State<ClosedBookAlertScreen> createState() => _ClosedBookAlertScreenState();
 }
 
 class _ClosedBookAlertScreenState extends State<ClosedBookAlertScreen> {
   bool _disposed = false;
-
   void navigateAfter(int milliSeconds) {
     Future.delayed(Duration(milliseconds: milliSeconds), () {
       //to prevent navigator from navigate back twice ,

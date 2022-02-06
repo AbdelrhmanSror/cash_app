@@ -34,7 +34,7 @@ class _MyCustomAppBarState extends State<MyCustomAppBar> {
       backgroundColor: Theme.of(context).canvasColor,
       elevation: 0,
       iconTheme: const IconThemeData(
-        color: const Color(0xFF3345A6), //change your color here
+        color: Color(0xFF3345A6), //change your color here
       ),
       centerTitle: true,
       actions: [
@@ -87,8 +87,6 @@ class _CashBookScreenState extends State<CashBookScreen>
   CashBookModelListDetails models = CashBookModelListDetails([]);
   bool _isLoading = true;
 
-  SortFilter sortType = SortFilter.latest;
-
   @override
   Widget build(BuildContext context) {
     return _isLoading
@@ -97,78 +95,59 @@ class _CashBookScreenState extends State<CashBookScreen>
               strokeWidth: 2,
             ),
           )
-        : RefreshIndicator(
-            onRefresh: () async {
-              databaseRepository.retrieveCashBooksForFirstTime();
-            },
-            child: Scaffold(
-                backgroundColor: const Color(0x00ffffff),
-                appBar: /* AppBar(backgroundColor: Theme.of(context).canvasColor,
-                  centerTitle: true,elevation: 0,
-                  title: const Text(
-                    'DEBTS',
-                    style: TextStyle(
-                        color: Color(0xFF3345A6),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24),
-                  ),
-                )*/
-                    MyCustomAppBar(
-                  title: const Text(
-                    'DEBTS',
-                    style: TextStyle(
-                        color: Color(0xFF3345A6),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24),
-                  ),
-                ),
-                body: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: buildCard(
-                          HeadLineChart(
-                            modelListDetails: models,
-                          ),
-                        ),
+        : Scaffold(
+            backgroundColor: const Color(0x00ffffff),
+            appBar: MyCustomAppBar(
+              title: const Text(
+                'DEBTS',
+                style: TextStyle(
+                    color: Color(0xFF3345A6),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24),
+              ),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: _buildCard(
+                      HeadLineChart(
+                        modelListDetails: models,
                       ),
-                      buildCard(buildInOutCashDetails()),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            buildOperationNumberWidget(),
-                            IconButton(
-                                onPressed: () async {
-                                  sortType = await databaseRepository
-                                      .getSortFromPreferences();
-                                  final cashType = await databaseRepository
-                                      .getTypesFromPreferences();
-                                  ScreenNavigation.navigateToCashListScreen(
-                                      context);
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Color(0xFF3345A6),
-                                ))
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                )));
+                  _buildCard(_buildInOutCashDetails()),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildOperationNumberWidget(),
+                        IconButton(
+                            onPressed: () async {
+                              ScreenNavigation.navigateToCashListScreen(
+                                  context);
+                            },
+                            icon: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFF3345A6),
+                            ))
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ));
   }
 
-  OperationNumberWidget buildOperationNumberWidget() {
+  OperationNumberWidget _buildOperationNumberWidget() {
     return OperationNumberWidget(countNumber: models.models.length);
   }
 
-  Widget buildInOutCashDetails() => InOutCashDetails(models: models);
+  Widget _buildInOutCashDetails() => InOutCashDetails(models: models);
 
   @override
   void initState() {
@@ -184,7 +163,6 @@ class _CashBookScreenState extends State<CashBookScreen>
     if (!mounted) return;
     setState(() {
       models = insertedModels.applyType(TypeFilter.all);
-      //applying default sortFilter as Older
     });
     // });
   }
@@ -200,7 +178,7 @@ class _CashBookScreenState extends State<CashBookScreen>
     });
   }
 
-  Widget buildCard(Widget child) {
+  Widget _buildCard(Widget child) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(2),

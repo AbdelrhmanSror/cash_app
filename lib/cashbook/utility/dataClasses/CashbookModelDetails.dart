@@ -21,6 +21,17 @@ class CashBookModelListDetails {
     print("");
   }
 
+  CashBookModelListDetails applyCash(double? cash) {
+    //by default it retrieves all types from database.
+    if (cash == null) return this;
+    return CashBookModelListDetails(
+        models.where((element) => element.cash.abs() == cash.abs()).toList(),
+        totalCashIn: totalCashIn,
+        totalCashOut: totalCashOut,
+        startDate: startDate,
+        endDate: endDate);
+  }
+
   CashBookModelListDetails applyType(TypeFilter typeFilter) {
     //by default it retrieves all types from database.
     if (typeFilter == TypeFilter.all) return this;

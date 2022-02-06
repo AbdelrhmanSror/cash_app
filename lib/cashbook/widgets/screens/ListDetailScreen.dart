@@ -144,7 +144,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     databaseRepository.deleteCashBook(widget.model);
                     Navigator.pop(context);
                     Navigator.of(context).pop(Utility.createAnimationRoute(
-                         CashListScreen(),
+                         const CashListScreen(),
                         const Offset(0.1, 0.0),
                         Offset.zero,
                         Curves.ease));
