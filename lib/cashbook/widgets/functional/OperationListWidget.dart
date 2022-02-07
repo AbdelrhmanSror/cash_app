@@ -1,7 +1,10 @@
+import 'dart:collection';
+
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
+import 'package:debts_app/cashbook/widgets/functional/ExpandableWidget.dart';
 import 'package:debts_app/cashbook/widgets/partial/AppTextWithDots.dart';
 import 'package:debts_app/cashbook/widgets/partial/CompositeWidget.dart';
 import 'package:flutter/material.dart';
@@ -9,20 +12,19 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 class OperationListWidget extends StatefulWidget {
-  const OperationListWidget(
-      {required this.groupBy,
-      required this.itemComparator,
-      required this.models,
-      this.onItemPressed,
-      this.onDeletePressed,
-      this.onEditPressed,
-      this.onArchivePressed,
-      required this.slideable,
-      Key? key})
+  const OperationListWidget({required this.groupBy,
+    required this.itemComparator,
+    required this.models,
+    this.onItemPressed,
+    this.onDeletePressed,
+    this.onEditPressed,
+    this.onArchivePressed,
+    required this.slideable,
+    Key? key})
       : super(key: key);
   final int Function(CashBookModel element) groupBy;
   final int Function(CashBookModel element1, CashBookModel element2)
-      itemComparator;
+  itemComparator;
 
   //final int Function(int id1, int id2) groupComparator;
   final Function(CashBookModel)? onDeletePressed;
@@ -38,6 +40,11 @@ class OperationListWidget extends StatefulWidget {
 }
 
 class _OperationListWidgetState extends State<OperationListWidget> {
+  //map represent the state of group with id
+  //if true then its expanded
+  //if false then its not
+  HashMap<int, bool> groupExpanded = HashMap();
+
   @override
   Widget build(BuildContext context) {
     return _buildSuggestions();
@@ -104,7 +111,13 @@ class _OperationListWidgetState extends State<OperationListWidget> {
             child: Align(
               alignment: Alignment.center,
               child: RawMaterialButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    //reverse the state of expanded widget with list has id of group id
+                    groupExpanded[element.groupId] =
+                        !groupExpanded.putIfAbsent(element.groupId, () => true);
+                  });
+                },
                 padding: const EdgeInsets.all(8),
                 fillColor: const Color(0xFF3345A6),
                 shape: RoundedRectangleBorder(
@@ -124,81 +137,84 @@ class _OperationListWidgetState extends State<OperationListWidget> {
               borderRadius: BorderRadius.circular(6.0),
             ),
             elevation: 4.0,
-            child: Slidable(
-              enabled: widget.slideable,
+            child: ExpandableWidget(
+              expand: groupExpanded.putIfAbsent(element.groupId, () => true),
+              child: Slidable(
+                enabled: widget.slideable,
 
-              // Specify a key if the Slidable is dismissible.
-              key: ValueKey(element.id),
+                // Specify a key if the Slidable is dismissible.
+                key: ValueKey(element.id),
 
-              // The start action pane is the one at the left or the top side.
-              startActionPane: ActionPane(
-                // A motion is a widget used to control how the pane animates.
-                motion: const ScrollMotion(),
+                // The start action pane is the one at the left or the top side.
+                startActionPane: ActionPane(
+                  // A motion is a widget used to control how the pane animates.
+                  motion: const ScrollMotion(),
 
-                // A pane can dismiss the Slidable.
-                dismissible: DismissiblePane(onDismissed: () {
-                  try {
-                    widget.onDeletePressed!(element);
-                  } on NullThrownError catch (_, e) {}
-                }),
-
-                // All actions are defined in the children parameter.
-                children: [
-                  // A SlidableAction can have an icon and/or a label.
-                  SlidableAction(
-                    onPressed: (_) {
-                      try {
-                        widget.onDeletePressed!(element);
-                      } on NullThrownError catch (_, e) {}
-                    },
-                    backgroundColor: const Color(0xFFFE4A49),
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
-                    label: 'Delete',
-                  ),
-                  SlidableAction(
-                    onPressed: (_) {
-                      try {
-                        widget.onEditPressed!(element);
-                      } on NullThrownError catch (_, e) {}
-                    },
-                    backgroundColor: const Color(0xFF21B7CA),
-                    foregroundColor: Colors.white,
-                    icon: Icons.share,
-                    label: 'Edit',
-                  ),
-                ],
-              ),
-
-              // The end action pane is the one at the right or the bottom side.
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    // An action can be bigger than the others.
-                    flex: 2,
-                    onPressed: (_) {
-                      try {
-                        widget.onArchivePressed!(element);
-                      } on NullThrownError catch (_, e) {}
-                    },
-                    backgroundColor: const Color(0xFF7BC043),
-                    foregroundColor: Colors.white,
-                    icon: Icons.archive,
-                    label: 'Archive',
-                  ),
-                ],
-              ),
-
-              // The child of the Slidable is what the user sees when the
-              // component is not dragged.
-              child: InkWell(
-                  child: OperationTile(model: element),
-                  onTap: () {
+                  // A pane can dismiss the Slidable.
+                  dismissible: DismissiblePane(onDismissed: () {
                     try {
-                      widget.onItemPressed!(element);
+                      widget.onDeletePressed!(element);
                     } on NullThrownError catch (_, e) {}
                   }),
+
+                  // All actions are defined in the children parameter.
+                  children: [
+                    // A SlidableAction can have an icon and/or a label.
+                    SlidableAction(
+                      onPressed: (_) {
+                        try {
+                          widget.onDeletePressed!(element);
+                        } on NullThrownError catch (_, e) {}
+                      },
+                      backgroundColor: const Color(0xFFFE4A49),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'Delete',
+                    ),
+                    SlidableAction(
+                      onPressed: (_) {
+                        try {
+                          widget.onEditPressed!(element);
+                        } on NullThrownError catch (_, e) {}
+                      },
+                      backgroundColor: const Color(0xFF21B7CA),
+                      foregroundColor: Colors.white,
+                      icon: Icons.share,
+                      label: 'Edit',
+                    ),
+                  ],
+                ),
+
+                // The end action pane is the one at the right or the bottom side.
+                endActionPane: ActionPane(
+                  motion: const ScrollMotion(),
+                  children: [
+                    SlidableAction(
+                      // An action can be bigger than the others.
+                      flex: 2,
+                      onPressed: (_) {
+                        try {
+                          widget.onArchivePressed!(element);
+                        } on NullThrownError catch (_, e) {}
+                      },
+                      backgroundColor: const Color(0xFF7BC043),
+                      foregroundColor: Colors.white,
+                      icon: Icons.archive,
+                      label: 'Archive',
+                    ),
+                  ],
+                ),
+
+                // The child of the Slidable is what the user sees when the
+                // component is not dragged.
+                child: InkWell(
+                    child: OperationTile(model: element),
+                    onTap: () {
+                      try {
+                        widget.onItemPressed!(element);
+                      } on NullThrownError catch (_, e) {}
+                    }),
+              ),
             ));
       },
     );
@@ -244,11 +260,11 @@ class OperationTile extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Container(
                       constraints:
-                          const BoxConstraints(maxWidth: 200, minWidth: 1),
+                      const BoxConstraints(maxWidth: 200, minWidth: 1),
                       alignment: Alignment.centerLeft,
                       child: AppTextWithDot(
                         text:
-                            'EGP ${Utility.formatCashNumber(model.cash.abs())}',
+                        'EGP ${Utility.formatCashNumber(model.cash.abs())}',
                         maxLines: 1,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -269,7 +285,7 @@ class OperationTile extends StatelessWidget {
                       ),
                       AppTextWithDot(
                           text:
-                              'EGP ${Utility.formatCashNumber((balance.abs()))}',
+                          'EGP ${Utility.formatCashNumber((balance.abs()))}',
                           style: TextStyle(
                               color: balance < 0
                                   ? const Color(0xFFF56B73)

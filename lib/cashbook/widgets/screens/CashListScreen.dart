@@ -252,6 +252,7 @@ class _CashListScreenState extends State<CashListScreen>
           .applyType(cashType)
           .applySort(_sortType)
           .applyCash(searchedString);
+
       //when grouping item in list
     });
     // });
