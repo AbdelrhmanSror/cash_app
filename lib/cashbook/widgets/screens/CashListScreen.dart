@@ -29,7 +29,7 @@ class _CashListScreenState extends State<CashListScreen>
   int _previousTypeSelectedOptionIndex = 0;
   SortFilter _sortType = SortFilter.latest;
   TextEditingController textController = TextEditingController();
-  double? filterCash;
+  String searchedString = '';
 
   @override
   Widget build(BuildContext context) {
@@ -132,12 +132,7 @@ class _CashListScreenState extends State<CashListScreen>
                         const EdgeInsets.only(left: 8.0, right: 8, bottom: 8),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildTypeFilter(),
-                          ],
-                        ),
+                        _buildTypeFilter(),
                         Expanded(child: _buildOperationListWidget(context)),
                         //buildCashInOutButton(context)
                       ],
@@ -151,7 +146,7 @@ class _CashListScreenState extends State<CashListScreen>
       closeSearchOnSuffixTap: false,
       autoFocus: true,
       width: MediaQuery.of(context).size.width - 110,
-      textInputType: TextInputType.number,
+      textInputType: TextInputType.text,
       textController: textController,
       onSuffixTap: () {
         setState(() {
@@ -238,7 +233,8 @@ class _CashListScreenState extends State<CashListScreen>
     //retrieve all the data in the database to initialize our app
     databaseRepository.retrieveCashBooksForFirstTime();
     textController.addListener(() {
-      filterCash = double.tryParse(textController.text);
+      searchedString = textController.text;
+      //return true if contains
       databaseRepository.retrieveFilteredCashBooks();
     });
   }
@@ -255,7 +251,7 @@ class _CashListScreenState extends State<CashListScreen>
       _modelListDetails = insertedModels
           .applyType(cashType)
           .applySort(_sortType)
-          .applyCash(filterCash);
+          .applyCash(searchedString);
       //when grouping item in list
     });
     // });

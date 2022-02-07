@@ -21,11 +21,22 @@ class CashBookModelListDetails {
     print("");
   }
 
-  CashBookModelListDetails applyCash(double? cash) {
+  CashBookModelListDetails applyCash(String searchedString) {
     //by default it retrieves all types from database.
-    if (cash == null) return this;
-    return CashBookModelListDetails(
-        models.where((element) => element.cash.abs() == cash.abs()).toList(),
+    //if searchedString is number so return all matched cash
+    //if searched string is contained in the description so return all matched
+    if (searchedString.isEmpty) return this;
+    final cash = double.tryParse(searchedString);
+    final List<CashBookModel> results = [];
+    if (cash != null) {
+      results.addAll(
+          models.where((element) => element.cash.abs() == cash.abs()).toList());
+    }
+    results.addAll(models
+        .where((element) => element.description.contains(searchedString))
+        .toList());
+
+    return CashBookModelListDetails(results,
         totalCashIn: totalCashIn,
         totalCashOut: totalCashOut,
         startDate: startDate,

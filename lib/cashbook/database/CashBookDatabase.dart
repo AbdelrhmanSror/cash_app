@@ -258,7 +258,6 @@ class CashBookDatabase extends AppDatabase {
         'SELECT * FROM "$_tableName" $whereClause ORDER BY date(date) ASC ',
         argumentList);
     List<CashBookModel> modelsAfterModel = maps.toCashBookModels();
-    print(modelsAfterModel);
     //we propagate data based on the new fetched operations
     if (modelsAfterModel.isNotEmpty) {
       //delete the cash in and out date from first fetched model because it depends on operation in different  range

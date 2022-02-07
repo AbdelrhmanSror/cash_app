@@ -129,7 +129,7 @@ class SpLineChart extends StatelessWidget {
                           TextSpan(
                               text: (Utility.formatCashNumber(touchedSpot.y)),
                               style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 14,
                                   color: (touchedSpot.y) < 0
                                       ? const Color(0xFFF56B73)
                                       : const Color(0xFF09C7B4),
