@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:debts_app/bottomNavigation.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'cashbook/repositry/DatabaseRepository.dart';
 import 'cashbook/widgets/screens/CashBookScreen.dart';
@@ -7,6 +11,12 @@ import 'cashbook/widgets/screens/CashBookScreen.dart';
 final databaseRepository = DataBaseRepository();
 
 void main() async {
+  if (Platform.isWindows || Platform.isLinux) {
+    // Initialize FFI
+    sqfliteFfiInit();
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
+  }
   runApp(const MainStatelessWidget());
 }
 
@@ -25,7 +35,7 @@ class MainStatelessWidget extends StatelessWidget {
 class MainStatefulWidget extends StatefulWidget {
   const MainStatefulWidget({Key? key}) : super(key: key);
   static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   @override
   State<MainStatefulWidget> createState() {
