@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Constants.dart';
-import 'dataClasses/Cash.dart';
 import 'dataClasses/Date.dart';
 
 class FilterSharedPreferences {
@@ -88,20 +87,6 @@ class FilterSharedPreferences {
         prefs.getString(DATE_START_RANGE) ?? defaultValue.firstDate;
     final endDate = prefs.getString(DATE_END_RANGE) ?? defaultValue.lastDate;
     return Date(startDate, endDate);
-  }
-
-  static Future<void> setCashRangeInPreferences(SharedPreferences prefs, CashRange cashRange) async {
-    final prefs = await SharedPreferences.getInstance();
-    _setFilterState(prefs, false);
-    prefs.setDouble(CASH_START_RANGE, cashRange.first);
-    prefs.setDouble(CASH_END_RANGE, cashRange.last);
-  }
-
-  static Future<CashRange> getCashRangeFromPreferences(CashRange defaultValue) async {
-    final prefs = await SharedPreferences.getInstance();
-    final startCash = prefs.getDouble(CASH_START_RANGE) ?? defaultValue.first;
-    final endCash = prefs.getDouble(CASH_END_RANGE) ?? defaultValue.last;
-    return CashRange(startCash, endCash);
   }
 
   static Future<void> flipArrowState(FilterArrowState filterArrowState) async {

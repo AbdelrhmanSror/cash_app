@@ -5,6 +5,7 @@ import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart
 import 'package:debts_app/cashbook/utility/dataClasses/Date.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../utility/DateUtility.dart';
 import 'AppDatabase.dart';
 import 'models/CashBookModel.dart';
 
@@ -237,9 +238,9 @@ class CashBookDatabase extends AppDatabase {
   }
 
   Future<CashBookModelListDetails> retrieveAll(
-      Date date,
-      /*TypeFilter type,*/
-      CashRange cashRange) async {
+    Date date,
+    /*TypeFilter type,*/
+  ) async {
     final db = await init();
     final argumentList = [];
     String whereClause = 'Where';
@@ -248,12 +249,10 @@ class CashBookDatabase extends AppDatabase {
     String startDate = '';
     String endDate = '';
     whereClause += ' date(date) BETWEEN ? And ? ';
-    argumentList.add(date.firstDate);
-    argumentList.add(date.lastDate);
-    whereClause += ' And cash>=? And cash <=?';
-    argumentList.add(cashRange.first);
-    argumentList.add(cashRange.last);
-
+    argumentList
+        .add(DateUtility.removeTimeFromDate(DateTime.parse(date.firstDate)));
+    argumentList
+        .add(DateUtility.removeTimeFromDate(DateTime.parse(date.lastDate)));
     final List<Map<String, dynamic>> maps = await db.rawQuery(
         'SELECT * FROM "$_tableName" $whereClause ORDER BY date(date) ASC ',
         argumentList);

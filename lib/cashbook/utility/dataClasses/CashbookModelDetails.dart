@@ -1,11 +1,11 @@
-//class that has details of the total cash in and out for the current list of models,
-// also has the start date and end date fro the entire list
-//use this class if you want to know such information because it doesn't matter what is order of the list,
-// the data is the same
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/DateUtility.dart';
 
+//class that has details of the total cash in and out for the current list of models,
+// also has the start date and end date fro the entire list
+//use this class if you want to know such information because it doesn't matter what is order of the list,
+// the data is the same
 class CashBookModelListDetails {
   final List<CashBookModel> models;
   final double totalCashIn;
@@ -17,9 +17,7 @@ class CashBookModelListDetails {
       {this.totalCashIn = 0,
       this.totalCashOut = 0,
       this.startDate = '',
-      this.endDate = ''}) {
-    print("");
-  }
+      this.endDate = ''});
 
   CashBookModelListDetails applyCash(String searchedString) {
     //by default it retrieves all types from database.

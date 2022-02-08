@@ -5,7 +5,6 @@ import 'package:debts_app/cashbook/database/ParentArchiveDatabase.dart';
 import 'package:debts_app/cashbook/database/models/ArchiveModel.dart';
 import 'package:debts_app/cashbook/database/models/CashBookModel.dart';
 import 'package:debts_app/cashbook/utility/Constants.dart';
-import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/FilterSharedPreferences.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Cash.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
@@ -85,19 +84,16 @@ class DataBaseRepository {
     CashRange? defaultCashRange,
   }) async {
     _alertOnCashBookStart(await _retrieveCashBooks(
-      defaultCashRange: defaultCashRange,
       defaultDate: defaultDate,
     ));
   }
 
   Future<CashBookModelListDetails> _retrieveCashBooks({
     Date? defaultDate,
-    CashRange? defaultCashRange,
   }) async {
     final date = defaultDate ?? await getDateFromPreferences();
-    final cashRange = defaultCashRange ?? await getCashRangeFromPreferences();
     CashBookModelListDetails cashBookModelListDetails =
-        await _cashBookDatabase.retrieveAll(date, cashRange);
+        await _cashBookDatabase.retrieveAll(date);
     return cashBookModelListDetails;
   }
 
@@ -139,7 +135,6 @@ class DataBaseRepository {
     CashRange? defaultCashRange,
   }) async {
     _alertOnCashBookChanged(await _retrieveCashBooks(
-      defaultCashRange: defaultCashRange,
       defaultDate: defaultDate,
     ));
   }
@@ -161,10 +156,6 @@ class DataBaseRepository {
     FilterSharedPreferences.setTypesInPreferences(typeFilter);
   }
 
-  Future<void> setCashRangeInPreferences(CashRange cashRange) async {
-    final prefs = await SharedPreferences.getInstance();
-    FilterSharedPreferences.setCashRangeInPreferences(prefs, cashRange);
-  }
 
   Future<void> setDateRangeInPreferences(Date? date) async {
     if (date == null) {
@@ -194,14 +185,8 @@ class DataBaseRepository {
 
   Future<Date> getDateFromPreferences() async {
     final date = await getMinMaxDate();
-    return FilterSharedPreferences.getDateFromPreferences(Date(
-        DateUtility.removeTimeFromDate(DateTime.parse(date.firstDate)),
-        DateUtility.removeTimeFromDate(DateTime.parse(date.lastDate))));
-  }
-
-  Future<CashRange> getCashRangeFromPreferences() async {
-    return FilterSharedPreferences.getCashRangeFromPreferences(
-        await getMinMaxCash());
+    return FilterSharedPreferences.getDateFromPreferences(
+        Date(date.firstDate, date.lastDate));
   }
 
   Future<void> flipArrowState(FilterArrowState filterArrowState) async {

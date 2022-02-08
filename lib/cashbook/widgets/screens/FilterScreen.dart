@@ -4,7 +4,6 @@ import 'package:debts_app/cashbook/utility/Constants.dart';
 import 'package:debts_app/cashbook/utility/DateUtility.dart';
 import 'package:debts_app/cashbook/utility/FilterSharedPreferences.dart';
 import 'package:debts_app/cashbook/utility/Utility.dart';
-import 'package:debts_app/cashbook/utility/dataClasses/Cash.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/CashbookModelDetails.dart';
 import 'package:debts_app/cashbook/utility/dataClasses/Date.dart';
 import 'package:debts_app/cashbook/widgets/functional/ExpandableWidget.dart';
@@ -38,14 +37,9 @@ class _FilterState extends State<FilterScreen>
 
   //variable represents the state of date filter options list arrow
   bool _dateExpanded = true;
-  bool _cashExpanded = true;
   bool _sortExpanded = true;
   bool _typeExpanded = true;
 
-  double _maxCash = 0;
-  double _minCash = 0;
-  double _startPrice = 0;
-  double _endPrice = 0;
 
   //number of retrieved models;
   int _count = 0;
@@ -250,30 +244,7 @@ class _FilterState extends State<FilterScreen>
     );
   }
 
-  Row buildCashTitle() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Cash Range',
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
-        ),
-        IconButton(
-            onPressed: () {
-              setState(() {
-                FilterSharedPreferences.flipArrowState(
-                    FilterArrowState.cashArrow);
 
-                _cashExpanded = !_cashExpanded;
-              });
-            },
-            icon: Icon(_cashExpanded
-                ? Icons.keyboard_arrow_up_rounded
-                : Icons.keyboard_arrow_down_rounded))
-      ],
-    );
-  }
 
   Row buildSortTitle() {
     return Row(
@@ -387,147 +358,6 @@ class _FilterState extends State<FilterScreen>
     );
   }
 
-  Widget buildCashSlider() {
-    return ExpandableWidget(
-      expand: _cashExpanded,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              TextButton(
-                  onPressed: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        final focusNode = FocusNode();
-                        final dialog = AlertDialog(
-                          content: TextField(
-                            focusNode: focusNode,
-                            onSubmitted: (number) async {
-                              /*   Navigator.of(context).pop();
-                              final value = double.parse(number);
-                              if (cashInRange(number) && value <= _endPrice) {
-                                showLoadingBar();
-                                // _startPrice = value;
-                                await databaseRepository
-                                    .setCashRangeInPreferences(
-                                        CashRange(value, _endPrice));
-
-                                databaseRepository.retrieveFilteredCashBooks();
-                              }*/
-                            },
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration.collapsed(
-                                hintText: 'Start Cash',
-                                fillColor: Colors.grey.shade50),
-                          ),
-                        );
-                        Utility.showKeyboard(focusNode, duration: 100);
-                        return dialog;
-                      },
-                    );
-                  },
-                  child: Text('EGP ${_startPrice.toInt()}',
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF3345A6),
-                          fontWeight: FontWeight.normal))),
-              Row(
-                children: [
-                  const Text(
-                    '-',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        final focusNode = FocusNode();
-                        showDialog<bool>(
-                          context: context,
-                          builder: (context) {
-                            final dialog = AlertDialog(
-                              content: TextField(
-                                focusNode: focusNode,
-                                onSubmitted: (number) async {
-                                  /*  Navigator.of(context).pop();
-
-                                  final value = double.parse(number);
-                                  //only if the number is bigger than the least number
-                                  if (cashInRange(number) &&
-                                      value >= _startPrice) {
-                                    showLoadingBar();
-                                    // _endPrice = value;
-                                    await databaseRepository
-                                        .setCashRangeInPreferences(
-                                            CashRange(_startPrice, value));
-                                    databaseRepository
-                                        .retrieveFilteredCashBooks();
-                                  }*/
-                                },
-                                keyboardType: TextInputType.number,
-                                textInputAction: TextInputAction.done,
-                                decoration: InputDecoration.collapsed(
-                                    hintText: 'End Cash',
-                                    fillColor: Colors.grey.shade50),
-                              ),
-                            );
-                            Utility.showKeyboard(focusNode, duration: 100);
-                            return dialog;
-                          },
-                        );
-                      },
-                      child: Text(
-                        'EGP ${_endPrice.toInt()}',
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF3345A6),
-                            fontWeight: FontWeight.normal),
-                      )),
-                ],
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(
-              'Current Range: EGP ${_endPrice.toInt() - _startPrice.toInt()}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.grey.shade100,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-              trackHeight: 1,
-              thumbColor: const Color(0xFF3345A6),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 15.0),
-            ),
-            child: RangeSlider(
-                values:
-                    RangeValues(_startPrice.toDouble(), _endPrice.toDouble()),
-                min: _minCash.toDouble(),
-                max: _maxCash.toDouble(),
-                labels: RangeLabels(
-                  RangeValues(_minCash.toDouble(), _maxCash.toDouble())
-                      .start
-                      .round()
-                      .toString(),
-                  RangeValues(_minCash.toDouble(), _maxCash.toDouble())
-                      .end
-                      .round()
-                      .toString(),
-                ),
-                onChanged: (_) {}),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget buildSortingSelection() {
     return ExpandableWidget(
       expand: _sortExpanded,
@@ -582,10 +412,6 @@ class _FilterState extends State<FilterScreen>
         ],
       ),
     );
-  }
-
-  bool cashInRange(String number) {
-    return double.parse(number) <= _maxCash && double.parse(number) >= _minCash;
   }
 
   Widget buildDateFilterSystem() {
@@ -812,13 +638,9 @@ class _FilterState extends State<FilterScreen>
   }
 
   Future<void> updateFilterUi(CashBookModelListDetails models) async {
-    final startEndCash = await databaseRepository.getMinMaxCash();
     final dateType = await databaseRepository.getDateTypeFromPreferences();
     final date = await databaseRepository.getDateFromPreferences();
-    final cashRange = await databaseRepository.getCashRangeFromPreferences();
     final sortFilter = await databaseRepository.getSortFromPreferences();
-    _minCash = startEndCash.first;
-    _maxCash = startEndCash.last;
     //if all is null then all is either cleared or not yet filtered
     if (await databaseRepository.isFilterCleared()) {
       isCleared = true;
@@ -828,7 +650,6 @@ class _FilterState extends State<FilterScreen>
     }
     updateCount(models);
     updateDateFilter(date, dateType);
-    updateCashFilter(cashRange);
     updateSortFilter(sortFilter);
   }
 
@@ -843,14 +664,8 @@ class _FilterState extends State<FilterScreen>
         await databaseRepository.getArrowState(FilterArrowState.typeArrow);
     _sortExpanded =
         await databaseRepository.getArrowState(FilterArrowState.sortArrow);
-    _cashExpanded =
-        await databaseRepository.getArrowState(FilterArrowState.cashArrow);
   }
 
-  void updateCashFilter(CashRange cashRange) {
-    _startPrice = cashRange.first;
-    _endPrice = cashRange.last;
-  }
 
   void updateSortFilter(SortFilter sortFilter) {
     _sortOptionSelections[previousSortSelectedOptionIndex] = false;
