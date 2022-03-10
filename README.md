@@ -14,35 +14,44 @@ A Flutter project that leverge SQLITE database.
 
 ## Screenshots
 # main screen
-![Main Screen](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
 
 # showing details on graph
-![Main Screen2](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
-![oprations options](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
 
 # Search by Cash
-![cash search](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20cash.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20cash.jpg)
+
 # Search by data mentioned in description
+
 ![description search](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20description%20.jpg)
 
 # inserting data to app
-![cash in insertion](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in.jpg)
-![cash out insertion](https://github.com/AbdelrhmanSror/cash_app/blob/master/CashOut.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/CashOut.jpg)
 
 # showing details of list before being archived
-![arhcive details](https://github.com/AbdelrhmanSror/cash_app/blob/master/ShowinglistToArchive.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/ShowinglistToArchive.jpg)
 
 # filter by cash type
-![cash in filter](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in%20filter.jpg)
-![cash out filter](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20out%20Filter.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in%20filter.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20out%20Filter.jpg)
 
 # showing archive list 
-![arhcive list](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list.jpg)
-![archive list details](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list%20details%20.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list%20details%20.jpg)
 
 # filteration options
-![filter by all](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterbyAll.jpg)
-![filter by all data](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByAll2.jpg)
+
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterbyAll.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByAll2.jpg)
 
 [](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek.jpg)
 [](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek2.jpg)
