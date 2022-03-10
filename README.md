@@ -13,8 +13,8 @@ A Flutter project that leverge SQLITE database.
 
  ## Screenshots
 
-![Screenshot 1](https://github.com/AbdelrhmanSror/cash_app/blob/master/06FB73D0-B7A7-4C97-9B0B-A41E4E5F5BED.jpeg)
-![Screenshot 2](springboot-react-frontend/screenshots/Capture1.JPG)
+![Main Screen ](https://github.com/AbdelrhmanSror/cash_app/blob/master/06FB73D0-B7A7-4C97-9B0B-A41E4E5F5BED.jpeg)
+
 
 
 
