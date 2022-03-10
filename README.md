@@ -12,9 +12,10 @@ A Flutter project that leverge SQLITE database.
 ,type of cash(cash in ,cash out ,all) ,order by cash or date.
 * you can even edit,delete or archive single cash row by swiping.
 
- ## Screenshots
+## Screenshots
 # main screen
-![Main Screen ](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
+![Main Screen](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
+
 # showing details on graph
 ![Main Screen2](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
 ![oprations options](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
