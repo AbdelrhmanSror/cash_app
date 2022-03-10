@@ -10,6 +10,7 @@ A Flutter project that leverge SQLITE database.
 * you can search for a specific cash by cash value or description you previously setuped while registering cash.
 * you can filter cash based on number of criteria you choose either by date (week ,month,year,last week,last month ,last year,custom date)
 ,type of cash(cash in ,cash out ,all) ,order by cash or date.
+* you can even edit,delete or archive single cash row by swiping.
 
  ## Screenshots
 # main screen
@@ -18,40 +19,62 @@ A Flutter project that leverge SQLITE database.
 ![Main Screen2](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
 ![oprations options](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20cash.jpg)
+# Search by Cash
+![cash search](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20cash.jpg)
+# Search by data mentioned in description
+![description search](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20description%20.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20description%20.jpg)
+# inserting data to app
+![cash in insertion](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in.jpg)
+![cash out insertion](https://github.com/AbdelrhmanSror/cash_app/blob/master/CashOut.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterbyAll.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByAll2.jpg)
+# showing details of list before being archived
+![arhcive details](https://github.com/AbdelrhmanSror/cash_app/blob/master/ShowinglistToArchive.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek2.jpg)
+# filter by cash type
+![cash in filter](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20in%20filter.jpg)
+![cash out filter](https://github.com/AbdelrhmanSror/cash_app/blob/master/Cash%20out%20Filter.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByThisYear.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByThisYear2.jpg)
+# showing archive list 
+![arhcive list](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list.jpg)
+![archive list details](https://github.com/AbdelrhmanSror/cash_app/blob/master/Archive%20list%20details%20.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLastMonth.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLastMonth2.jpg)
+# filteration options
+![filter by all](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterbyAll.jpg)
+![filter by all data](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByAll2.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLast30days.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLast30Days2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByWeek2.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom2.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom3.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByThisYear.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByThisYear2.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByOlder.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByOlder2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLastMonth.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLastMonth2.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLatest.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLatest2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLast30days.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLast30Days2.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashHighToLow.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashHighToLow2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCustom3.jpg)
 
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashLowToHigh.jpg)
-(https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashLowToHigh2.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByOlder.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByOlder2.jpg)
+
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLatest.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByLatest2.jpg)
+
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashHighToLow.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashHighToLow2.jpg)
+
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashLowToHigh.jpg)
+[](https://github.com/AbdelrhmanSror/cash_app/blob/master/FilterByCashLowToHigh2.jpg)
+
+# doing fast modification to single item through swiping 
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/SwipeOptions.jpg)
+![](https://github.com/AbdelrhmanSror/cash_app/blob/master/SwipeOptions2.jpg)
+
 
 
 
