@@ -1,16 +1,21 @@
-# debts_app
+# cash_app
 
-A new Flutter project.
+A Flutter project that leverge SQLITE database.
 
 ## Getting Started
+* flutter app that enables you to make cash in or out or even archive a batch of cash.
+* you can display the statitic of your cashes so you quickely know if you lose of save cashe.
+* you can display the the details of a certain cash.
+* you can simply edit cash data if you want.
+* you can search for a specific cash by cash value or description you previously setuped while registering cash.
+* you can filter cash based on number of criteria you choose either by date (week ,month,year,last week,last month ,last year,custom date)
+,type of cash(cash in ,cash out ,all) ,order by cash or date.
 
-This project is a starting point for a Flutter application.
+ ## Screenshots
 
-A few resources to get you started if this is your first Flutter project:
+![Screenshot 1](springboot-react-frontend/screenshots/Capture.JPG)
+![Screenshot 2](springboot-react-frontend/screenshots/Capture1.JPG)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+### ENJOY
