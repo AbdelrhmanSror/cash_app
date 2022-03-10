@@ -14,11 +14,11 @@ A Flutter project that leverge SQLITE database.
 
 ## Screenshots
 # main screen
-[Main Screen](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
+![Main Screen](https://github.com/AbdelrhmanSror/cash_app/blob/master/Main%20screen.jpg)
 
 # showing details on graph
-[Main Screen2](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
-[oprations options](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
+![Main Screen2](https://github.com/AbdelrhmanSror/cash_app/blob/master/graph%20detail.jpg)
+![oprations options](https://github.com/AbdelrhmanSror/cash_app/blob/master/Operation%20options.jpg)
 
 # Search by Cash
 ![cash search](https://github.com/AbdelrhmanSror/cash_app/blob/master/Search%20by%20cash.jpg)
